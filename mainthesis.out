@@ -1,0 +1,36 @@
+\BOOKMARK [0][-]{chapter*.2}{List of Figures}{}% 1
+\BOOKMARK [0][-]{chapter*.2}{List of Abbreviations}{}% 2
+\BOOKMARK [0][-]{chapter.1}{Comparing metagenomic assemblies}{}% 3
+\BOOKMARK [1][-]{section.1.1}{abstract}{chapter.1}% 4
+\BOOKMARK [1][-]{section.1.2}{Introduction}{chapter.1}% 5
+\BOOKMARK [1][-]{section.1.3}{Methods}{chapter.1}% 6
+\BOOKMARK [2][-]{subsection.1.3.1}{Likelihood of an assembly}{section.1.3}% 7
+\BOOKMARK [2][-]{subsection.1.3.2}{Extending LAP to metagenomic assemblies}{section.1.3}% 8
+\BOOKMARK [2][-]{subsection.1.3.3}{Integration into MetAMOS}{section.1.3}% 9
+\BOOKMARK [1][-]{section.1.4}{Results}{chapter.1}% 10
+\BOOKMARK [2][-]{subsection.1.4.1}{Likelihood score maximized using correct abundances}{section.1.4}% 11
+\BOOKMARK [2][-]{subsection.1.4.2}{Impact of errors on synthetic metagenomes}{section.1.4}% 12
+\BOOKMARK [2][-]{subsection.1.4.3}{Likelihood scores correlate with reference-based metrics}{section.1.4}% 13
+\BOOKMARK [2][-]{subsection.1.4.4}{Tuning assembly parameters for MetAMOS}{section.1.4}% 14
+\BOOKMARK [1][-]{section.1.5}{Discussion}{chapter.1}% 15
+\BOOKMARK [1][-]{section.1.6}{Conclusion}{chapter.1}% 16
+\BOOKMARK [0][-]{chapter.2}{Stochastic Four-Wave-Mixing}{}% 17
+\BOOKMARK [1][-]{section.2.1}{Abstract}{chapter.2}% 18
+\BOOKMARK [1][-]{section.2.2}{Introduction}{chapter.2}% 19
+\BOOKMARK [1][-]{section.2.3}{Methods}{chapter.2}% 20
+\BOOKMARK [2][-]{subsection.2.3.1}{Compression strategies}{section.2.3}% 21
+\BOOKMARK [2][-]{subsection.2.3.2}{Data sets}{section.2.3}% 22
+\BOOKMARK [2][-]{subsection.2.3.3}{Performance evaluation}{section.2.3}% 23
+\BOOKMARK [1][-]{section.2.4}{Results}{chapter.2}% 24
+\BOOKMARK [2][-]{subsection.2.4.1}{Compression effectiveness versus information loss}{section.2.4}% 25
+\BOOKMARK [2][-]{subsection.2.4.2}{Effects on sequence read preprocessing}{section.2.4}% 26
+\BOOKMARK [2][-]{subsection.2.4.3}{Effects on genome assembly}{section.2.4}% 27
+\BOOKMARK [2][-]{subsection.2.4.4}{Effects on read mapping}{section.2.4}% 28
+\BOOKMARK [1][-]{section.2.5}{Discussion}{chapter.2}% 29
+\BOOKMARK [2][-]{subsection.2.5.1}{Lossy compression acceptable for subsequent biological analyses}{section.2.5}% 30
+\BOOKMARK [2][-]{subsection.2.5.2}{Extension of 2-bin encoding}{section.2.5}% 31
+\BOOKMARK [2][-]{subsection.2.5.3}{Extension of polynomial regression}{section.2.5}% 32
+\BOOKMARK [2][-]{subsection.2.5.4}{Potential for operations on compressed data}{section.2.5}% 33
+\BOOKMARK [2][-]{subsection.2.5.5}{Future of lossy compression in bioinformatics analyses}{section.2.5}% 34
+\BOOKMARK [1][-]{section.2.6}{Conclusion}{chapter.2}% 35
+\BOOKMARK [0][-]{chapter*.3}{Bibliography}{}% 36

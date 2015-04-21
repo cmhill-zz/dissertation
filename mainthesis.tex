@@ -1,0 +1,110 @@
+% March 2015 (TOC contents linked in red in pdf file)
+%This template was prepared by Dorothea F. Brosius of the 
+%Institute for Electronics and Applied Physics, University of Maryland, College Park, MD
+%The template was last updated in March 2015
+%Thesis Main Page used with thesis.sty based on the
+%University of Maryland Electronic Thesis and Dissertation (ETD) Style Guide
+
+%The YourInformation file was created by Freja Nordsiek, 2014.
+%Code for linking the TOC titles to the text in the pdf file was created by Freja Nordsiek, 2014.
+
+
+% Select the version that fits how you are making this LaTeX document (its driver).
+% The first two are the most likely ones to be needed.
+%
+\newcommand{\mydriver}{pdftex} %Making a PDF directly using pdflatex.
+%\newcommand{\mydriver}{dvipdfmx} %Making a DVI and converting that to PDF using dvipdfmx.
+% \newcommand{\mydriver}{dvipdfm} %Making a DVI and converting that to PDF using dvipdfm.
+% \newcommand{\mydriver}{dvips} %Making a DVI and converting that to PS using dvips (may later be converted to PDF).  (Used with my pc)
+% \newcommand{\mydriver}{dvipsone} %Making a DVI and converting that to PS using dvipsone (may later be converted to PDF).
+% \newcommand{\mydriver}{ps2pdf} %Same as the one for dvips except it is compatible with Ghostscript's PDF writer.
+
+
+\documentclass[12pt,\mydriver]{thesis}  %12pt is larger than 11pt
+
+\usepackage{titlesec}
+   \titleformat{\chapter}
+      {\normalfont\large}{Chapter \thechapter:}{1em}{}
+
+\usepackage{hyperref} 
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{lscape}
+\usepackage{indentfirst}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{tabls}
+\usepackage{wrapfig}
+\usepackage{slashbox}
+\usepackage{longtable}
+\usepackage{supertabular}
+%\usepackage{subeqn}
+\usepackage{subfigure}
+\usepackage[cmex10]{amsmath}
+
+\newcommand{\tbsp}{\rule{0pt}{18pt}} %used to get a vertical distance after \hline
+\renewcommand{\baselinestretch}{2}
+\setlength{\textwidth}{5.9in}
+\setlength{\textheight}{9in}
+\setlength{\topmargin}{-.50in}
+%\setlength{\topmargin}{0in}    %use this setting if the printer makes the the top margin 1/2 inch instead of 1 inch
+\setlength{\oddsidemargin}{.55in}
+\setlength{\parindent}{.4in}
+\pagestyle{empty}
+
+\begin{document}
+
+\include{Abstract} %(must be first, required, non-numbered)
+\include{Titlepage} %(must follow Abstract, required, non-numbered)
+\include{Copyright} %(highly recommended, non-numbered)
+
+%Pages from this point start at lower-case Roman number ii)
+\pagestyle{plain}
+\pagenumbering{roman}
+\setcounter{page}{2}
+
+\include{Preface}  %(if present, start at lower-case Roman number ii)
+\include{Foreword} %(if present, lower-case Roman)
+\include{Dedication} %(if present, lower-case Roman)
+\include{Acknowledgements} %(if present, lower-case Roman)
+
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\tableofcontents %(required, lower-case Roman)
+\newpage
+%\listoftables %(if present, lower-case Roman)
+%\newpage
+\listoffigures %(if present, lower-case Roman)
+\newpage
+% LIST OF ABBREVIATIONS
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\include{Abbreviations}
+
+\newpage
+\setlength{\parskip}{0em}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+%Pages from this point start at Arabic numeral 1
+\setcounter{page}{1}
+\pagenumbering{arabic}
+%\include{Chapter1}
+\include{Chapter2}
+\include{Chapter3}
+%\include{supertabular}
+\titleformat{\chapter}
+      {\normalfont\large}{Appendix \thechapter:}{1em}{}
+%\include{AppendixA}
+%\include{AppendixB}
+
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+%\include{Bibliography}
+%When using Bibtex, delete the previous line and use the following
+%three lines.  
+\newpage
+\bibliographystyle{unsrt} 
+\bibliography{Chapter2,Chapter3} %replace "Galactic,Dottie" with the
+%                 file name(s) of your bib file(s)
+
+\end{document}

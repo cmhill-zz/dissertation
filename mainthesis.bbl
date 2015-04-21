@@ -1,0 +1,363 @@
+\begin{thebibliography}{10}
+
+\bibitem{myers1995}
+EW~Myers.
+\newblock Toward simplifying and accurately formulating fragment assembly.
+\newblock {\em J. Comp. Biol.}, 2:275--90, 1995.
+
+\bibitem{medvedev2007computability}
+Paul Medvedev, Konstantinos Georgiou, Gene Myers, and Michael Brudno.
+\newblock Computability of models for sequence assembly.
+\newblock In {\em Algorithms in Bioinformatics}, pages 289--301. Springer,
+  2007.
+
+\bibitem{ABySS}
+J.T. Simpson, K.~Wong, S.~D. Jackman, J.~E. Schein, S.~J.~M. Jones, and
+  .I~Birol.
+\newblock Abyss: a parallel assembler for short read sequence data.
+\newblock {\em Genome Res.}, 19(6):1117--1123, 2009.
+
+\bibitem{SOAPdenovo}
+R~Li, H~Zhu, J~Ruan, W~Qian, X~Fang, Z~Shi, Y~Li, S~Li, G~Shan, and et~al.
+  Kristiansen, K.
+\newblock De novo assembly of human genomes with massively parallel short read
+  sequencing.
+\newblock {\em Bioinformatics}, 20(2):265--272, 2010.
+
+\bibitem{Velvet}
+D.~R. Zerbino and E.~Birney.
+\newblock Velvet: algorithms for de novo short read assembly using de bruijn
+  graphs.
+\newblock {\em Genome Res.}, 18:821--829, 2008.
+
+\bibitem{salzberg2005misassemblies}
+S.~L. Salzberg and J.A. Yorke.
+\newblock Beware of mis-assembled genomes.
+\newblock {\em Bioinformatics}, 21(24):4320--4321, 2005.
+
+\bibitem{nagarajan2010finishing}
+N.~Nagarajan, C.~Cook, M.P. Di~Bonaventura, H.~Ge, A.~Richards,
+  K.~Bishop-Lilly, R.~DeSalle, T.~Read, and M.~Pop.
+\newblock Finishing genomes with limited resources: lessons from an ensemble of
+  microbial genomes.
+\newblock {\em BMC genomics}, 11(1):242, 2010.
+
+\bibitem{chin2013nonhybrid}
+Chen-Shan Chin, David~H Alexander, Patrick Marks, Aaron~A Klammer, James Drake,
+  Cheryl Heiner, Alicia Clum, Alex Copeland, John Huddleston, Evan~E Eichler,
+  et~al.
+\newblock Nonhybrid, finished microbial genome assemblies from long-read smrt
+  sequencing data.
+\newblock {\em Nature methods}, 2013.
+
+\bibitem{koren2013reducing}
+Sergey Koren, Gregory~P Harhay, Timothy~PL Smith, James~L Bono, Dayna~M Harhay,
+  D~Scott Mcvey, Diana Radune, Nicholas~H Bergman, and Adam~M Phillippy.
+\newblock Reducing assembly complexity of microbial genomes with
+  single-molecule sequencing.
+\newblock {\em arXiv preprint arXiv:1304.3752}, 2013.
+
+\bibitem{ribeiro2012finished}
+Filipe~J Ribeiro, Dariusz Przybylski, Shuangye Yin, Ted Sharpe, Sante Gnerre,
+  Amr Abouelleil, Aaron~M Berlin, Anna Montmayeur, Terrance~P Shea, Bruce~J
+  Walker, et~al.
+\newblock Finished bacterial genomes from shotgun sequence data.
+\newblock {\em Genome research}, 22(11):2270--2277, 2012.
+
+\bibitem{rusch2007sorcerer}
+Douglas~B Rusch, Aaron~L Halpern, Granger Sutton, Karla~B Heidelberg, Shannon
+  Williamson, Shibu Yooseph, Dongying Wu, Jonathan~A Eisen, Jeff~M Hoffman,
+  Karin Remington, et~al.
+\newblock The sorcerer ii global ocean sampling expedition: northwest atlantic
+  through eastern tropical pacific.
+\newblock {\em PLoS biology}, 5(3):e77, 2007.
+
+\bibitem{wu2011stalking}
+Dongying Wu, Martin Wu, Aaron Halpern, Douglas~B Rusch, Shibu Yooseph, Marvin
+  Frazier, J~Craig Venter, and Jonathan~A Eisen.
+\newblock Stalking the fourth domain in metagenomic data: searching for,
+  discovering, and interpreting novel, deep branches in marker gene
+  phylogenetic trees.
+\newblock {\em PLoS One}, 6(3):e18011, 2011.
+
+\bibitem{yooseph2007sorcerer}
+Shibu Yooseph, Granger Sutton, Douglas~B Rusch, Aaron~L Halpern, Shannon~J
+  Williamson, Karin Remington, Jonathan~A Eisen, Karla~B Heidelberg, Gerard
+  Manning, Weizhong Li, et~al.
+\newblock The sorcerer ii global ocean sampling expedition: expanding the
+  universe of protein families.
+\newblock {\em PLoS biology}, 5(3):e16, 2007.
+
+\bibitem{varin2012metagenomic}
+Thibault Varin, Connie Lovejoy, Anne~D Jungblut, Warwick~F Vincent, and Jacques
+  Corbeil.
+\newblock Metagenomic analysis of stress genes in microbial mat communities
+  from antarctica and the high arctic.
+\newblock {\em Applied and environmental microbiology}, 78(2):549--559, 2012.
+
+\bibitem{he2013comparative}
+Shaomei He, Natalia Ivanova, Edward Kirton, Martin Allgaier, Claudia Bergin,
+  Rudolf~H Scheffrahn, Nikos~C Kyrpides, Falk Warnecke, Susannah~G Tringe, and
+  Philip Hugenholtz.
+\newblock Comparative metagenomic and metatranscriptomic analysis of hindgut
+  paunch microbiota in wood-and dung-feeding higher termites.
+\newblock {\em PloS one}, 8(4):e61126, 2013.
+
+\bibitem{gill2006metagenomic}
+Steven~R Gill, Mihai Pop, Robert~T DeBoy, Paul~B Eckburg, Peter~J Turnbaugh,
+  Buck~S Samuel, Jeffrey~I Gordon, David~A Relman, Claire~M Fraser-Liggett, and
+  Karen~E Nelson.
+\newblock Metagenomic analysis of the human distal gut microbiome.
+\newblock {\em science}, 312(5778):1355--1359, 2006.
+
+\bibitem{peterson2009nih}
+Jane Peterson, Susan Garges, Maria Giovanni, Pamela McInnes, Lu~Wang, Jeffery~A
+  Schloss, Vivien Bonazzi, Jean~E McEwen, Kris~A Wetterstrand, Carolyn Deal,
+  et~al.
+\newblock The nih human microbiome project.
+\newblock {\em Genome research}, 19(12):2317--2323, 2009.
+
+\bibitem{peng2011meta}
+Yu~Peng, Henry~CM Leung, Siu-Ming Yiu, and Francis~YL Chin.
+\newblock Meta-idba: a de novo assembler for metagenomic data.
+\newblock {\em Bioinformatics}, 27(13):i94--i101, 2011.
+
+\bibitem{namiki2012metavelvet}
+Toshiaki Namiki, Tsuyoshi Hachiya, Hideaki Tanaka, and Yasubumi Sakakibara.
+\newblock Metavelvet: an extension of velvet assembler to de novo metagenome
+  assembly from short sequence reads.
+\newblock {\em Nucleic acids research}, 40(20):e155--e155, 2012.
+
+\bibitem{boisvert2012ray}
+S{\'e}bastien Boisvert, Fr{\'e}d{\'e}ric Raymond, {\'E}l{\'e}nie Godzaridis,
+  Fran{\c{c}}ois Laviolette, Jacques Corbeil, et~al.
+\newblock Ray meta: scalable de novo metagenome assembly and profiling.
+\newblock {\em Genome biology}, 13(12):R122, 2012.
+
+\bibitem{salzberg2011gage}
+S.L. Salzberg, A.M. Phillippy, A.~Zimin, D.~Puiu, T.~Magoc, S.~Koren, T.J.
+  Treangen, M.C. Schatz, A.L. Delcher, M.~Roberts, et~al.
+\newblock Gage: A critical evaluation of genome assemblies and assembly
+  algorithms.
+\newblock {\em Genome Research}, 2011.
+
+\bibitem{earl2011assemblathon}
+D.~Earl, K.~Bradnam, J.S. John, A.~Darling, D.~Lin, J.~Fass, H.O.K. Yu,
+  V.~Buffalo, D.R. Zerbino, M.~Diekhans, et~al.
+\newblock Assemblathon 1: A competitive assessment of de novo short read
+  assembly methods.
+\newblock {\em Genome research}, 21(12):2224--2241, 2011.
+
+\bibitem{bradnam2013assemblathon}
+Keith~R Bradnam, Joseph~N Fass, Anton Alexandrov, Paul Baranay, Michael
+  Bechner, {\.I}nan{\c{c}} Birol, S{\'e}bastien Boisvert10, Jarrod~A Chapman,
+  Guillaume Chapuis, Rayan Chikhi, et~al.
+\newblock Assemblathon 2: evaluating de novo methods of genome assembly in
+  three vertebrate species.
+\newblock {\em arXiv preprint arXiv:1301.5406}, 2013.
+
+\bibitem{clark2013ale}
+Scott Clark, Rob Egan, Peter~I Frazier, and Zhong Wang.
+\newblock Ale: a generic assembly likelihood evaluation framework for assessing
+  the accuracy of genome and metagenome assemblies.
+\newblock {\em Bioinformatics}, 2013.
+
+\bibitem{rahman2013cgal}
+Atif Rahman and Lior Pachter.
+\newblock Cgal: computing genome assembly likelihoods.
+\newblock {\em Genome Biology}, 14(1):R8, 2013.
+
+\bibitem{LAP}
+M.~Ghodsi, Hill C.M., I.~Astrovskaya, H.~Lin, Sommer D., Koren S., and M.~Pop.
+\newblock De novo genome assembly evaluation.
+\newblock In press.
+
+\bibitem{angly2006marine}
+Florent~E Angly, Ben Felts, Mya Breitbart, Peter Salamon, Robert~A Edwards,
+  Craig Carlson, Amy~M Chan, Matthew Haynes, Scott Kelley, Hong Liu, et~al.
+\newblock The marine viromes of four oceanic regions.
+\newblock {\em PLoS biology}, 4(11):e368, 2006.
+
+\bibitem{dinsdale2008functional}
+Elizabeth~A Dinsdale, Robert~A Edwards, Dana Hall, Florent Angly, Mya
+  Breitbart, Jennifer~M Brulc, Mike Furlan, Christelle Desnues, Matthew Haynes,
+  Linlin Li, et~al.
+\newblock Functional metagenomic profiling of nine biomes.
+\newblock {\em Nature}, 452(7187):629--632, 2008.
+
+\bibitem{carrigg2007dna}
+Cora Carrigg, Olivia Rice, Siobh{\'a}n Kavanagh, Gavin Collins, and Vincent
+  O’Flaherty.
+\newblock Dna extraction method affects microbial community profiles from soils
+  and sediment.
+\newblock {\em Applied microbiology and biotechnology}, 77(4):955--964, 2007.
+
+\bibitem{krsek1999comparison}
+M~Krsek and EMH Wellington.
+\newblock Comparison of different methods for the isolation and purification of
+  total community dna from soil.
+\newblock {\em Journal of Microbiological Methods}, 39(1):1--16, 1999.
+
+\bibitem{morgan2010metagenomic}
+Jenna~L Morgan, Aaron~E Darling, and Jonathan~A Eisen.
+\newblock Metagenomic sequencing of an in vitro-simulated microbial community.
+\newblock {\em PLoS One}, 5(4):e10209, 2010.
+
+\bibitem{temperton2009bias}
+Ben Temperton, Dawn Field, Anna Oliver, Bela Tiwari, Martin M{\"u}hling, Ian
+  Joint, and Jack~A Gilbert.
+\newblock Bias in assessments of marine microbial biodiversity in fosmid
+  libraries as evaluated by pyrosequencing.
+\newblock {\em The ISME journal}, 3(7):792--796, 2009.
+
+\bibitem{treangen2013metamos}
+Todd~J Treangen, Sergey Koren, Daniel~D Sommer, Bo~Liu, Irina Astrovskaya,
+  Brian Ondov, Aaron~E Darling, Adam~M Phillippy, and Mihai Pop.
+\newblock Metamos: a modular and open source metagenomic assembly and analysis
+  pipeline.
+\newblock {\em Genome biology}, 14(1):R2, 2013.
+
+\bibitem{langmead2012fast}
+Ben Langmead and Steven~L Salzberg.
+\newblock Fast gapped-read alignment with bowtie 2.
+\newblock {\em Nature methods}, 9(4):357--359, 2012.
+
+\bibitem{mitreva2012structure}
+Makedonka Mitreva et~al.
+\newblock Structure, function and diversity of the healthy human microbiome.
+\newblock {\em Nature}, 486:207--214, 2012.
+
+\bibitem{methe2012framework}
+Barbara~A Meth{\'e}, Karen~E Nelson, Mihai Pop, Heather~H Creasy, Michelle~G
+  Giglio, Curtis Huttenhower, Dirk Gevers, Joseph~F Petrosino, Sahar Abubucker,
+  Jonathan~H Badger, et~al.
+\newblock A framework for human microbiome research.
+\newblock {\em Nature}, 486(7402):215--221, 2012.
+
+\bibitem{phillippy2008genome}
+A.M. Phillippy, M.C. Schatz, and M.~Pop.
+\newblock Genome assembly forensics: finding the elusive mis-assembly.
+\newblock {\em Genome Biology}, 9(3):R55, 2008.
+
+\bibitem{delcher2003using}
+Arthur~L Delcher, Steven~L Salzberg, and Adam~M Phillippy.
+\newblock Using mummer to identify similar regions in large sequence sets.
+\newblock {\em Current Protocols in Bioinformatics}, pages 10--3, 2003.
+
+\bibitem{chikhi2013informed}
+Rayan Chikhi and Paul Medvedev.
+\newblock Informed and automated k-mer size selection for genome assembly.
+\newblock {\em arXiv preprint arXiv:1304.5665}, 2013.
+
+\bibitem{Cock:2010ve}
+PJA Cock, CJ~Fields, N~Goto, ML~Heuer, and PM~Rice.
+\newblock The {S}anger {FASTQ} file format for sequences with quality scores,
+  and the {Solexa/Illumina FASTQ} variants.
+\newblock {\em Nucleic Acids Res}, 38(6):1767--71, Apr 2010.
+
+\bibitem{Ewing:1998ly}
+B~Ewing and P~Green.
+\newblock Base-calling of automated sequencer traces using {P}hred. {II}.
+  {E}rror probabilities.
+\newblock {\em Genome Res}, 8(3):186--94, Mar 1998.
+
+\bibitem{Langmead:2012rw}
+Ben Langmead and Steven~L Salzberg.
+\newblock Fast gapped-read alignment with bowtie 2.
+\newblock {\em Nat Methods}, 9(4):357--9, Apr 2012.
+
+\bibitem{Minoche:2011km}
+AE~Minoche, JC~Dohm, and H~Himmelbauer.
+\newblock Evaluation of genomic high-throughput sequencing data generated on
+  {Illumina HiSeq} and {Genome Analyzer} systems.
+\newblock {\em Genome Biol}, 12(11):R112, 2011.
+
+\bibitem{Canovas:2014fr}
+Rodrigo C{\'a}novas, Alistair Moffat, and Andrew Turpin.
+\newblock Lossy compression of quality scores in genomic data.
+\newblock {\em Bioinformatics}, 30(15):2130--6, Aug 2014.
+
+\bibitem{janin2013adaptive}
+Lilian Janin, Giovanna Rosone, and Anthony~J Cox.
+\newblock Adaptive reference-free compression of sequence quality scores.
+\newblock {\em Bioinformatics}, page btt257, 2013.
+
+\bibitem{mcgill1978variations}
+Robert McGill, John~W Tukey, and Wayne~A Larsen.
+\newblock Variations of box plots.
+\newblock {\em The American Statistician}, 32(1):12--16, 1978.
+
+\bibitem{Wan:2012kq}
+Raymond Wan, Vo~Ngoc Anh, and Kiyoshi Asai.
+\newblock Transformations for the compression of {FASTQ} quality scores of
+  next-generation sequencing data.
+\newblock {\em Bioinformatics}, 28(5):628--35, Mar 2012.
+
+\bibitem{Ochoa:2013rt}
+Idoia Ochoa, Himanshu Asnani, Dinesh Bharadia, Mainak Chowdhury, Tsachy
+  Weissman, and Golan Yona.
+\newblock {QualComp}: a new lossy compressor for quality scores based on rate
+  distortion theory.
+\newblock {\em BMC Bioinformatics}, 14:187, 2013.
+
+\bibitem{macqueen1967some}
+James MacQueen et~al.
+\newblock Some methods for classification and analysis of multivariate
+  observations.
+\newblock In {\em Proceedings of the fifth Berkeley symposium on mathematical
+  statistics and probability}, volume~1, pages 281--297. Oakland, CA, USA.,
+  1967.
+
+\bibitem{hartigan1979algorithm}
+John~A Hartigan and Manchek~A Wong.
+\newblock Algorithm as 136: A k-means clustering algorithm.
+\newblock {\em Applied statistics}, pages 100--108, 1979.
+
+\bibitem{Salzberg:2012rc}
+SL~Salzberg, AM~Phillippy, A~Zimin, D~Puiu, T~Magoc, S~Koren, TJ~Treangen,
+  MC~Schatz, AL~Delcher, M~Roberts, G~Mar{\c c}ais, M~Pop, and JA~Yorke.
+\newblock {GAGE}: A critical evaluation of genome assemblies and assembly
+  algorithms.
+\newblock {\em Genome Res}, 22(3):557--67, Mar 2012.
+
+\bibitem{sickle}
+Joshi NA and Fass JN.
+\newblock Sickle: A sliding-window, adaptive, quality-based trimming tool for
+  {FastQ} files (version 1.33), 2013.
+
+\bibitem{Ghodsi:2013hb}
+M~Ghodsi, CM~Hill, I~Astrovskaya, H~Lin, DD~Sommer, S~Koren, and M~Pop.
+\newblock De novo likelihood-based measures for comparing genome assemblies.
+\newblock {\em BMC Res Notes}, 6:334, 2013.
+
+\bibitem{Gnerre:2011kx}
+S~Gnerre, I~MacCallum, D~Przybylski, FJ~Ribeiro, JN~Burton, BJ~Walker,
+  T~Sharpe, G~Hall, TP~Shea, S~Sykes, AM~Berlin, D~Aird, M~Costello, R~Daza,
+  L~Williams, R~Nicol, A~Gnirke, C~Nusbaum, ES~Lander, and DB~Jaffe.
+\newblock High-quality draft assemblies of mammalian genomes from massively
+  parallel sequence data.
+\newblock {\em Proc Natl Acad Sci USA}, 108:1513--1518, 2011.
+
+\bibitem{Kozanitis:2011kl}
+Christos Kozanitis, Chris Saunders, Semyon Kruglyak, Vineet Bafna, and George
+  Varghese.
+\newblock Compressing genomic sequence fragments using {SlimGene}.
+\newblock {\em J Comput Biol}, 18(3):401--13, Mar 2011.
+
+\bibitem{Ferrarini:2013vf}
+Marco Ferrarini, Marco Moretto, Judson~A Ward, Nada {\v S}urbanovski, Vladimir
+  Stevanovi{\'c}, Lara Giongo, Roberto Viola, Duccio Cavalieri, Riccardo
+  Velasco, Alessandro Cestaro, and Daniel~J Sargent.
+\newblock An evaluation of the {PacBio RS} platform for sequencing and de novo
+  assembly of a chloroplast genome.
+\newblock {\em BMC Genomics}, 14:670, 2013.
+
+\bibitem{Koren:2013ye}
+Sergey Koren, Gregory~P Harhay, Timothy P~L Smith, James~L Bono, Dayna~M
+  Harhay, Scott~D Mcvey, Diana Radune, Nicholas~H Bergman, and Adam~M
+  Phillippy.
+\newblock Reducing assembly complexity of microbial genomes with
+  single-molecule sequencing.
+\newblock {\em Genome Biol}, 14(9):R101, 2013.
+
+\end{thebibliography}

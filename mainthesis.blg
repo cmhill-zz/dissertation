@@ -1,0 +1,63 @@
+This is BibTeX, Version 0.99d (TeX Live 2013)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: mainthesis.aux
+A level-1 auxiliary file: Abstract.aux
+A level-1 auxiliary file: Titlepage.aux
+A level-1 auxiliary file: Copyright.aux
+A level-1 auxiliary file: Preface.aux
+A level-1 auxiliary file: Foreword.aux
+A level-1 auxiliary file: Dedication.aux
+A level-1 auxiliary file: Acknowledgements.aux
+A level-1 auxiliary file: Abbreviations.aux
+A level-1 auxiliary file: Chapter2.aux
+A level-1 auxiliary file: Chapter3.aux
+The style file: unsrt.bst
+Database file #1: Chapter2.bib
+Database file #2: Chapter3.bib
+Warning--entry type for "sickle" isn't style-file defined
+--line 40 of file Chapter3.bib
+Warning--I didn't find a database entry for "["
+Warning--empty journal in LAP
+Warning--can't use both volume and number fields in macqueen1967some
+You've used 57 entries,
+            1791 wiz_defined-function locations,
+            797 strings with 16607 characters,
+and the built_in function-call counts, 15892 in all, are:
+= -- 1196
+> -- 1202
+< -- 6
++ -- 420
+- -- 363
+* -- 1399
+:= -- 2735
+add.period$ -- 172
+call.type$ -- 57
+change.case$ -- 57
+chr.to.int$ -- 0
+cite$ -- 59
+duplicate$ -- 556
+empty$ -- 1268
+format.name$ -- 363
+if$ -- 3319
+int.to.chr$ -- 0
+int.to.str$ -- 57
+missing$ -- 56
+newline$ -- 287
+num.names$ -- 57
+pop$ -- 94
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 244
+stack$ -- 0
+substring$ -- 994
+swap$ -- 106
+text.length$ -- 6
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 136
+width$ -- 59
+write$ -- 621
+(There were 4 warnings)
