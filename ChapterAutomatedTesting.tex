@@ -1,0 +1,598 @@
+\section{Introduction}
+
+The issues with testing ``non-testable programs'' were first raised by Davis
+and Weyuker in a 1981 paper \cite{Davis:1981:PNP:800175.809889}. An important
+characteristic of such programs is the absence of a {\it test oracle}, the
+mechanism that determines whether a software under test (SUT) executed
+correctly for a test case.  Without a test oracle, a test case has no way to
+{\it pass} or {\it fail}. This calls into question the overall purpose and
+value of software testing.
+
+Although there has been work in the area of testing such non-testable programs
+\cite{McMinn:2009:SFD:1569901.1570127,Murphy:2010:MTT:1970820,Murphy:2009:AST:1572272.1572295,Yoo:2010:MTS:1799526.1799581,Chan:2010:FFP:1815297.1815298,Chen:2002:SIM:566172.566202,Lazic:2005:AMS:1983314.1983364,Just:2010:AST:1808266.1808280,Just:2011:AUI:2036458.2036488},
+in practice this problem continues to be a significant hurdle for test
+automation in many scientific domains, where it is either very expensive or
+impossible to determine the correct answer for a scientific problem
+\cite{Hook:2009:TTS:1556904.1556936} (e.g., validating machine learning
+classifiers \cite{Xie:2011:TVM:1942318.1942371}, analyses of feature models
+\cite{Segura:2011:AMT:1937186.1937327}) or computation (e.g., processing large
+XML files \cite{Kim-Park:2010:ATO:1868048.1868050}.  image segmentation
+\cite{Frounchi:2011:AIS:2038078.2038454}, mesh simplification
+\cite{chan2009pat}).  This is especially problematic for the
+domain of bioinformatics, a largely software-intensive field. Bugs in
+bioinformatics software have the potential to lead to incorrect scientific
+conclusions.  As observed by Chen et al.  \cite{BMC}, ``{\it incorrectly
+computed results may lead to wrong biological conclusion, and ...
+misguide downstream experiments}.''
+
+Consider the classic problem in bioinformatics -- {\it de novo genome sequence assembly}.  The
+{\it genome sequence} of an organism is important for understanding its life
+cycle and evolution.  Current sequencing technology is only able to produce
+{\it reads} (sequenced fragments) that are drastically shorter than the genome.
+Therefore, in order to carry out meaningful biological analyses, one must first
+{\it assemble} the original genome using {\it assemblers}.  The result of the
+assembly is one or more {\it contigs} (contiguous sequence fragments) that can
+be ordered and oriented into {\it scaffolds} with {\it gaps} (unknown parts in
+the sequence).  Current formulations of the genome assembly problem are
+optimization problems on graphs, which are known to be NP-hard
+\cite{medvedev2007computability}.  In practice, assemblers are only able to
+return an approximate solution.
+
+Because of the nature of the domain, it is very difficult to validate the
+correctness ({\it quality} \cite{monya2012}) of an assembly -- the
+correct/expected solution is not known.  In software testing terms, the {\it
+test oracle} is unavailable.
+Moreover, when researchers develop a new
+assembler, they often run it on a new data set, making comparisons difficult.
+Monya \cite{monya2012} notes that the bioinformatics community needs to find
+``{\it ways to assess and improve assemblers in general.}''
+
+Hence, the community faces the following scenario: {\it iteratively improve
+the assember}, ensuring at each step that the assembly did indeed improve, and
+that no new bugs that might degrade the assembler's output were introduced.
+This puts us in the realm of {\it regression testing}.  One way to determine
+whether bugs have not degraded a software's output is by using what we call a
+{\it diff}-based approach, i.e., running test cases on the old and new versions
+of the code and identifying differences in the tests' outcome
+\cite{Orso:2008:BBR:1401827.1401835}.  Thus, regression testing employed by
+assemblers may compare the text output of an assembler on test data sets with
+previously computed assemblies to determine if the code changes produced a
+different assembly.  Comparing the raw text outputs of an assembler is not
+robust enough to capture whether there were actual differences in the quality
+of assembly. Multiple assemblies of the same set of \emph{reads} are acceptable as correct. Reordering the reads may produce different
+assemblies that have the same overall quality, but contain trivial differences,
+such as the assembly starting a different position in circular bacteria genome (Fig. \ref{fig:circular_genome}).
+%Reads and assemblies are stored in the FASTA format, where each entry consists of a single line descriptor starting with \verb|>| symbol, followed by the biological sequence.
+
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+%\includegraphics[width=4in]{preprocessing_results.pdf}
+\begin{verbatim}
+>sample circular sequence
+AGCATCTTTATTGGAGATGTGCCACAGCACATTG
+\end{verbatim}
+  %\end{minipage} GCTTTGGTGGGTTTACATTTAAAAGAACAAGCGGGT
+  %\begin{minipage}{.2\linewidth}
+\begin{center}
+\line(1,0){200}
+\end{center}
+\begin{verbatim}
+>sample circular sequence rotated 1 char
+GAGCATCTTTATTGGAGATGTGCCACAGCACATT
+\end{verbatim}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[FASTA file containing two entries that represent the same circular sequence.]{FASTA file containing two entries that represent the same circular sequence. Each entry consists of a single line descriptor starting with the $>$ symbol, followed by the biological sequence. Text comparison tools would detect that these two sequences are different.}
+\label{fig:circular_genome}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+\iffalse
+To illustrate the inadequacy of previous assembly regression testing, we use two assemblers, SOAPdenovo \cite{li2010novo} and Minimus of the AMOS package \cite{sommer2007minimus}.
+We run SOAPdenovo and Minimus on the \emph{Rhodobacter sphaeroides} fragment library (1,408,188 reads of length 101 bp) using the original reads, along with a shuffled version of the original reads and perform the unix command \textbf{diff} on the output.
+Since SOAPdenovo allows the use of multiple threads, we run the assembler using one and eight threads.
+Both assemblers produce different assemblies depending on whether they use the original or shuffled reads (Table \ref{Tab:01}).
+By doing a \textbf{diff} of the text outputs we are unable to determine if there is a non-trivial change in assembly quality.
+
+
+%AMOS is a set of open-source whole genome assembly tools \cite{sommer2007minimus}.  Developers at different institutions are involved in the development of AMOS.  Whenever a developer makes a change to the code, it is tested on the developer’s local hardware, ensuring that the code changes do not produce different assemblies.
+\begin{table}[h]
+%\processtable{Using rhodobacter ALLPATHS-LG corrected fragment library.}
+%{\tiny
+\caption{For Minimus and SOAPdenovo, we check if assemblies produced from the original and shuffled reads are the same by doing a \textbf{diff} of the resulting assembly text files.  In addition, we also find that the assemblies produced using different number of threads differ in SOAPdenovo.  Assemblers used rhodobacter ALLPATHS-LG corrected fragment library. 1408188 reads.}
+\label{Tab:01}
+\begin{tabular}{r|cc}
+& Minimus & SOAPdenovo \\ \hline
+Original vs. shuffled reads & Not equal & Not equal \\
+1 vs. 8 threads & NA & Not equal \\ \hline
+\end{tabular}
+%{\tiny {Table 1. Using rhodobacter ALLPATHS-LG corrected fragment library. 1408188 reads.  For Minimus and SOAPdenovo, we check if assemblies produced from the original and shuffled reads are the same by doing a diff of the resulting assembly text files.  In addition, we also find that the assemblies produced using different number of threads differ in SOAPdenovo.}}
+%}
+\end{table}
+\fi
+
+In this paper, we present a novel assembler-specific regression testing
+framework that uses two assembly evaluation mechanisms: \emph{assembly likelihood}, calculated using LAP\cite{LAP}, and \emph{read-pair coverage}, calculated using REAPR\cite{hunt2013reapr}, to determine if code modifications result in non-trivial
+changes in assembly quality. The log average probability, LAP, is
+the log of the geometric mean of the probability that the observed reads are generated from the given assembly.
+By modeling the sequencing process, we are able to accurately calculate this probability. REAPR is
+tool for detecting misassemblies using the coverage of read-pairs.
+
+We evaluate our framework using SOAPdenovo \cite{li2010novo} and Minimus \cite{sommer2007minimus}.
+SOAPdenovo is a widely popular \emph{de novo} assembler designed for short reads that has been used in many high profile genome assemblies, including the giant panda \cite{li2009sequence}.
+Minimus is one of the several assembly pipelines in the AMOS software package.
+Minimus provides a good case study for software engineering in bioinformatics due to its open-source nature, modular design, and active developer community.
+
+We study assembler evolution in two contexts. First,
+we examine how assembly quality changes
+throughout the version history of SOAPdenovo. Second,
+we show that our framework can correctly evaluate decrease in assembly quality
+using fault-seeded versions of Minimus.
+Our results show that our framework accurately detects trivial
+changes in assembly quality produced from permuted input reads and using
+multi-core systems, which fail to be detected using traditional regression
+testing methods.
+
+Our paper makes the following contributions:
+
+\begin{itemize}
+
+\item
+%{\bf Chris: say something about a fundamental contribution for bioinformatics.}
+Provides a regression testing framework novel to the domain of \emph{de novo} genome assembly.
+%, saving developer resources.
+
+\item
+%{\bf Chris: say something about a fundamental contribution for software
+%testing. For example, we develop a mechanism that can be used in other software
+%testing situations?}
+Illustrates the benefits of developing a regression testing framework for untestable software leveraging existing third party tools.
+%Shows that is still useful to leverage existing
+
+\item
+%{\bf Chris: say something about our experiments. For example, others can
+%use the subjects, versions, etc.}
+\emph{All} of the software from our regression testing framework, experimental sequence data, assemblers, and results are available online.
+
+\end{itemize}
+
+We believe that this research is both timely and relevant.  As sequencing
+technology becomes cheaper, assemblers will operate on increasingly larger data
+sets, \emph{requiring} large multi-core machines in order to assemble these
+data sets in a reasonable time frame.  Developers need to design test cases
+that match the complexity and size of practical data sets to adequately test
+their assembler.  Depending on the underlying algorithms, concurrent programs
+may produce different outputs.  Assemblers may produce slightly different
+assemblies than their single-threaded version, making it difficult to compare
+the raw text outputs.
+
+\noindent{\bf Structure of the paper:} In the next section,
+we describe how the problem of testing without an oracle is not limited to bioinformatics, and the different strategies typically used and their limitations.
+In Section~\ref{methods}, we describe our regression testing approach, briefly outlining the theory behind assembly likelihood and read-pair coverage and why they are our main measure of assembly quality.
+% we provide an overview of our approach via an example, showing how {\it diff} is not a correct means of assessing differences in assembly quality.
+%In Section~\ref{methods}, we briefly describe the theory behind why the LAP is the main measure of assembly quality in our regression testing framework, along with the purpose of including amosValidate.
+In Section~\ref{results}, we show how our framework is able to accurately evaluate the trivial changes in assembly quality using real sequencing data.  Then, we examine how assembly quality changes throughout the release history of SOAPdenovo.  We wrap up our results showing the fault detection power of our framework using manually seeded faults within Minimus.
+In Section~\ref{discussion}, we discuss the significance and limitations of our framework, and the lack of adequate testing within the assembler community.
+Finally, in Section~\ref{conclusion}, we conclude with a discussion of future research directions.
+
+\section{Related work}
+\label{related_works}
+The difficulty in software testing without an oracle is not limited to genome assembly,
+ but has been encountered in many other fields such as bioinformatics, weather prediction, and image and speech processing. In bioinformatics, for example, a common task is to
+find all potential mappings of a sequence to another reference sequence which contains at most a certain number of mismatches.
+Without an oracle, it is hard to check whether a sequence has been mapped to \emph{all} positions in the reference sequence \cite{chen2009innovative}. In weather prediction, software has no oracle to verify if it is functioning correctly. Discrepancies between the predicted and actual result can be attributed to an error in the model employed by the weather prediction program rather than an error in the software. However, this prediction model involves very complex computation, which makes it very hard to verify its output. Testing done on weather prediction is frequently used to test performance and scalability of the framework instead of the accuracy of the predictions \cite{delgado2010performance}, \cite{michalakes2004weather}.
+
+Literature has witnessed several techniques developed to address the lack of oracle in software testing. The first technique is \emph{dual coding}
+or ``pseudo-oracle'' \cite{weyuker1982testing}, where developers independently create a program with the same specification as
+the original. Identical input data sets are used and outputs from both programs are, then, compared.
+The extra overhead involved in creating a duplicate program as complex as genome assembler often makes this technique impractical.
+In order to reduce this overhead in some instances,
+McMinn \cite{McMinn:2009:SFD:1569901.1570127} proposed program transformation which automatically creates pseudo-oracles
+by transforming aspects of the SUT into alternative versions. He also proposed using search-based
+testing techniques to generate two types of inputs that have the potential to produce different outputs from the pseudo-oracles and the original program. The first type of input targets programs with numerical computations while the second one focuses on multi-threaded code with the presence of race conditions.
+
+Metamorphic testing \cite{chen1998metamorphic} proposed by Chen et al. is another common technique to deal with testing applications without oracle. It identifies expected relation properties among inputs and their corresponding outputs,
+which can detect incorrect output but cannot validate the correct one. Metamorphic testing is widely-applied in many specific domains such as mesh simplification programs, stochastic optimization algorithms, machine learning classifiers and feature models.
+Chan et al. applied metamorphic testing to mesh simplification programs which create 3-D polygonal models similar to an original polygonal model, yet with fewer polygons\cite{Chan:2010:FFP:1815297.1815298, chan2009pat}. The test oracle problem in this domain is that the programs produce different graphic despite the same original polygonal model being used. The proposed iterative solution uses a reference model of the SUT as the pseudo-oracle to train a classifier which categorizes a test case into ``failed'' or ``passed''. However, since the passed test cases may be misclassified, they are then inputted into a metamorphic testing model as initial test cases to generate follow-up test cases which in turn are classified by the classifier.
+Yoo \cite{Yoo:2010:MTS:1799526.1799581} focused on solving the same oracle problem in stochastic optimization algorithms whose performance depends not only on the correctness of implementations but also on the problem instances they are used to solve. The paper provides a comparison and evaluation of the impact of different problem instances on the effectiveness of metamorphic testing of stochastic optimization.
+Xie et al. \cite{Xie:2011:TVM:1942318.1942371} used metaphoric testing to test machine learning classifiers. Their solution first identifies all the necessary metamorphic relations that classifiers would be expected to demonstrate, then checks if the corresponding classifier algorithm satisfies these relations. A failure to exhibit the relation indicates a fault.
+In feature model analysis tools, output is very difficult to evaluate due to the combinatorial complexity and numerous operations of the analyses. The current testing method is very time-consuming and error-prone; thus, metamorphic testing is used to automatically generate test data for the tools.
+
+There are, however, some limitations in metamorphic testing such as manually intensive, insufficient number of metamorphic properties and ineffective fault detection in individual functions. In order to reduce these limitations, Christian proposed metamorphic runtime checking \cite{Murphy:2010:MTT:1970820}, which specifies the metamorphic properties at the function level rather than at the application level, and automated metamorphic system testing, \cite{Murphy:2009:AST:1572272.1572295} which requires little manual intervention.
+
+\section{Methods}
+\label{methods}
+
+Here we present an assembler regression testing framework that utilizes a non-traditional test oracle, one that need not assess whether a test case passed or failed; rather, it computes ``goodness of output'' measure or quality for assemblers.
+Our framework uses two mechanisms to accurately assess assembly quality: \emph{assembly likelihood} and \emph{read-pair coverage}.
+These mechanisms serve as our testing oracle in the sense that we will be modeling a process (sequencing) that the software (assembler) is trying to reverse.
+We will outline the importance of each mechanism and the software used in our framework.
+
+%assembly evaluation tools, the log average probability (LAP) \cite{LAP} and REAPR\cite{hunt2013reapr}, to determine if code modifications result in non-trivial changes in assembly quality.
+%We use two assembly evaluation tools: assembly probability\cite{LAP} and amosValidate\cite{phillippy2008genome}, to determine if code modifications result in non-trivial changes in assembly quality.
+
+%In order to determine if code modifications result in non-trivial changes in assembly quality, our regression testing framework makes use of two assembly evaluation tools: assembly probability \cite{LAP} and amosValidate \cite{phillippy2008genome}.
+\subsection{Regression testing framework}
+\subsubsection{Assembly likelihood}
+
+The correct assembly of a set of sequences should be consistent with the statistical characteristics of the data generation process\cite{myers1995toward}.
+In other words, we can evaluate an assembly based on the likelihood that the reads could have been generated from it.
+An important property of this mechanism is that the true genome maximizes this likelihood\cite{LAP}.
+Recent tools have utilized this theory: ALE\cite{clark2013ale}, CGAL\cite{rahman2013cgal}, and LAP\cite{LAP}.
+
+For our testing framework, we have selected LAP as our tool to evaluate assembly likelihood.
+The LAP framework defines the quality of an assembly as the probability that the observed reads, $R$, are generated from the given assembly, $A$: $\Pr[R|A]]$.
+This conditional probability is the product of the individual read probabilities, $p_r$ (assuming that the event of observing each read is independent).  That is,
+\begin{equation}
+  \label{probability_reads_given_assembly}
+  \Pr[R \vert A]=\prod_{r \in R} p_r
+\end{equation}
+
+The probability of each read, $p_r$, is calculated by modeling the data generation process, which varies depending on the sequencing technology used.
+%By modeling the data generation process, we can calculate the probability of each read, $p_r$.
+If we assume the reads are generated error-free and uniformly at random from the given genome, then a read may be sequenced starting from any position of the genome with equal probability.
+%For example, if a read matches to only one position in the assembly then $p_r=\frac{1}{2L}$, where $L$ is the length of the assembly, which is doubled due to the double-stranded nature of DNA molecules.
+%The length of the assembly is doubled due to the double-stranded molecules of DNA that make up the genome.
+Thus, if a read
+%and its reverse-complement
+matches at $n_r$ positions on the assembly of length $L$, then
+% and its reverse-complement
+\begin{equation}
+  \label{error_free_probability}
+  p_r = \frac{n_r}{2L}
+\end{equation}
+The assembly length is doubled due to the double-stranded nature of DNA molecules.
+
+Modifying the calculation of $p_r$ to handle practical contraints such as sequencing errors, paired-reads, and large data sets are detailed in \cite{LAP}.
+%Ghodsi et al. details how to modify the calculation of $p_r$ to handle practical constraints, e.g., sequencing errors and mate pairs (reads that are experimentally known to be separated by a given length).
+
+
+%Assuming the reads are sampled independently,
+%%The likelihood of the assembly is proportional to the product of the individual read probabilities \cite{medvedev2009maximum}.
+%By modeling the sequence data generation process, the probability of each read being generated from the assembly can be calculated.
+
+%The metric used in accessing the assembly probability is the logarithm of the geometric mean of the read probabilities, referred to as the log average probability (LAP).
+%We can calculate a sample of the read probabilities in cases where the amount of reads is too large.
+%If the amount of reads is too large, we can use a random sample of the reads to estimate the probability of the reads, given the assembly.
+%We then take the log geometric mean of the read probabilities to counteract the effect of sample size on the probability, using the LAP framework provided by Ghodsi et al.
+%to calculate the logarithm of the geometric mean of the read probabilities, referred to as the log average probability (LAP).
+%Being able to sample the reads and get an accurate estimate of assembly quality is the reason we use LAP as the basis of our assembly regression testing framework.
+
+%To counteract the effect of sample size on the probability, we take the geometric mean of the read probabilities.
+%The mean of the read probabilities over the sample is expected to be equal to the mean over all reads, but if the sample size is too small, then the accuracy of the estimation will be poor.
+
+
+%We use the tool provided by Ghodsi et al. to calculate the logarithm of the geometric mean of the read probabilities, referred to as the log average probability (LAP).
+%Being able to sample the reads and get an accurate estimate of assembly quality is the reason we use LAP as the basis of our assembly regression testing framework.
+
+We can provide a brief demonstration of the effectiveness of the LAP in detecting trivial differences in assembly quality using the sample circular sequence from Fig. \ref{fig:circular_genome}.
+The length of the circular sequence is 35 characters, known as base pairs (bps).
+Due to the inability to represent the circular nature of the sequence in the file format used for storing sequences (FASTA), we must arbitrarily break the circular sequence into a linear fragment.
+Let's assume we are able to generate error-free reads of length 5 from each position in the circular sequence, resulting in 35 reads:
+\begin{verbatim}>sample circular sequence
+AGCATCTTTATTGGAGATGTGCCACAGCACATTG
+
+Reads:
+    AGCAT, GCATC, ..., CATTG (31 total)
+Reads that wrap around:
+    ATTGA, TTGAG, TGAGC, GAGCA (4 total)
+\end{verbatim}
+
+
+Assuming that each read aligns exactly at most one location, then 31 reads will align exactly 1 time, while the 4 reads that span the end of the sequence will be unable to align.
+If we align the reads to the sample circular sequence \emph{rotated} 1 base pair, then it should be apparent that we get the same number of reads that match exactly 1 time (albeit different reads), and the same number of reads that do not match.
+Therefore, $\Pr[R \vert A]$ = $\Pr[R \vert A_{rotated}]$ and the LAP of each assembly will be equal.
+We are able to determine that these assemblies are of equivalent quality, unlike the \textbf{diff}-based method.
+
+%Ghodsi defines the quality of an assembly as the likelihood that the observed reads are generated from the given assembly.  By modeling the data generation process, we can calculate the probability of each read.  The logarithm of the geometric mean of the read probabilities (Log Average Probability - LAP) is the metric provided by Ghodsi’s framework.  The framework is able to handle the addition of mate pairs.  Ghodsi shows that the true genome maximizes their likelihood metric.
+
+We use LAP in our framework over CGAL and ALE because the LAP score can be calculated accurately and efficiently using a sample of the reads, making it practical for large data sets.
+
+
+\subsubsection{Read-pair coverage}
+
+%We use the LAP to detect a non-trivial difference in assembly quality, but it is also beneficial to report a collection of other commonly used assembly metrics.
+%These metrics include contig sizes, depth of coverage, repeat content, and breakpoints in read alignments to identify possible areas of misassembly in the assembly.
+
+Many current sequencing technologies produce read-pairs, where reads are sequenced from opposing ends of the same fragment.
+These read-pairs are used to resolve genomic repeats as well as orient contigs into scaffolds (contigs with gaps that are connected by a known distance).
+Since we know what the distribution of fragment sizes should be, we can use this as a constraint when evaluating the quality of our assembly.
+REAPR\cite{hunt2013reapr} is a tool that leverages this constraint and evaluates the accuracy of the assembly using read-pair coverage.
+REAPR determines the fragment coverage by first independently aligning the read-pairs to the assembly.
+A fragment is defined as the distance from the end points of proper read-pairs (those that are determined to have correct orientation and separated by the correct distance).
+REAPR is able to find base-level errors by comparing the fragment coverage of a given base with the theoretical coverage.
+
+Although the LAP score implicitly captures the quality of alignable read-pairs, REAPR provides assembler developers with a detailed breakdown of the specific errors in their assembly, giving the user the option to automatically break assemblies at locations of error.
+We use the specific error locations to calculate the percentage of error-free bases of the assembly.
+
+%amosValidate is a pipeline for detecting misassemblies using a statistical analysis of the above metrics.
+%In contrast to the LAP, amosValidate provides multiple sources of assembly quality.
+%The LAP implicitly captures the quality of alignable paired end reads, but REAPR provides developers with a detailed breakdown of the specific changes in assembly quality.
+
+
+
+%there are many conflicting metrics and it is non-trivial how to combine and weight them(Vezzi et al. 2012).
+
+%AmosValidate is a pipeline to detect misassemblies using a collection of assembly quality metrics.
+%In contrast to the single value produced from LAP, amosvalidate provides multiple sources of assembly quality.
+
+
+
+\subsection{Evaluating changes in assembly quality}
+Since the LAP is computed over a sample of the reads, for our experiments, we consider assemblies of equal quality if they are within one standard deviation of each other (see Section \emph{Estimating the average read likelihood by sampling} in \cite{LAP}).
+Users are free to select how large of a deviation they want to allow between assemblies.
+We also provide the user with the percentage of error-free bases in the assembly using results generated by REAPR.
+Both of these analyses are performed on the assemblies during the validation step of the assembly pipeline iMetAMOS\cite{koren2014automated, treangen2011metamos}.
+MetAMOS generates a summary HTML page for the assembly quality results.
+
+\section{Results}
+\label{results}
+
+
+
+To illustrate the inadequacy of the \emph{diff}-based approach, %we use two assemblers, SOAPdenovo and minimus.
+we first generate assemblies with SOAPdenovo and Minimus using bacterial sequences from a recent high-profile assembly competition, GAGE \cite{salzberg2012gage}.
+The \emph{Rhodobacter sphaeroides} data set contains 1,408,188 reads of length 101 bps.
+%, known as base-pairs (bp).
+Assemblies are created using the original reads, along with a shuffled version of the original reads and compared using unix command \textbf{diff}.
+Since SOAPdenovo allows the use of multiple threads, we run the assembler using one and eight (the default in SOAPdenovo) threads.
+Both assemblers produce different assemblies depending on whether they use the original or shuffled reads.
+By doing a \textbf{diff} of the text outputs, we are unable to determine if there is a non-trivial change in assembly quality.
+%Thus, there is a need for regression testing that is designed specifically for assemblers, that can properly evaluate changes in assembly quality.
+
+%We evaluate our assembly regression testing framework using sequencing data from the GAGE assembly competition \cite{salzberg2012gage}.  We run SOAPdenovo and minimus on the \emph{Rhodobacter sphaeroides} fragment library (1,408,188 reads of length 101 bp) using the original reads, along with a shuffled version of the reads.  Since SOAPdenovo allows the use of multiple threads, we run the assembler using one and eight threads.
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+  \includegraphics[width=\linewidth]{figures/modified_read_asm_param.eps}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[LAP scores for original and shuffled \emph{R. sphaeroides} data set.]{SOAPdenovo assemblies of the 1,408,188 \emph{R. sphaeroides} error-corrected reads.  The LAP was determined using a sample of 100,000 reads.  The assemblies produced from the original reads and shuffled reads are within the acceptable standard deviation.}
+\label{fig:modified_read_asm_param}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+Next, we evaluate the \emph{Rhodobacter sphaeroides} assemblies using our proposed regression testing framework.
+The LAP is able to accurately detect trivial changes in assembly quality that raw text comparisons cannot (Fig. \ref{fig:modified_read_asm_param}).
+For SOAPdenovo, the LAP of the assemblies generated from the original and shuffled reads are within the acceptable standard deviation.  Furthermore, assemblies produced using 1 and 8 threads contain nearly identical LAPs.
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+  \includegraphics[width=\linewidth]{figures/soapdenovo_versions.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+  \caption[LAP scores for SOAPdenovo assemblies across various versions]{LAP scores for SOAPdenovo assemblies produced from different versions, using \emph{R. sphaeroides}, \emph{S. aureus}, and \emph{C. Rudii} data sets.
+  %416,798,  704,094 error-corrected mate pairs with insert size of 180bp).
+  The LAP was determined using all reads.  LAPs approaching zero represent more probable assemblies.
+  %SOAPdenovo assemblies produced using versions 1-1.03 are equivalent.  Assembly quality improves in version 1.04, but drops back down in 1.05.
+  }
+  \label{fig:soapdenovo_versions}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+The purpose of regression testing is to ensure that a code change does not introduce new faults, but our framework has the added benefit of detecting positive changes in assembly quality.
+Ideally, we want to use our framework alongside the development of an assembler to evaluate how code changes affect assembly quality.
+Fortunately, SOAPdenovo's source code and previous versions are available for download.
+We have created custom assembler specification files for each of the 11 assembler versions so that they can be run by MetAMOS\cite{treangen2011metamos}.
+We evaluate the different versions of SOAPdenovo using LAP and REAPR on the \emph{Rhodobacter sphaeroides}, \emph{Staphylococcus aureus}, and \emph{Carsonella ruddii} data sets (Fig. \ref{fig:soapdenovo_versions}).
+The \emph{R. sphaeroides} data set contains 762,266 Quake-corrected \cite{kelley2010quake} read-pairs with insert sizes of 180bps.
+The \emph{S. aureus} data set contains 408,285 Quake-corrected read-pairs with insert sizes of 180bps.
+%For the \emph{R. sphaeroides} and \emph{S. aureus} data sets, we use Quake-corrected \cite{kelley2010quake} reads.
+The \emph{Carsonella ruddii} data set contains 50,000 read-pairs with insert sizes ranging from 500bps to 3,500bps and comes packaged as test data for MetAMOS.
+We assemble the data using MetAMOS with our custom SOAPdenovo assemblers, then run the LAP and REAPR tools on the resulting assemblies at the contig-level.
+%MetAMOS provides a summary file of the LAP and REAPR scores
+SOAPdenovo is a de Bruijn assembler and requires the user to specify a parameter, k-mer, to construct the de Bruijn graph.
+For each data set we construct assemblies using two different k-mer sizes: 31 and 55.
+The default binaries for SOAPdenovo versions 1.00 - 1.05 were only able to build assemblies using k-mer sizes <=31.
+Versions 2.00 and higher were used to process up to 127-mers.
+%The read-pair data sets for these organisms will aid us in testing how their
+%We use the mate pair data sets for these organisms in order to test the scaffolding updates of SOAPdenovo.
+%The \emph{S. aureus} and \emph{R. sphaeroides} data set contains 416,798 and  mate pairs.
+
+The respective assemblies of each data set using 31-mers are identical across SOAPdenovo versions 1 to 1.03.
+%Assemblies produced from SOAPdenovo versions 1 through 1.03 are identical in both test cases.
+The changelists for versions 1.01 through 1.03 state that only bugs were fixed.
+The bug fixes in these versions are not covered by our test cases.
+The changelist for version 1.04 mentions an improved gap filling module, which is used during the scaffolding step of assembly.
+Our framework detects an increase in assembly quality between version 1.04 and the previous versions across the \emph{S. aureus}, \emph{R. sphaeroides}, and \emph{C. Rudii} data sets.
+The LAP indicates a more probable assembly was produced in 1.04.
+This positive change in assembly quality is supported by our REAPR results.
+The percentage of error-free bases increased from 78.34\% to 81.93\% and 65.28\% to 72.75\% in the \emph{S. aureus} and \emph{R. sphaeroides} data sets, respectively.
+A breakdown of the \emph{S. Aureus} (31-mer) assemblies are given in Table \ref{table:soapdenovo_crudii}.
+REAPR agrees with the LAP scores, showing a correlation with the percentage of error-free bases across the different versions of SOAPdenovo.
+%The sharp decline in assembly quality at version 2.00 is detected by both LAP and REAPR.
+
+Interestingly, SOAPdenovo version 2.00 produces a less likely assembly for the \emph{S. aureus} and \emph{R. sphaeroides} data sets (using 31-mers) than the earlier versions.
+Our framework detects that this code change produced a lower quality assembly in terms of LAP and percentage of error-free bases, signaling that developers need to investigate further.
+SOAPdenovo versions beyond 2.00 appear to have fixed the issue resulting in the lower quality assemblies.
+
+\begin{table}[tb!]
+\begin{center}
+\caption{Regression testing results for different SOAPdenovo versions using \emph{S. Aureus} (31-mer) data set.  The percentage of error-free basepairs are calculated using REAPR. N50 is a commonly-used metric to measure contiguity.}
+\begin{tabular}{l|ccc}
+Assembler & LAP        & Error-free bps (\%) & N50 (bps)    \\
+\hline
+V1.00   & -11.961 & 78.34 & 8,751  \\
+V1.01   & -11.961 & 78.34 & 8,751  \\
+V1.02   & -11.961 & 78.34 & 8,751  \\
+V1.03   & -11.961 & 78.34 & 8,751  \\
+V1.04   & -11.816 & 81.93 & 12,568 \\
+V1.05   & -11.816 & 81.94 & 12,568 \\
+V2.00   & -14.474 & 49.04 & 2,428  \\
+V2 r223 & -11.816 & 81.62 & 12,568 \\
+V2 r238 & -11.816 & 81.62 & 12,568 \\
+V2 r239 & -11.816 & 81.62 & 12,568 \\
+V2 r240 & -11.816 & 81.62 & 12,568 \\
+\hline
+\end{tabular}
+\end{center}
+\label{table:soapdenovo_crudii}
+\end{table}
+
+
+The quality of assemblies using 55-mers remain largely unchanged across the version history.
+There was a slight increase in LAP of the \emph{S. Aureus} assembly from versions 2.00 to 2r223, but there was only an increase of 0.01\% in error-free bases.
+
+
+
+% Fault seeding
+%To illustrate our framework's ability for detecting code changes that result in a decrease in assembly quality, we introduce faults into core modules of the minimus assembler.
+Finally, we introduce faults into the core modules of the Minimus source code to evaluate how well our framework detects the resulting change in assembly quality (Fig. \ref{fig:minimus_fault_seeded}).
+Minimus consists of three core modules: \texttt{hash-overlap}, \texttt{tigger}, and \texttt{make-consensus}.
+\texttt{Hash-overlap} computes the overlaps between reads using a special type of hash seed called a \emph{minimizer}\cite{roberts2004reducing}.
+The \texttt{tigger} uses the computed overlaps to assemble reads into individual contigs.
+The \texttt{make-consensus} module then improves the layout of the contigs using alignment data from the reads.
+For our tests, we seed faults into the \texttt{hash-overlap} and \texttt{tigger} modules and produce assemblies using the Influenza-A and zebrafish gene data sets packaged with Minimus.
+In order to find the shared regions of code executed between both data sets, we first obtain the code coverage (summarized in Table \ref{Tab:codecoverage}).
+
+\begin{table*}[htbp]
+\caption{Code coverage for Influenza-A and zebrafish gene test cases.}
+\label{Tab:codecoverage}
+\begin{center}
+\begin{tabular}{r|cccc}
+Testcase & Lines(Hit / Total) & Functions(Hit / Total) & Branches(Hit / Total)\\ \hline
+Influenza-A & 5724 / 46333 = 12.4\% & 3170 / 19019 = 16.7\% & 4333 / 21029 = 20.6\% \\
+Zebrafish & 5606 / 46333 = 12.1\%  & 3108 / 19019 = 16.3\% & 4247 / 21029 = 20.2\% \\
+\hline
+\end{tabular}
+\end{center}
+\end{table*}
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+  \includegraphics[width=\linewidth]{figures/minimus_fault_seeded.eps}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[LAP scores for fault-seeded versions of Minimus]{The LAP of fault-seeded versions of Minimus using the Influenza-A and zebrafish gene data sets.  Faults 1, 2, and 3 were inserted into the \textbf{hash-overlapper} module and Faults 4, and 5 were inserted into the \textbf{tigger} module. All faults were detected in the zebrafish gene data set; however, faults 1 and 3 were not detected in the Influenza-A data set.}
+\label{fig:minimus_fault_seeded}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+We insert three faults into the \texttt{hash-overlap} module.
+The first fault allows all errors to be accepted between overlaps that contain a minimizer.
+Accepting all overlaps, regardless of quality, will increase the number of reads that can be combined.
+This fault produces an identical assembly as the fault-free version of the code in the Influenza-A data set, thus is not detected by our framework.
+A noticeable drop in assembly quality is detected in the zebrafish gene data set.
+
+The next two faults modify the functionality of the minimizers.
+Minimizers need to be sorted so a more computationally expensive dynamic programming algorithm can be used to connect them across mismatching sequence.
+Both faults attempt to break the initialization and sorting of the minimizers.
+The faults produced assemblies of lower quality in the zebrafish gene data set; however, only one fault produced a lower quality assembly of the Influenza-A data set.
+
+We insert two faults into the \texttt{tigger} module.
+The first fault disrupts a method that hides transitive edges within the assembly graph.
+An edge between nodes \emph{A} and \emph{C} is transitive if there exists an edge between nodes \emph{A} and \emph{B} and an edge between nodes \emph{B} and \emph{C}.
+Without the ability to hide transitive edges, Minimus will encounter more nodes that have multiple outgoing edges.
+Minimus will be unable to compress these paths into unitigs, resulting in additional contigs.
+Our framework correctly detects the drop in assembly quality in both the zebrafish gene and Influenza-A data sets.
+
+The second fault is related to the first, but breaks Minimus's ability to remove nodes from the graph that are contained by an overlap between two other nodes.
+%While this fault still allows minimus to remove transitive edges, unitigs created can erroneously contain duplicate sequence.
+Our framework correctly detects the resulting drop in assembly quality across both test data sets.
+The Influenza-A assembly produced using this faulted version has the same N50 size as the fault-free version of Minimus.
+The N50 size is the weighted median
+contig size, i.e., the length of largest contig c such that
+the total size of the contigs larger than c exceeds half of
+the genome size.
+Including this commonly-used metric serves as an example of the importance of using the LAP as the main criteria for accessing changes in assembly quality.
+The N50 metric would mislead developers into believing that the assemblers were of equal quality due to their nearly equal size.
+
+
+\section{Discussion}
+\label{discussion}
+
+Regression testing without an oracle can potentially delay the release of software as developers attempt to track down a non-existent error due to differing results.
+In the worst case, developers may modify a correct program in order to reproduce incorrect results.
+Utilizing \emph{assembly likelihood} (via LAP) and \emph{read-pair coverage} (via REAPR), assembler developers will spend less time deciphering changes in assembly quality, allowing them to focus on algorithm improvements and other bug fixes.
+If a significant change in assembly quality is detected, the inclusion of REAPR provides developers with an additional breakdown of potential error locations in the assembly.
+Comparing the error locations between version histories may aid in tracking down sources of potential error within the code.
+
+MetAMOS greatly simplifies the assembler regression testing process.
+Although all \emph{de novo} assemblers require a set of reads as input, it is difficult to automate the assembly process utilizing multiple assemblers, since different parameters are used by different assemblers.
+Assembler parameters can change across software versions.
+It is common in large-scale assembly projects to combine the results of multiple assemblers in order to achieve what they believe is the best assembly.
+MetAMOS provides a standard generic assembler format for developers where they can specify how an assembler should run given a set of predefined keywords, such as \emph{k-mer} length.
+This gives users the ability to specify a single parameter in MetAMOS, which is then automatically translated to the appropriate runtime parameter for the corresponding assemblers.
+
+
+A frequently used strategy to test software without an oracle is to run the program on a simplified data set for which the correctness of the result can be accurately determined \cite{weyuker1982testing}.
+In general, software is often tested this way, since exhausting testing is not practical.
+A simplified data set may uncover some easy to find faults, but the complex cases are usually more error-prone.
+The Minimus test cases, Influenza-A and zebrafish gene, contain only 151 and 153 reads, respectively.
+However, typical assembly data sets consist of millions of reads, such as the \emph{S. aureus} and \emph{R. shpaeroides} data sets presented in Section \ref{results}.
+Two of the faults we seeded do not affect the assembly quality of Influenza-A data set, but do affect the zebrafish gene assembly quality.
+The zebrafish gene data set executes 0.8\% and 0.2\% and more code in the \texttt{hash-overlap} and \texttt{tigger} modules, respectively.
+Although the faults are inserted into shared sections of code, it is difficult to determine how much more complex the state of the assembler becomes due to the increase code execution.
+
+Ideally, once a fault is discovered, a test case is added that exercises the code path containing the fault.
+Unit tests are one of way testing the method containing the fault, but the state of an assembler is often very large with many complex interactions.
+Thus, assemblers heavily rely upon end-to-end testing.
+However, it is difficult to modify existing test cases to exercise the fixed fault.
+Modifying the reads %in order to exercise the fixed fault
+could have unforeseen side effects.
+Altered reads could produce new overlaps, changing the execution path of the code and potentially skipping the fixed fault.
+
+Unlike Minimus, SOAPdenovo does not come packaged with a test set of sequences and assemblies.
+The changelist for the three versions following the initial release of SOAPdenovo only states that they, ``\emph{fixed some bugs}.''
+The details of these bugs are not given, nor their affect on assembly quality using their in-house test data.
+In addition, users may employ different software/hardware configurations than those tested by the developers.
+It is crucial for the user to have the means to verify that they have correctly installed said software and are able to verify that the software is operating as the developers intended.
+Otherwise, results published from these users could lead to incorrect biological conclusions and misguided future studies.
+
+
+%Unit tests are one of way testing the method containing the fault, but the state of an assembler is often very large with complex interactions.
+%Thus, assemblers heavily rely upon end-to-end testing.
+
+% possibly resulting in different contigs.
+%In the which could bypass the desired section of code to be tested.
+%The fault-seeding experiment shows that some faults do not affect the assembly quality of the Influenza-A data set,
+
+
+
+%The developers will still have to investigate the cause of the error, but learning that a recent assembly contains a majority of mate-pairs with a smaller insert size
+
+\section{Conclusion}
+\label{conclusion}
+Assembler developers face a difficult task: iteratively improving their assemblers to handle the exponential increases in biological data, while ensuring that changes at each step do not introduce any bugs.
+%As assemblers develop, it is difficult to determine if code changes affect the quality of the assembly.
+Traditional methods of comparing the text outputs of assemblers are unable to detect trivial differences in assemblies that are the result of using multi-core systems (a \emph{requirement} to process increasingly large data sets) or the circular nature of bacterial genomes.
+We have developed a regression testing framework for genome assembly software that leverages existing assembly tools to accurately evaluate changes in assembly quality that traditional regression testing methods do not.
+We have examined the change in assembly quality over the version history of the popular assembler, SOAPdenovo.
+Lastly, our regression testing framework was able to detect manually inserted faults into the Minimus assembler.
+
+Future work includes the addition of interactive visual analytics tools for genome assembly to our regression testing framework.
+In cases where our framework detects non-trivial changes in assembly quality, it could be easier for the user to understand the differences if the assemblies were displayed visually.
+%We accurately detect changes in assembly quality by leveraging existing assembly tools.
+%Our framework detects changes in assembly quality that traditional regression testing methods do not.
+
+\section{Acknowledgment}
+
+
+The authors would like to thank members of the Memon and Pop labs for their support and valuable discussions.
+This work was supported by NIH grant R01-AI-100947 to MP.
+
+The contributions of SK were funded under Agreement No. HSHQDC-07-C-00020 awarded by the Department of Homeland Security Science and Technology Directorate (DHS/S\&T) for the management and operation of the National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and Development Center. The views and conclusions contained in this document are those of the authors and should not be interpreted as necessarily representing the official policies, either expressed or implied, of the U.S. Department of Homeland Security. In no event shall the DHS, NBACC, or Battelle National Biodefense Institute (BNBI) have any responsibility or liability for any use, misuse, inability to use, or reliance upon the information contained herein. The Department of Homeland Security does not endorse any products or commercial services mentioned in this publication.
+
+\section{Availability}
+Software to calculate the LAP is available for download at \url{assembly-eval.sourceforge.net}.
+REAPR is available for download at \url{http://www.sanger.ac.uk/resources/software/reapr/}.
+Both tools are available for automatic installation with MetAMOS (\url{https://github.com/treangen/metAMOS}).
+Sequence libraries are available GAGE assembler competition at \url{http://gage.cbcb.umd.edu/data/index.html}.

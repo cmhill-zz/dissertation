@@ -14,8 +14,8 @@
 \hspace{-.15in}
 \begin{tabular}{ll}
 Title of dissertation:    & {\large  BEYOND GENOME ASSEMBLY: }\\
-&				      {\large  WHAT'S GOOD?} \\
-&				      {\large  WHAT'S REAL GOOD?} \\
+&				      {\large COMPARING, VALIDATING, AND } \\
+&                     {\large THIRD-GENERATION SEQUENCING} \\
 \ \\
 &                          {\large  Christopher Michael Hill, Doctor of Philosophy, 2015} \\
 \ \\
@@ -28,11 +28,11 @@ Dissertation directed by: & {\large  Professor Mihai Pop} \\
 \renewcommand{\baselinestretch}{2}
 \large \normalsize
 
-Pulse propagation through optical fibers is studied for two different phenomena: (i) the evolution of four-wave-mixing and (ii) the interplay between self- and cross-phase modulation for ultra-short pulses in a polarization maintaining fiber.
+FILLER
+The current revolution in genomics has been made possible by software tools called genome assemblers, which stitch together DNA fragments “read” by sequencing machines into complete or nearly complete genome sequences. Despite decades of research in this field and the development of dozens of genome assemblers, assessing and comparing the quality of assembled genome sequences still relies on the availability of independently determined standards, such as manually curated genome sequences, or independently produced mapping data.
 
-For the four-wave-mixing case, we present the results of a study of the dynamical evolution of multiple four-wave-mixing processes in a single-mode optical fiber with spatially and temporally $\delta$-correlated phase noise. A nonlinear Schr\"odinger equation (NLSE) with stochastic phase fluctuations along the length of the fiber is solved using the Split-Step Fourier method. Good agreement is obtained with previous experimental and computational results based on a truncated-ODE model in which stochasticity was seen to play a key role in determining the nature of the dynamics. The full NLSE allows for simulations with high frequency resolution (60\,MHz) and frequency span (16\,THz) compared to the truncated ODE model (300\,GHz and 2.8\,THz, respectively), thus enabling a more detailed comparison with observations. Fluctuations in the refractive index of the fiber core are found to be a possible source for this phase noise. It is found that index fluctuations as small as 1 part per billion are sufficient to explain observed features of the evolution of the four-wave-mixing sidebands. These measurements and numerical models thus may provide a technique for estimating these refractive index fluctuations which are otherwise difficult to measure.
+In the first part of my talk, I will describe our de novo  probabilistic measure of assembly quality which allows for an objective comparison of multiple assemblies generated from the same set of reads. I will detail extensions to our probabilistic framework that allows for an accurate evaluatation of metagenomic assemblies in addition to single genomes.
 
-For the case of self- and cross-phase modulation, the evolution of orthogonal polarizations of asymmetric femtosecond pulses (810\,nm) propagating through  a birefringent single-mode optical fiber (6.9\,cm) is studied both experimentally (using GRENOUILLE) and numerically (using a set of coupled NLSEs). A linear optical spectrogram representation is derived from the electric field of the pulses and juxtaposed with the optical spectrum and optical time-trace. The simulations are 
-in good qualitative agreement with the experiments. Input temporal pulse asymmetry is found to be the dominant cause of output spectral asymmetry. The results indicate that it is possible to modulate short pulses both temporally and spectrally by passage through polarization maintaining optical fibers with specified orientation and length.
+In the second part of my talk, I will describe VALET, a de novo pipeline for finding metagenomic mis-assemblies.  We flag regions of the genome that are statistically inconsistent with the data generation process and underlying species abundances. VALET is one of the first de novo tools to accurately and efficiently find mis-assemblies in metagenomic data sets and is currently being used to evaluate assemblies in the The Critical Assessment of Metagenome Interpretation (CAMI) competition.
 
-
+For the final part of my talk, I will discuss my ongoing work with long read sequencing technologies. Long read sequencing technologies have brought us closer to the goal of a complete genome assembly.  The first computationally difficult step in most assembly algorithms is identifying sequences that overlap.  Here, we propose an efficient filtering method relying on SPQR tree-based decomposition that allows us to provide a locality sensitive labeling for these long, high-error reads.  In addition to providing us with a more efficient assembly, the tree-based decomposition of the assembly graph allows us to uncover population variatints when with multiple samples.

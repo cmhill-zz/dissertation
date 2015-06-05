@@ -2,7 +2,7 @@
 
 \renewcommand{\thechapter}{2}
 
-\chapter{Comparing metagenomic assemblies}
+\chapter{Comparing and Evaluating Metagenomic Assemblies}
 
 \section{abstract}
 %\boldmath
@@ -10,17 +10,17 @@ The ever-decreasing costs of sequencing technology has led to a sharp increase i
 The first step in these analyses is to perform
 genome assembly to piece together the DNA fragments into complete, or
 near complete, genomes.
-%The first step in these analyses involves the use of tools called assemblers that piece together the DNA fragments into complete or near complete genome sequences. 
+%The first step in these analyses involves the use of tools called assemblers that piece together the DNA fragments into complete or near complete genome sequences.
 Metagenomic assemblers inherit all the difficulties of traditional single genome assembly, but with the additional complexity of trying to resolve assemblies of closely related species with drastically varying abundances.
 Assessing and comparing the quality of single genome assembly still relies on the availability of independently determined standards, such as manually curated genomic sequences.
 These standards are often not possible in metagenomic projects, where a large portion of the organisms and strains are novel.
 Thus, we must rely on \emph{de novo} methods for assessing and comparing assembly qualities.
 Here we describe an extension to our \emph{de novo} LAP framework to evaluate metagenomic assemblies.
 We will show that by modifying our likelihood calculation to take into account abundances of assembled sequences, we can accurately and efficiently compare metagenomic assemblies.
-%We evaluate our extended framework on results generated from the Human Microbiome Project (HMP) and 
+%We evaluate our extended framework on results generated from the Human Microbiome Project (HMP) and
 We find that our extended LAP framework is able to reproduce results on data from the Human Microbiome Project (HMP) that closely match the reference-based evaluation metrics and outperforms other \emph{de novo} metrics traditionally used to measure assembly quality.
 Finally, we have integrated our LAP framework into the metagenomic analysis pipeline MetAMOS, allowing any user to reproduce quality assembly evaluations with relative ease.
-%Even without knowledge of the true reference sequences, our \emph{de novo} metric 
+%Even without knowledge of the true reference sequences, our \emph{de novo} metric
 %Here we introduce an extension to our LAP  \emph{de novo} probabilistic measure of assembly quality, which allows for an objective comparison of multiple assemblies generated from the same set of reads.
 %We define the quality of a sequence produced by an assembler, as the conditional probability of observing the sequenced reads from the assembled sequence.
 
@@ -78,7 +78,7 @@ Finally, we show how our LAP framework can be used automatically by the metageno
 The software implementing our approach is made available, open-source and free of charge, at: \url{http://assembly-eval.sourceforge.net/} and with the MetAMOS package: \url{https://github.com/treangen/MetAMOS}.
 
 %\hfill mds
- 
+
 %\hfill July 17, 2013
 
 %\newpage
@@ -91,7 +91,7 @@ The software implementing our approach is made available, open-source and free o
 \begin{quote}
 \caption[The metagenome of an environment]{The metagenome of an environment can be viewed as the concatenation of the organisms found in the environment whose multiplicity is determined by their abundance. \label{fig:metagenome}}
 \end{quote}
-\end{figure} 
+\end{figure}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
 \newpage
@@ -99,7 +99,7 @@ The software implementing our approach is made available, open-source and free o
 % \begin{figure}[!t]
 % \centering
 % \includegraphics[width=3in]{metagenome}
-% % where an .eps filename suffix will be assumed under latex, 
+% % where an .eps filename suffix will be assumed under latex,
 % % and a .pdf suffix will be assumed for pdflatex; or what has been declared
 % % via \DeclareGraphicsExtensions.
 % \caption{The metagenome of an environment can be viewed as the concatenation of the organisms found in the environment whose multiplicity is determined by their abundance.}
@@ -121,8 +121,8 @@ By modeling the data generation process, we can calculate the probability of eac
 Assuming uniform coverage, where each position in the genome is covered by roughly the same amount of reads as any other position, a read may be sequenced starting from any position of the genome with equal probability.
 In the basic error-free model, if a read matches to one position in the assembly, and its reverse-complement does not match anywhere, then the probability of the read being produced from the assembly is $p_r=\frac{1}{2L}$, where $L$ is the length of the assembly.
 The length of the assembly is doubled due to the double-stranded molecules of DNA that make up the genome.
-Thus, if a read 
-%and its reverse-complement 
+Thus, if a read
+%and its reverse-complement
 matches at $n_r$ positions on the assembly, then
 % and its reverse-complement
 \begin{equation}
@@ -140,13 +140,13 @@ To counteract the effect of sample size on the probability, we define the assemb
 %
 \begin{align}
 \label{average_log_probability}
-  \operatorname{AP}(R^\prime) = 
+  \operatorname{AP}(R^\prime) =
   \left(\prod_{r \in R^\prime} p_r\right)^{\frac{1}{\left|R^\prime\right|}} \nonumber  \\
   \operatorname{LAP}(R^\prime) = \log_{10} \left( \operatorname{AP}(R^\prime) \right) = \frac{\sum_{r \in R^\prime} \log_{10} p_r}{\left|R^\prime\right|}
 \end{align}
 %
 %For the remainder of this paper, we define the assembly quality as the average log likelihood (LAP) of the reads given the assembly.
-%This formulation allows us to estimate the 
+%This formulation allows us to estimate the
 The mean of the read probabilities over the sample is expected to be equal to the mean over all reads, but if the sample size is too small, then the accuracy of the estimation will be poor.
 
 \begin{figure}
@@ -154,9 +154,9 @@ The mean of the read probabilities over the sample is expected to be equal to th
 %\begin{figure*}[tbhp!]
 %\centering
 
-\subfigure[\emph{B. cereus} (1 copy, 5.2MB) and \emph{A. baumannii} (4 copies, 4.0MB).]{\includegraphics[width=4in]{ref_abun_1} \label{fig:ref_abun_1}}
+\subfigure[\emph{B. cereus} (1 copy, 5.2MB) and \emph{A. baumannii} (4 copies, 4.0MB)]{\includegraphics[width=4in]{ref_abun_1} \label{fig:ref_abun_1}}
 \hfil
-\subfigure[\emph{B. cereus} (4 copies, 5.2MB) and \emph{A. odontolyticus} (7 copies, 2.4MB).]{\includegraphics[width=4in]{ref_abun_2} \label{fig:ref_abun_2}}
+\subfigure[\emph{B. cereus} (4 copies, 5.2MB) and \emph{A. odontolyticus} (7 copies, 2.4MB)]{\includegraphics[width=4in]{ref_abun_2} \label{fig:ref_abun_2}}
 \end{center}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
@@ -193,7 +193,7 @@ This setting is similar to that of repeats in single genome assembly, where a re
 Like in the case of single genomes, the assembler that correctly estimates these repeat counts maximizes the LAP score.
 In other words, in order to accurately evaluate the metagenomic assemblies using our LAP framework, the abundance (or copy number) of each contig is needed.
 %The assembler that figures out the correct copy number of repeats (in this case, contigs) will have the highest LAP score.
-As most metagenomic assemblers do not report this information, 
+As most metagenomic assemblers do not report this information,
 here we use the average coverage of the contig (provided by the MetAMOS pipeline) to represent the copy number.
 
 %In order to accurately calculate the LAP of a metagenomic assembly, in addition to the actual assemblies, we need the abundances.
@@ -222,7 +222,7 @@ where $S_r$ is the set of alignments in the SAM file for the read $r$ and the pr
 
 
 
-%allow the assembler to tell us what copy number it expects for each contig - that is the average coverage for the contig (provided in our analysis by the MetAMOS pipeline). 
+%allow the assembler to tell us what copy number it expects for each contig - that is the average coverage for the contig (provided in our analysis by the MetAMOS pipeline).
 %Our LAP framework uses the average per basepair coverage of assembled contigs provided by MetAMOS.
 
 An important factor in any likelihood-based assembly evaluation framework is the handling of reads that do not align well to the given assembly.
@@ -266,13 +266,6 @@ Tongue  & Meta-IDBA & -21.368 & 25,698 & 88.70\% & 7 & \textbf{710} & \textbf{2,
 \end{table*}
 
 
-\begin{figure}[b!]
-\centering
-\includegraphics[width=3.5in]{errors}
-\caption{Synthetic errors in simulated \emph{E. coli} (5 copies, 4.9Mbp) \emph{B. cereus} (1 copy, 5.2Mbp) community.}
-\label{fig:errors}
-\end{figure}
-
 
 \subsection{Integration into MetAMOS}
 
@@ -303,7 +296,7 @@ We calculated the LAP scores of the error-free reference genomes for all combina
 %\begin{figure}[!t]
 %\centering
 %\includegraphics[width=3in]{ref_abun_2}
-% where an .eps filename suffix will be assumed under latex, 
+% where an .eps filename suffix will be assumed under latex,
 % and a .pdf suffix will be assumed for pdflatex; or what has been declared
 % via \DeclareGraphicsExtensions.
 %\caption{LAP scores for simulated B. cereus (4x, 5.2MB) and A. odontolyticus (7x, 2.4MB)}
@@ -315,6 +308,19 @@ We expect the highest LAP scores for the assemblies that contain the correct abu
 As seen in Figs. \ref{fig:ref_abun_1} and \ref{fig:ref_abun_2}, our LAP score is able to accurately reflect the varying organism abundance ratios present in the sample.
 The LAP score increases as the estimates approach the true abundance ratios, with the true ratio yielding the highest LAP scores in both communities.
 
+\begin{figure}[htb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{errors}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Synthetic errors in simulated \emph{E. coli} and \emph{B. cereus} (1 copy, 5.2Mbp) community]{Synthetic errors in simulated \emph{E. coli} (5 copies, 4.9Mbp) \emph{B. cereus} (1 copy, 5.2Mbp) community.}
+\label{fig:errors}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \subsection{Impact of errors on synthetic metagenomes}
 
@@ -385,7 +391,7 @@ The LAP score penalizes misassemblies within abundant contigs in the SOAPdenovo 
 %The Meta-IDBA assembly a far more uniform frequency of contig abundances compared to the SOAPdenovo assembly.
 
 Next, we applied our framework on real data where we did not know the actual genomes comprising the sample (HMP tongue dorsum female sample, SRS077736) (Table \ref{tab:hmp}).
-Although we do not know for certain which organisms are present in the sample, the HMP identified a reference genome set with high similarity to the sequences within the sample (HMP Shotgun Community profiling SRS077736). 
+Although we do not know for certain which organisms are present in the sample, the HMP identified a reference genome set with high similarity to the sequences within the sample (HMP Shotgun Community profiling SRS077736).
 The reference-based error metrics only consider chimeric errors due to the possibility of structural difference between an organism and its version in the reference database.
 We calculated the LAP of the assemblies using a single library consisting of 42,013,917 reads.
 The SOAPdenovo assembly had a far greater LAP score than the Meta-IDBA assembly.
@@ -395,14 +401,19 @@ Furthermore, the MetAMOS metrics show that the SOAPdenovo assembly contained app
 %These datasets have the advantage over simulated data because it captures the error and bias introduced from the sequence technology.
 
 
-
-\begin{figure}[tb!]
-\centering
-\includegraphics[width=3in]{coverage}
-\caption{Frequency of contig abundances for assemblies of the HMP mock Staggered dataset.}
+\begin{figure}[htb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{coverage}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Frequency of contig abundances for assemblies of the HMP mock Staggered dataset]{Frequency of contig abundances for assemblies of the HMP mock Staggered dataset.}
 \label{fig:coverage}
+\end{quote}
 \end{figure}
-
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \begin{table}[b]
 \caption{Self-tuning MetAMOS using \emph{C. ruddii} test dataset.}
@@ -505,7 +516,7 @@ Providing a systematic way of combining assembler approaches using our LAP score
 %\begin{figure}[!t]
 %\centering
 %\includegraphics[width=2.5in]{myfigure}
-% where an .eps filename suffix will be assumed under latex, 
+% where an .eps filename suffix will be assumed under latex,
 % and a .pdf suffix will be assumed for pdflatex; or what has been declared
 % via \DeclareGraphicsExtensions.
 %\caption{Simulation Results}
@@ -539,7 +550,7 @@ Providing a systematic way of combining assembler approaches using our LAP score
 % reference/describe all of them (a), (b), etc., within the main caption.
 
 
-% An example of a floating table. Note that, for IEEE style tables, the 
+% An example of a floating table. Note that, for IEEE style tables, the
 % \caption command should come BEFORE the table. Table text will default to
 % \footnotesize as IEEE normally uses this smaller font for tables.
 % The \label must come after \caption as always.
@@ -577,5 +588,3 @@ Providing a systematic way of combining assembler approaches using our LAP score
 In this paper we have described an extension to our \emph{de novo} assembly evaluation framework (LAP) for comparing metagenomic assemblies.
 We showed that the true metagenome and correct relative abundances maximizes our extended LAP score.
 Furthermore, we have integrated our framework into the metagenomic assembly pipeline MetAMOS, showing that any user is able to reproduce quality evaluations of metagenomic assemblies with relative ease.
-
-

@@ -1,0 +1,264 @@
+\section{abstract}
+With the increased availability of next-generation sequencing technologies, researchers are gathering more data than they are able to process and analyze. One of the most widely performed analysis is identifying regions of similarity between DNA or protein sequences using the Basic Local Alignment Search Tool, or BLAST. Due to the large amount of sequencing data produced, parallel implementations of BLAST are needed to process the data in a timely manner.  While these implementations have been designed for those researchers with access to computing grids, recent web-based services, such as Amazon's Elastic Compute Cloud, now offer scalable, pay-as-you-go computing.  In this paper, we present K-mulus, an application that performs distributed BLAST queries via Hadoop MapReduce using a collection of established parallelization strategies. In addition, we provide a method to speedup BLAST by clustering the sequence database to reduce the search space for a given query.  Our results show that users must take into account the size of the BLAST database and memory of the underlying hardware to efficiently carry out the BLAST queries in parallel.  Finally, we show that while our database clustering and indexing approach offers a significant theoretical speedup, in practice the distribution of protein sequences prevents this potential from being realized.
+
+%
+%\input{section_introduction.tex}
+\section{Introduction}
+Identifying regions of similarity between DNA or protein sequences is one of the most widely studied problems in bioinformatics. These similarities can be the result of functional, structural, or evolutionary relationships between the sequences. As a result, many tools have been developed with the intention of efficiently searching for these similarities \cite{altschul1990basic,eddy2009new,kent2002blat}. The most widely used application is the Basic Local Alignment Search Tool, or BLAST\cite{altschul1990basic}.
+
+With the increased availability of next-generation sequencing technologies, researchers are gathering more data than ever before. This large influx of data has become a major issue as researchers have a difficult time processing and analyzing it. For this reason, optimizing the performance of BLAST and developing new alignment tools has been a well researched topic over the past few years. Take the example of environmental sequencing projects, in which the biodiversity of various environments, including the human microbiome, is analyzed and characterized to generate on the order of several terabytes of data\cite{peterson2009nih}. One common way in which biologists use these massive quantities of data is by running BLAST on large sets of unprocessed, repetitive reads to identify putative genes\cite{li2010est,murray2002identification}. Unfortunately, performing this task in a timely manner while dealing with terabytes of data far exceeds the capabilities of most existing BLAST implementations.
+
+As a result of this trend, large sequencing projects require the utilization of high-performance and distributed systems.
+BLAST implementations have been created for popular distributed platforms such as Condor\cite{condor-hunter} and MPI\cite{darling2003design,dongarra1993proposal}.
+%\emph{mpiBLAST}\cite{darling2003design} is a widely-used distributed version of BLAST, which can yield super-linear speed-up over running BLAST on a single node. \emph{mpiBLAST} works by segmenting the database into equal-sized chunks and distributing these chunks among the available nodes. All nodes then proceed to search the entirety of the query set against all chunks of the database. The results from individual nodes are later aggregated.
+Recently, MapReduce\cite{dean2008mapreduce} has become one of the de-facto standards for distributed processing.
+There are a few advantages of using the MapReduce framework over other existing parallel processing frameworks. The entirety of the framework rests in two simple methods: a \emph{map} and a \emph{reduce} function.
+The underlying framework takes care of the communication between nodes in the cluster.
+By abstracting the communication between nodes, it allows software developers to quickly design software that can run in parallel over potentially thousands of processors.
+Although this makes it simple to program, without direct control of the communication, it may be more inefficient compared to other distributed platforms.
+%For instance, if a developer wanted to count the number of occurrences of each of the words in a body of text, they could design a MapReduce application that would do this in parallel with little to no effort. Initially, they would feed the body of text as the input. Individual words from the file would be distributed evenly among all available nodes. The mappers would output key-value pairs of the form (word, 1). Finally, when all mappers have finished, the reducers will each get a key, and a list of values. In this case, the list of values is exclusively composed of 1s. The reducer would then aggregate all the entries in the list, and output the final key-value pair, which corresponds to (word, count).
+
+%//MOVE to methods/ADD other hadoop Blast implementations.
+
+%CloudBLAST\cite{matsunaga2008cloudblast} is a parallel implementation of BLAST which uses the MapReduce paradigm in conjunction with the Hadoop Distributed File System (HDFS) \cite{borthakur2007hadoop}. Unlike \emph{mpiBLAST}, which speedups up BLAST by segmenting the database, CloudBLAST’s parallelization approach solely involves segmenting the queries.
+
+While these parallel implementations of BLAST were designed to work on large computing grids, most researchers do not have access to these types of clusters, due to their high cost and maintenance requirements.
+Fortunately, cloud computing offers a solution to this problem, allowing researchers to run their jobs on demand without the need of owning or managing any large infrastructure.
+%//REMOVE: The speedup offered by running large jobs in parallel, as well as the opportunities for novel reduction of the BLAST protein search space\cite{morgulis2008database,williams1996indexing}, are the motivating factors that led us to devote this paper to effectively parallelizing protein BLAST (blastx and blastp).
+Web-based services, such as Amazon’s Elastic Compute Cloud (EC2)\cite{inc_amazon_2008}, have risen in recent years to address the need for scalable, pay-as-you-go computing.
+These services allow users to select from a collection of pre-configured disk images and services, and also allow more fine-grained customization down to the number of CPUs, speed, and amount of memory in their rented cluster.
+%Arguably the most popular, Amazon’s Elastic Compute Cloud (EC2)\cite{inc_amazon_2008} allows users to select pre-configured disk images and services.
+
+In this paper, we present K-mulus, a collection of Hadoop MapReduce tools for performing distributed BLAST queries.
+We show that a limitation to previous cloud BLAST implementations is their ``one size fits all'' solution to parallelizing BLAST queries.
+We provide several different strategies for parallelizing BLAST depending on the underlying cloud architecture and sequencing data, including: (1) parallelizing on the input queries, (2) parallelizing on the database, and then a (3) hybrid, query and database parallelization approach.
+Finally, we describe a k-mer indexing heuristic to achieve speedups by generating database clusters which results in a reduction of the search space during query execution.
+
+%After the database is partitioned by cluster, a lightweight k-mer index is generated for each partition. During a query, the k-mers of the query sequences can be quickly compared against these indices to determine if the cluster contains potential matches. In this way, a query sequence need only be compared against a subset of the original database, thereby reducing the search space.
+
+
+%\input{section_methods.tex}
+\section{Methods}
+
+%\emph{mpiBLAST}\cite{darling2003design}  Although K-mulus and mpiBLAST’s both divide the database into smaller chunks, mpiBLAST chunks the data arbitrarily, while K-mulus does so according to similarity-based clustering.
+
+\subsection{MapReduce}
+The MapReduce framework was created by Google to support large-scale parallel execution of data intensive applications using commodity hardware\cite{dean2008mapreduce}.
+Unlike other parallel programming framework where developers must explicitly handle inter-process communication, MapReduce developers only have to focus on two major functions, called \emph{map} and \emph{reduce}.
+
+Prior to running a MapReduce program, the data must be first stored in the Hadoop Distributed File System (HDFS).
+The user then specifies a \emph{map} function that will run on the chunks of the input data in parallel.
+MapReduce is ``data aware,'' performing computation at the nodes containing the required data instead of transferring the data across the network.
+The \emph{map} function processes the input in a particular way according to the developer’s specifications, and outputs a series of key-value pairs. Once all nodes have finished outputting their key-value pairs, all the values for a given key are aggregated into a list (via Hadoop's internal shuffle and sort mechanisms), and sent to the assigned reducer. During the reduce phase, the (key, list of values) pairs are processed. This list of values is used to compute the final result according to the application’s needs.
+For more details and examples, please see \cite{dean2008mapreduce}.
+%For instance, if a developer wanted to count the number of occurrences of each of the words in a body of text, they could design a MapReduce application that would do this in parallel with little to no effort. Initially, they would feed the body of text as the input. Blocks of text from the input file would be distributed evenly among all available nodes.
+%During the mapping phase, a mapper would process the text line-by-line.
+%Even though each mapper node is assigned a block of a text, the \emph{map} function is called separately on each line of the text.
+%The \emph{map} function would split the line by whitespace and for each word, it would output key-value pairs of the form (\emph{word}, 1). Finally, when all mappers have finished, the reducers will each receive a key, and a list of values. In this case, the list of values is exclusively composed of 1's. The reducer would then sum all the entries in the list, and output the final key-value pair, which corresponds to (\emph{word}, count).
+
+\subsection{Parallelization Strategies}
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CP112_fig1.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption{Query segmentation approach for parallelizing BLAST.}
+\label{fig:strategies}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+K-mulus uses three main strategies to perform distributed BLAST queries using Hadoop MapReduce.
+As we will show, the efficacy of these strategies are all dependent on the underlying hardware and data being used.
+\subsubsection{Query Segmentation.}
+Arguably the simplest way to parallelize an application using MapReduce is to set the \emph{map} function to the given application and execute it on subsets of the input.
+The individual results of the \emph{map} functions are then aggregated by a single \emph{reducer}.
+This query segmentation is the default implementation of CloudBLAST\cite{matsunaga2008cloudblast}, a popular MapReduce implementation of BLAST.
+Instead of writing custom \emph{map} and \emph{reduce} functions, CloudBLAST takes advantage of Hadoop's streaming extension that allows seamless, parallel execution of existing software on Hadoop without having to modify the underlying application.
+
+The first step of the query segmentation approach is to partition the query file into a predetermined number of chunks (usually the number of computing nodes) and send them to random nodes (Fig. \ref{fig:strategies}).
+This partitioning of the query sequences can be done automatically as the sequence files are uploaded to the HDFS.
+The user must pay special attention to the size of their query sequence file because the block sizes for the HDFS are 128MB by default.
+It is possible to underutilize the Hadoop cluster, since the \emph{map} functions are often assigned to blocks of the input data.
+If a user uploads a 128MB sequence file to HDFS and uses Hadoop's streaming extension, then despite the number of nodes they request, BLAST will be performed only using the node containing the block of the data.
+%K-mulus provides additional functionality to partition the input into the desired number of blocks to prevent this from happening.
+
+During runtime, the \emph{map} function receives as input a block of FASTA-formatted sequences.
+Each \emph{map} function simply executes the included BLAST binary against the included database sequences and outputs the results directly to disk.
+Although there is no need to use a reducing step for this strategy, one reducer can be used to aggregate the results.
+%By using Hadoop, we do not have to worry load balancing and communication between nodes.
+
+\subsubsection{Database Segmentation.}
+
+Instead of segmenting the query, we can segment the database into a predetermined number of chunks.
+By segmenting the database, we can reduce the overhead of disk I/O for databases that do not fit completely into memory.
+Otherwise, as soon as the database grows larger than the amount of main memory, the runtime increases by orders of magnitude\cite{darling2003design}.
+Therefore, it is important to examine the underlying hardware limitations and database size before using the default query segmentation approach.
+
+During runtime, the query sequences are uploaded to the HDFS and sent to all nodes using the DistributedCache feature of Hadoop.  The DistributedCache feature ensures that all nodes involved in the MapReduce have access to the same files.  The \emph{map} function is only responsible for passing the path of the database chunks to the reducer.  Each \emph{reduce} function executes BLAST on the complete set of input sequences.
+
+Since BLAST takes into account the size of the database when computing alignment statistics, the individual BLAST results must have their scores adjusted for the database segmentation.
+Fortunately, BLAST provides the user an option to specify the effective length of the complete database.
+%In order to determine the k and $\lambda$ values (statistical parameters dependent upon the alignment scoring and the background amino acid frequencies), a test query of one sequence must be performed against against the entire non-segmented database.
+
+\subsubsection{Hybrid Approach.}
+One potential problem with the database segmentation approach is that if we evenly partition the database across all nodes in our cluster, then the database chunks may only fill up a small portion of the available memory.
+In this case, we must use a hybrid approach, where we segment the database into the least number of chunks that can fit entirely into memory.
+%When the database is too large to fit in memory, but segmenting the database results in very small chunks, then we must use a hybrid approach.
+Afterwards, we replicate the database chunks across the remaining machines.
+During runtime, the query sequences are split and sent to the different the databases chunks, but only sent once to each of the database chunk replicates.
+This hybrid approach is also utilized by \emph{mpiBLAST}\cite{darling2003design}, a widely-used distributed version of BLAST using MPI, which can yield super-linear speed-up over running BLAST on a single node.
+
+During runtime, each \emph{map} function receives a chunk of the query sequences and is responsible for sending out the chunk to each database partition.
+For each database partition $i$, the \emph{map} function randomly selects a replicate to send the query chunk to in the form of a tuple ($db_{i,\text{replicate\_num}}$, query chunk).
+The reducer receives a collection of query chunks for a given database partition and replicate and BLASTs the query chunk against the database partition.
+
+\subsection{K-mer Indexing}
+One of the original algorithms that BLAST uses is ``seed and extend'' alignment. This approach requires that there be at least one k-mer (sequence sub-string of length k) match between query and database sequence before running the expensive alignment algorithm between them\cite{altschul1990basic}. Using this rule, BLAST can bypass any database sequence which does not share any common k-mers with the query. Using this heuristic, we can design a distributed version of BLAST using the MapReduce model. One aspect of BLAST which we take advantage of is the database indexing of k-mers. While some versions of BLAST have adopted database k-mer indexing for DNA databases, it seems that this approach has not been feasibly scaled to protein databases\cite{morgulis2008database}. For this reason, BLAST iterates through nearly every database sequence to find k-mer hits. Here we describe an approach for K-mulus that attempts to optimize this process by using lightweight database indexing to allow query iteration to bypass certain partitions of the database.
+
+In order to cluster the database, for each sequence, we first create a vector of bits in which the value at each position indicates the presence of a specific sequence k-mer. The index of each k-mer in the vector is trivial to compute.
+We then cluster these bit vectors using a collection of clustering algorithms: k-means\cite{hartigan1979algorithm}, and k-medoid\cite{van2003new}.
+Our algorithms perform clustering with respect to the presence vectors of each input sequence. For each cluster, a center presence vector is computed as the union of all sequence presence vectors in the cluster. The distance between clusters is taken as the Hamming distance, or number of bitwise differences, between these cluster centers. This design choice creates a tighter correspondence between the clustering algorithm and the metrics for success of the results, which depend entirely on the cluster presence vectors as computed above.
+We also keep track of the centers for each cluster as they play the crucial role of identifying membership to a cluster.
+
+After the database has been clustered, we compare the input query sequences to all centers. The key idea is that by comparing the input query sequence to the cluster centers, we can determine whether a potential match is present in a given cluster. If this is the case, we run the BLAST algorithm on the query sequence and the database clusters that we determined as relevant for the query.
+
+
+%\input{section_results.tex}
+\section{Results}
+
+\subsection{Comparison of Parallelization Approaches on a Modest Size Cluster}
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CP112_fig2.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption{Runtimes of different BLAST parallelization approaches.}
+\label{fig:parallel_approaches}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+We evaluated the different parallelization approaches of protein BLAST on 30,000 translated protein sequences randomly chosen from the Human Microbiome Project\cite{peterson2009nih} (Fig. \ref{fig:parallel_approaches}).
+The sequences were BLAST against NCBI's non-redundant (\emph{nr}) protein database (containing 3,429,135 sequences).
+For our analyses we used a 46 node Hadoop (version 0.20.2) cluster.  Each node had 2 map/reduce tasks and 2GB of memory, reproducing a typical cloud cluster.
+
+The \emph{nr} database used was 9GB in size and unable to completely fit into the memory of a single node in our cluster.
+We segmented the database into 100 and 500 chunks to test our database segmentation approach.
+With 100 database chunks, the database will be roughly split across each reduce task.
+We included a partitioning of 500 database chunks to show the effects of over-partitioning the database.
+
+Segmenting the database into 100 and 500 partitions resulted in a 26\% and 16\% decrease in runtime compared to the query segmentation approach, respectively.
+Although using a smaller number of database partitions was faster, there are still advantages for using more database partitions.
+Assuming an even distribution of query workload, if a node fails near the end of its BLAST execution, then that task must be restarted and the overall runtime is essentially doubled.
+Over-partitioning the database allows for a failed task to restart and complete faster.
+
+Our hybrid query and database segmentation approach resulted in a 44\% decrease in runtime compared to only query segmentation.
+Considering that the memory of each node in our cluster was 2GB, and the \emph{nr} database was 9GB, we partitioned the database into 5 chunks, each roughly 2GB in size.
+This allows the databases to fit completely into memory at each node.
+
+\subsection{Analysis of Database k-mer Index}
+
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CP112_fig3.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption{Runtimes of database segmentation with k-mer index approach.}
+\label{fig:db_index}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+Using our clustering and k-mer index approach, we show noticeable speedups on well clustered data.
+To demonstrate this we simulated an ideal data set of 1,000 sequences, where the sequences were composed of one of two disjoint sets of 3-mers.
+The database sequences were clustered into two even-size clusters.
+The sample query was 10,000 sequences, also comprising one of two disjoint sets of 3-mers.
+Figure \ref{fig:db_index} shows the result of running BLAST on the query using Hadoop's streaming extension with query segmentation (the method used by CloudBLAST to execute BLAST queries) and K-mulus.
+K-mulus running on 2 cores with 2 databases yields a 56\% decrease in runtime over BLAST using Hadoop's streaming extension on 2 cores.
+In practice, this degree of separability is nearly impossible to replicate, but this model allows us to set a practical upper bound for the speedup contributed by clustering and search space reduction.
+
+For a more practical BLAST query using the \emph{nr} database, our database and k-mer indexing approach took 2.75x as long compared to the naive Hadoop streaming method using a realistic query of 30,000 sequences from the HMP project. The poor performance is due to the very high k-mer overlap between clusters and uneven cluster sizes.
+Due to the high k-mer overlap, each query sequence is being replicated and compared against nearly all clusters.
+
+K-mulus' database clustering and k-mer indexing approach shows poor performance due entirely to noisy, overlapping clusters. In the worst case, K-mulus will map every query to every cluster and devolve to a naive parallelized BLAST on database segments, while also including some overhead due to database indexing. This is close to the behavior we observed when running our clustering and k-mer index experiments on the \emph{nr} database. In order to describe the best possible clusters we could have generated from a database, we considered a lower limit on the exact k-mer overlap between single sequences in the \emph{nr} database (Fig. \ref{fig:kmer_intersection}). We generated this plot by taking 50 random samples of 3000 \emph{nr} sequences each, computing the pairwise k-mer intersection between them, and plotting a histogram of the magnitude of pairwise k-mer overlap. This shows that there are very few sequences in the \emph{nr} database which have no k-mer overlap which makes the generation of disjoint clusters impossible. Furthermore, this plot is optimistic in that it does not include BLAST’s neighboring words, nor does it illustrate comparisons against cluster centers which will have intersection greater than or equal to that of a single sequence.
+
+One strategy to improve the separability of the clusters and reduce the k-mer intersection between clusters is to use repeat masking software.
+In order to show the improvement offered by repeat masking, we ran SEG\cite{wootton1993statistics} on the sequences before computing the intersection (Fig. \ref{fig:kmer_intersection}). On average, SEG resulted in a 6\% reduction in the number of exact k-mer overlap between two given sequences. Repeat masking caused a significant, favorable shift in k-mer intersection and would clearly improve clustering results. However, the \emph{nr} database had so much existing k-mer overlap that using SEG preprocessing would have almost no effect on the speed of K-mulus' clustering and k-mer index approach.
+
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CP112_fig4.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+  \caption{Pair-wise k-mer intersection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences.}
+  \label{fig:kmer_intersection}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+
+%\input{section_discussion.tex}
+\section{Discussion}
+
+With Amazon EC2 and other cloud platforms supporting Hadoop, developers should not make assumptions about the underlying hardware.
+Here we have provided K-mulus, which gives users the versatility to handle the common ways to perform distributed BLAST queries in the cloud without making assumptions of the underlying hardware and data.
+The default approach of most Hadoop implementations of BLAST is to segment the query sequences and run BLAST on the chunks in parallel.
+This approach works best when the entire BLAST database can fit into memory of a single machine, but as sequencing becomes cheaper and faster, this will become less likely.
+Computing clusters provided by services such as EC2 often contain commodity hardware with low memory, which we have shown makes the default query segmentation approach poor in practice.
+The query segmentation approach works quite well on more powerful clusters that are able to load the entire database into memory.
+By providing users with the different parallel strategies, they are free to choose the one that is most effective with their data and hardware.
+
+We have also provided a way to speed up BLAST queries by clustering and indexing the database using MapReduce.
+The speedup potential is largely dependent on the clusterability of the data.
+Protein sequences lie in high-dimensional non-Euclidean space, so by comparing them, we encounter the curse of dimensionality, where almost all pairs of sequences are equally far away from one another.
+This problem maybe slightly alleviated if we are trying to cluster multiple data sets of highly redundant sequences (multiple deep coverage whole genome sequencing projects with distinct, non-intersecting k-mer spectra).
+Future work includes clustering and indexing the query sequences, which may have higher redundancy than the database sequences.
+%Users of NCBI's BLAST web interface are given the option to BLAST their query sequences against non-redundant databases by default, suggesting that non-redundant databases are most often used.
+%However, clustering these databases with a stringent enough criteria to get few k-mer intersections often results in clusters of very little size\cite{li2002tolerating}.
+%When the size of the database clusters are a fraction of the available memory, we have shown that this is quite inefficient.
+%One potential improvement is to use a hierarchical clustering algorithm that proceeds until we have enough sequences to fill up the available memory of a node in our cluster.
+
+%Although we focused only on achieving speedups by clustering of the database, it may be worth exploring the potential speedups by clustering the query sequences.
+%Unlike the database, which is clustered prior to runtime and used throughout different BLAST executions, the query would have to be clustered at runtime.
+%Thus, the efficacy of this approach depends on the speed of the clustering algorithm and k-mer composition of the query sequences.
+% to ensure speedups over the default query segmentation approach.
+
+%Our work did not include analysis of any clustering or indexing methods which would have resulted in a loss of BLAST search sensitivity. For example, K-mulus clustering might benefit from the positive results shown for protein k-mer indexing of large k-mers over compressed alphabets\cite{shiryev2007improved}.
+%Another possible improvement would be to map queries according to percent k-mer identity to a cluster, or to raise the threshold for required k-mer overlap with a cluster index.
+%While these approaches would reduce BLAST sensitivity, the trade off with search speed may be favorable. The motivation for this work comes from our evidence that if protein clustering in K-mulus can be improved, large speedups can be achieved.
+
+Although our clustering and indexing approach was used on protein sequences, the logical next step is to include nucleotide database indexing, which has historically had more success in speeding up sequence alignment\cite{kent2002blat}.
+With a four character alphabet and simplified substitution rules, nucleotides are easier to work with than amino acids, and allow for much more efficient hashing by avoiding of the ambiguity inherent in amino acids.
+%Furthermore, we expect a more random distribution of nucleotide k-mers than amino acids k-mers, which allows for better clustering.
+%While we chose to pursue improvements to protein BLAST,
+%In our analysis it has become clear that a K-mulus nucleotide BLAST not only has a promising outlook for a speedup, but could serve as a model for effectively executing the more complex task of protein clustering.
+
+It should be noted that the parallelization strategies presented here would also benefit other commonly used bioinformatics tools.  Short read alignment tools (such as Bowtie2\cite{langmead2012fast}) can be parallelized by partitioning the reference index as well as the query sequences.  More work needs to be done to determine the best parallelization strategies for these tools running on commodity clusters.
+
+\subsubsection{Availability}
+Java source code for K-mulus are located at: \url{https://github.com/biocloud/k-mulus}
+
+\subsubsection{Acknowledgments}
+We would like to thank Mohammadreza Ghodsi for advice on clustering, Daniel Sommer for advice on Hadoop, Lee Mendelowitz for manuscript feedback, Katherine Fenstermacher for the name K-mulus, and the other members of the Pop lab for valuable discussions on all aspects of our work.
+
+This work is supported in part by grants from the National Science Foundation, grant IIS-0844494 to MP.

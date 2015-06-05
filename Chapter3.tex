@@ -2,7 +2,7 @@
 
 \renewcommand{\thechapter}{3}
 
-\chapter{Stochastic Four-Wave-Mixing}
+\chapter{Additional Contributions}
 
 \section{Abstract}
 
@@ -131,7 +131,7 @@ used by Tukey's box plot~\cite{mcgill1978variations}. The main
 benefit of this approach is that it is completely data-dependent, and
 no assumptions regarding the distribution of the quality values need
 to be made.
- 
+
 With 2-bin encoding binary encoding is possible, allowing us to use a
 single bit to represent the quality of a base instead of the standard
 8 bits used to store quality values in \textsc{ascii}. An additional
@@ -151,9 +151,17 @@ Truncating treats a user-defined number of highest quality values as a single bi
 LogBinning works similar to UniBinning, except with the \emph{log} of the error probability distribution, which effectively bins the \textsc{ascii} quality values evenly.
 Our 2-bin encoding is a combination of LogBinning and Truncating in that we are placing the highest quality values (as defined above) of the log of the error probability distribution into a single bin.
 
+
 \begin{figure}[!tpb]%figure2
-\centerline{\includegraphics[width=3.35in]{profiles_128.png}}
-\caption{Quality profiles obtained by $k$-means clustering on the
+\begin{center}
+\includegraphics[width=.8\textwidth]{profiles_128.png}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Quality profiles obtained by $k$-means clustering on the
+  fragment library from \textit{Rhodobacter sphaeroides} 2.4.1 data
+  set]{Quality profiles obtained by $k$-means clustering on the
   fragment library from \textit{Rhodobacter sphaeroides} 2.4.1 data
   set using $k$ = 128, with each row corresponding to a quality
   profile. Dark to light colors represent low to high quality
@@ -162,8 +170,12 @@ Our 2-bin encoding is a combination of LogBinning and Truncating in that we are 
   quality. One can also see sporadic low-position values in a handful
   of profiles, likely capturing intermittent problems in the
   sequencing process affecting thousands of reads at a
-  time.}\label{fig:profiles_128}
+  time.}
+  \label{fig:profiles_128}
+\end{quote}
 \end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \subsubsection{Modeling}
 
@@ -197,22 +209,6 @@ Once the model parameters are calculated, they are stored by the decoder to late
 The quality values can be clustered before hand to produce more accurate models.
 
 \subsubsection{Profiling}
-
-\begin{figure*}[!tb]%figure2
-%\centerline{\includegraphics[width=3.65in]{mse_frag.png}}
-\centerline{\includegraphics[width=7in]{compression_results.pdf}}
-\caption{Mean squared error versus bits/base-call for different
-  compression methods applied to the \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} data sets. 2B --- 2-bin encoding; P$n$ --- profiling
-  with $n$ profiles; R$n$ --- modeling with polynomial regression
-  models of degree $n$; Q$n$ --- \textsc{q}ual\textsc{c}omp with rate parameter of
-  $n$. Asterisks denote the corresponding lossless compression using
-  \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
-  data.}
-\label{fig:mse_vs_bpbp}
-\end{figure*}
 
 As large sets of quality strings show similar trends of quality over
 their length, it makes sense to identify such common patterns in the
@@ -296,6 +292,33 @@ was obtained from the NCBI RefSeq database (NC\_000913.2).
 \url{http://trace.ddbj.nig.ac.jp/DRASearch/run?acc=SRR032209}, which
 consisted of 18,828,274 reads of length 36.
 
+\begin{figure}[!tpb]%figure2
+\begin{center}
+\includegraphics[width=\textwidth]{compression_results.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Mean squared error versus bits/base-call for different
+  compression methods applied to the \textit{Rhodobacter sphaeroides}
+  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
+  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
+    musculus} data sets]{Mean squared error versus bits/base-call for different
+  compression methods applied to the \textit{Rhodobacter sphaeroides}
+  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
+  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
+    musculus} data sets. 2B --- 2-bin encoding; P$n$ --- profiling
+  with $n$ profiles; R$n$ --- modeling with polynomial regression
+  models of degree $n$; Q$n$ --- \textsc{q}ual\textsc{c}omp with rate parameter of
+  $n$. Asterisks denote the corresponding lossless compression using
+  \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
+  data.}
+  \label{fig:mse_vs_bpbp}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
 \subsection{Performance evaluation}
 
 As a measure of compression effectiveness we use bits/base-call, and
@@ -371,10 +394,17 @@ per sequence of quality values. The read length of the \textit{Mus musculus}
 data set is only 26, so the 7th-degree polynomial regression is storing
 six more bytes than necessary for lossless encoding the quality data.
 
-\begin{figure}[!tbp]%figure2
-%\centerline{\includegraphics[width=3.65in]{mse_frag.png}}
-\centerline{\includegraphics[width=3.65in]{preprocessing_results.pdf}}
-\caption{Preprocessing results of \textit{Rhodobacter sphaeroides}
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=4in]{preprocessing_results.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Preprocessing results of \textit{Rhodobacter sphaeroides}
+  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
+  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
+    musculus} data sets]{Preprocessing results of \textit{Rhodobacter sphaeroides}
   2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
   and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
     musculus} data sets. Sequences were trimmed using Sickle. The
@@ -382,7 +412,10 @@ six more bytes than necessary for lossless encoding the quality data.
   compared with the amount of bases filtered using the uncompressed
   sequences.}
   \label{fig:preprocessing}
+\end{quote}
 \end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \subsection{Effects on sequence read preprocessing}
 
@@ -487,16 +520,25 @@ runs counter to the the decrease in \textsc{mse} of the different
 rates.
 
 
-\begin{figure}[!tbp]%figure2
-%\centerline{\includegraphics[width=3.65in]{mse_frag.png}}
-\centerline{\includegraphics[width=3.65in]{rhodo_assembly_results.pdf}}
-\caption{Rankings of compression methods based on \textit{Rhodobacter
+\begin{figure}[!htb]%figure2
+\begin{center}
+\includegraphics[width=.8\textwidth]{rhodo_assembly_results.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Rankings of compression methods based on \textit{Rhodobacter
+    sphaeroides} assembly attributes]{Rankings of compression methods based on \textit{Rhodobacter
     sphaeroides} assembly attributes sorted by overall
   rank. Assemblies were constructed using \textsc{allpaths-lg}.
   Rankings above the median value are in cyan, those below the median
   value in magenta.}
   \label{fig:assembly_ranks}
+\end{quote}
 \end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
 
 \subsection{Effects on read mapping}
 
@@ -563,36 +605,36 @@ quality results in the lowest proportion of mapped reads 72.8\%.
 % \label{tab:quality_control}
 % \begin{tabular}{lr|cc|cc|cc|cc|cc}
 %  & & \multicolumn{2}{c|}{MaxQual} & \multicolumn{2}{c|}{MinQual} & \multicolumn{2}{c|}{2-bin} & \multicolumn{2}{c|}{Degree 0} & \multicolumn{2}{c}{Degree 1} \\
-%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\ 
+%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
 %   \cline{2-12}
-% & kept & 883576 &   0 &   0 & 883576 & 871035 & 12541 & 728349 & 155227 & 871510 & 12066 \\ 
-% {\em original} & discarded & 141858 &   0 &   0 & 141858 & 1882 & 139976 & 1475 & 140383 & 9214 & 132644 \\ 
+% & kept & 883576 &   0 &   0 & 883576 & 871035 & 12541 & 728349 & 155227 & 871510 & 12066 \\
+% {\em original} & discarded & 141858 &   0 &   0 & 141858 & 1882 & 139976 & 1475 & 140383 & 9214 & 132644 \\
 % \cline{2-12}
-%  & proportion & 1.000 & 0.000 & 0.000 & 1.000 & 0.851 & 0.149 & 0.712 & 0.288 & 0.859 & 0.141 \\ 
+%  & proportion & 1.000 & 0.000 & 0.000 & 1.000 & 0.851 & 0.149 & 0.712 & 0.288 & 0.859 & 0.141 \\
 % \end{tabular}
 
 % \bigskip
 
 % \begin{tabular}{lr|cc|cc|cc|cc|cc}
 %  & & \multicolumn{2}{c|}{Degree 3} & \multicolumn{2}{c|}{Degree 5} & \multicolumn{2}{c|}{Degree 7} & \multicolumn{2}{c|}{Profile (64)} & \multicolumn{2}{c}{Profile (128)} \\
-%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\ 
+%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
 % \cline{2-12}
-% & kept & 872006 & 11570 & 878936 & 4640 & 877802 & 5774 & 876149 & 7427 & 877513 & 6063 \\ 
+% & kept & 872006 & 11570 & 878936 & 4640 & 877802 & 5774 & 876149 & 7427 & 877513 & 6063 \\
 % {\em original}  &  discarded & 10369 & 131489 & 10004 & 131854 & 8821 & 133037 & 15795 & 126063 & 17453 & 124405 \\
 % \cline{2-12}
-% & proportion & 0.860 & 0.140 & 0.867 & 0.133 & 0.865 & 0.135 & 0.870 & 0.130 & 0.873 & 0.127 \\ 
+% & proportion & 0.860 & 0.140 & 0.867 & 0.133 & 0.865 & 0.135 & 0.870 & 0.130 & 0.873 & 0.127 \\
 % \end{tabular}
 
 % \bigskip
 
 % \begin{tabular}{lr|cc|cc|cc|cc|cc}
 % &  & \multicolumn{2}{c|}{Profile (256)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (6)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (10)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (30)} & \multicolumn{2}{c}{\textsc{q}ual\textsc{c}omp (100)} \\
-%  & &  kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\ 
+%  & &  kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
 % \cline{2-12}
-% & kept & 881215 & 2361 & 878702 & 4874 & 879682 & 3894 & 881948 & 1628 & 881939 & 1637 \\ 
-% {\em original}  & discarded & 15985 & 125873 & 13434 & 128424 & 12855 & 129003 & 10872 & 130986 & 7179 & 134679 \\ 
+% & kept & 881215 & 2361 & 878702 & 4874 & 879682 & 3894 & 881948 & 1628 & 881939 & 1637 \\
+% {\em original}  & discarded & 15985 & 125873 & 13434 & 128424 & 12855 & 129003 & 10872 & 130986 & 7179 & 134679 \\
 % \cline{2-12}
-% & proportion & 0.875 & 0.125 & 0.870 & 0.130 & 0.870 & 0.130 & 0.871 & 0.129 & 0.867 & 0.133 \\ 
+% & proportion & 0.875 & 0.125 & 0.870 & 0.130 & 0.870 & 0.130 & 0.871 & 0.129 & 0.867 & 0.133 \\
 % \end{tabular}
 % \end{table*}
 
@@ -610,38 +652,38 @@ quality results in the lowest proportion of mapped reads 72.8\%.
   compression.}
 \begin{tabular}{lr|cc|cc|cc|cc|cc}
  & & \multicolumn{2}{c|}{MaxQual} & \multicolumn{2}{c|}{MinQual} & \multicolumn{2}{c|}{2-bin} & \multicolumn{2}{c|}{Degree 0} & \multicolumn{2}{c}{Degree 1} \\
-& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\ 
+& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
 \cline{2-12}
-& mapped & 746716 & 145897 & 892613 &   0 & 891864 & 749 & 851682 & 40931 & 883390 & 9223 \\ 
-{\em original} & unmapped &   0 & 132821 & 10821 & 122000 & 186 & 132635 &  67 & 132754 &  55 & 132766 \\ 
+& mapped & 746716 & 145897 & 892613 &   0 & 891864 & 749 & 851682 & 40931 & 883390 & 9223 \\
+{\em original} & unmapped &   0 & 132821 & 10821 & 122000 & 186 & 132635 &  67 & 132754 &  55 & 132766 \\
 \cline{2-12}
-%& sum & 746716 & 278718 & 903434 & 122000 & 892050 & 133384 & 851749 & 173685 & 883445 & 141989 \\ 
-& proportion & 0.728 & 0.272 & 0.881 & 0.119 & 0.870 & 0.130 & 0.831 & 0.169 & 0.862 & 0.138 \\ 
+%& sum & 746716 & 278718 & 903434 & 122000 & 892050 & 133384 & 851749 & 173685 & 883445 & 141989 \\
+& proportion & 0.728 & 0.272 & 0.881 & 0.119 & 0.870 & 0.130 & 0.831 & 0.169 & 0.862 & 0.138 \\
 \end{tabular}
 
 \bigskip
 
 \begin{tabular}{lr|cc|cc|cc|cc|cc}
  & & \multicolumn{2}{c|}{Degree 3} & \multicolumn{2}{c|}{Degree 5} & \multicolumn{2}{c|}{Degree 7} & \multicolumn{2}{c|}{Profile (64)} & \multicolumn{2}{c}{Profile (128)} \\
-& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\ 
+& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
 \cline{2-12}
-& mapped & 889537 & 3076 & 891019 & 1594 & 891479 & 1134 & 891753 & 860 & 891952 & 661 \\ 
-{\em original} & unmapped & 117 & 132704 & 155 & 132666 & 154 & 132667 & 144 & 132677 & 143 & 132678 \\ 
+& mapped & 889537 & 3076 & 891019 & 1594 & 891479 & 1134 & 891753 & 860 & 891952 & 661 \\
+{\em original} & unmapped & 117 & 132704 & 155 & 132666 & 154 & 132667 & 144 & 132677 & 143 & 132678 \\
 \cline{2-12}
-%& sum & 889654 & 135780 & 891174 & 134260 & 891633 & 133801 & 891897 & 133537 & 892095 & 133339 \\ 
-& proportion & 0.868 & 0.132 & 0.869 & 0.131 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 \\ 
+%& sum & 889654 & 135780 & 891174 & 134260 & 891633 & 133801 & 891897 & 133537 & 892095 & 133339 \\
+& proportion & 0.868 & 0.132 & 0.869 & 0.131 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 \\
 \end{tabular}
 
 \bigskip
 
 \begin{tabular}{lr|cc|cc|cc|cc|cc}
 &  & \multicolumn{2}{c|}{Profile (256)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (6)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (10)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (30)} & \multicolumn{2}{c}{\textsc{q}ual\textsc{c}omp (100)} \\
-& &  mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\ 
+& &  mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
 \cline{2-12}
-& mapped & 892051 & 562 & 891375 & 1238 & 891777 & 836 & 892233 & 380 & 892454 & 159 \\ 
-{\em original}  & unmapped & 119 & 132702 & 304 & 132517 & 265 & 132556 & 220 & 132601 & 172 & 132649 \\ 
+& mapped & 892051 & 562 & 891375 & 1238 & 891777 & 836 & 892233 & 380 & 892454 & 159 \\
+{\em original}  & unmapped & 119 & 132702 & 304 & 132517 & 265 & 132556 & 220 & 132601 & 172 & 132649 \\
 \cline{2-12}
-%& sum & 892170 & 133264 & 891679 & 133755 & 892042 & 133392 & 892453 & 132981 & 892626 & 132808 \\ 
+%& sum & 892170 & 133264 & 891679 & 133755 & 892042 & 133392 & 892453 & 132981 & 892626 & 132808 \\
 & proportion & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 \\
 
 \end{tabular}
@@ -755,8 +797,7 @@ information in the compressed quality values.
 
 \section*{Acknowledgement}
 We thank the 2014 Bioinformatics
-Exchange for Students and Teachers (\textsc{best}) Summer School, 
+Exchange for Students and Teachers (\textsc{best}) Summer School,
 funded by the offices of the Dean of The Graduate School at University
-of Maryland and the Rektor of University of T\"{u}bingen, where this 
+of Maryland and the Rektor of University of T\"{u}bingen, where this
 research was initiated.
-
