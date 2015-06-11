@@ -6,6 +6,16 @@
 
 \chapter{Introduction}
 
+The genome of an organism is a blueprint for life.
+
+The human genome was published in 2001.
+
+Even a genome as highly researched as the human periodically releases updates correcting mistakes.
+The main reference has undergone over 38 revisions.
+Filling in gaps.
+Correcting misassemblies.
+When a new organsim is assembled, it is not easy determining what is missing, what is a mistake, and what is experimental artifact.
+
 
 
 \section{Genome Assembly}
@@ -15,57 +25,39 @@
 
 \section{Contributions of This Dissertation}
 
-In Chap.\ 2, we present the results of a computational study of the
-influence of stochasticity on the dynamical evolution of multiple
-four-wave-mixing processes in a single mode optical fiber with spatially
-and temporally $\delta$-correlated phase noise. A generalized nonlinear
-Schr\"odinger equation (NLSE) with stochastic phase fluctuations along the
-length of the fiber is solved using the Split-step Fourier method
-(SSFM). Good agreement is obtained with previous experimental and
-computational results based on a truncated-ODE (Ordinary Differential
-Equation) model in which stochasticity was seen to play a key role in
-determining the nature of the dynamics. The full NLSE allows for
-simulations with high frequency resolution (60\,MHz) and frequency span (16
-THz) compared to the truncated ODE model (300\,GHz and 2.8\,THz,
-respectively), thus enabling a more detailed comparison with
-observations. A physical basis for this hitherto phenomenological phase
-noise is discussed and quantified.
+In Chapter 2, we present an objective and holistic approach for evaluating and
+comparing the quality of assemblies derived from a same dataset.  Our
+approach defines the quality of an assembly as the likelihood that the
+observed reads are generated from the given assembly, a value which can
+be accurately estimated by appropriately modeling the sequencing
+process. We show that our approach is able to automatically and accurately reproduce the
+reference-based ranking of assembly tools produced by highly-cited assembly competitions: the
+Assemblathon~\cite{earl2011assemblathon} and GAGE~\cite{salzberg2011gage}
+competitions.
 
-In Chap.\ 3, we discuss the implications of spontaneous and stimulated
-Raman scattering on the project discussed in Chap.\ 2, namely, the dynamical evolution of
-stochastic four-wave-mixing processes in an optical fiber.
-The following question is asked - can stimulated Raman scattering be a mechanism by which
-adequate multiplicative stochastic phase fluctuations are introduced in the
-electric field of light undergoing four-wave-mixing as? Adequately checked numerical
-algorithms of stimulated Raman scattering (SRS), spontaneous Raman generation and intrapulse
-Raman scattering (IRS) are used while exploring this issue. The algorithms are described in detail, as also are
-the results of the simulations. It is found that a 50-meter length of fiber (as used in the experiments),
-is too short to see the influence of Raman scattering, which is found to eventually
-dominate for longer fiber lengths.
+In Chapter 3, we extend our \emph{de novo} LAP framework to evaluate metagenomic assemblies.
+We will show that by modifying our likelihood calculation to take into account abundances of assembled sequences, we can accurately and efficiently compare metagenomic assemblies.
+%We evaluate our extended framework on results generated from the Human Microbiome Project (HMP) and
+We find that our extended LAP framework is able to reproduce results on data from the Human Microbiome Project (HMP) that closely match the reference-based evaluation metrics and outperforms other \emph{de novo} metrics traditionally used to measure assembly quality.
+Finally, we have integrated our LAP framework into the metagenomic analysis pipeline MetAMOS, allowing any user to reproduce quality assembly evaluations with relative ease.
 
-In Chap.\ 4, self- and cross-phase modulation (XPM) of femtosecond pulses ($\sim$ 810
-nm) propagating through a birefringent single-mode optical fiber ($\sim$ 6.9
-cm) is studied both experimentally (using GRENOUILLE - Grating Eliminated
-No Nonsense Observation of Ultrafast Laser Light Electric Fields)
-%(using second harmonic
-%generation-frequency resolved optical gating or SHG-FROG)
-and numerically
-(by solving a set of coupled nonlinear Schr\"odinger equations or
-CNLSEs). An optical spectrogram representation is derived from the
-electric field of the pulses and is linearly juxtaposed with the
-corresponding optical spectrum and optical time-trace. The effects of
-intrapulse Raman scattering (IRS) are discussed and the question whether
-it can be a cause of asymmetric tranfer of pulse energies towards longer
-wavelengths is explored. The simulations are shown to be in good qualitative
-agreement with the experiments. Measured input pulse asymmetry, when incorporated
-into the simulations, is found to be the dominant cause of output spectral
-asymmetry. \renewcommand{\baselinestretch}{1} \small\footnotesize
-\footnote{These averages are reported
-for $45$ `detailed occupational codes', which is an intermediate
-occupational classification (between two and three-digit codes)
-given by the Current Population Survey (CPS).}
-\renewcommand{\baselinestretch}{2} \small\normalsize
-The results indicate that it is possible to modulate short pulses both temporally and spectrally by passage through polarization maintaining
-optical fibers with specified orientation and length. The modulation technique is very direct and straightforward. No frequency components of the broadband pulse have to be rejected as the entire spectrum is uniformly modulated. The technique is flexible as the modulation spacing can be varied by varying the fiber length.
+In Chapter 4, we provide a novel regression testing framework for genome assemblers.
+Our framework that uses two assembly evaluation mechanisms: \emph{assembly likelihood}, calculated using LAP\cite{LAP}, and \emph{read-pair coverage}, calculated using REAPR\cite{hunt2013reapr}, to determine if code modifications result in non-trivial
+changes in assembly quality.
+%We evaluate our framework using popular assemblers SOAPdenovo \cite{li2010novo} and Minimus \cite{sommer2007minimus}.
+We study assembler evolution in two contexts. First,
+we examine how assembly quality changes
+throughout the version history of the popular assembler SOAPdenovo. Second,
+we show that our framework can correctly evaluate decrease in assembly quality
+using fault-seeded versions of another assembler Minimus.
+Our results show that our framework accurately detects trivial
+changes in assembly quality produced from permuted input reads and using
+multi-core systems, which fail to be detected using traditional regression
+testing methods.
 
-Chapter 5 provides the conclusion to the thesis.
+In Chapter 5, we build on the pipeline described in Chapter 4 and introduce VALET, a \emph{de novo} pipeline for finding mis­assemblies within metagenomic assemblies.
+We flag regions of the genome that are statistically inconsistent with the data generation process and underlying species abundances.
+VALET is the first tool to accurately and efficiently find mis­assemblies in metagenomic data sets.
+We provide a detailed list of predicted mis­assemblies in the Human Microbiome Project and use these findings to suggest improvements for future metagenomic assemblers.
+
+In Chapter 6, we discuss our other contributions to bioinformatics relating to the domains of clustering, compression, and cloud computing.

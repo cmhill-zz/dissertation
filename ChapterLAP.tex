@@ -812,7 +812,7 @@ compare our \emph{de novo} likelihood score to these reference-based
 metrics.
 
 Generally, the \emph{de novo} LAP scores agree with the reference-corrected contiguity
-values (see Tables~1,~2, and ~3).  Furthermore, the reference genome assembly (assumed to be the
+values (see Tables~\ref{tab:rhodobacter},~\ref{tab:staph}, and ~\ref{tab:rhodobacter}).  Furthermore, the reference genome assembly (assumed to be the
 most correct reconstruction of the genome being analyzed) achieves the
 highest LAP score while the references derived from the closely-related
 organisms are considerably worse than all the other assemblies.  In
@@ -831,6 +831,146 @@ identify the best assembly.  This phenomenon is due to the fact that
 the Abyss assembly is able to incorporate more of the reads however
 their placement in the assembly is inconsistent with the mate-pair
 linkage information.
+
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{table}[tb!]
+\centering
+\tiny
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & & \\
+\hline
+Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & Unaligned reads (frac) & Unaligned mates (frac) \\
+\hline
+ABySS & -20.924 & -27.365 & 5.9 & 4.2 & -20.929 & -27.320 & 9 & 5 & 0.228 & 0.524\\
+Allpaths-LG & {\bf -20.795} & {\bf -27.141} & 42.5 & {\bf 34.4} & {\bf -20.796} & {\bf -27.099} & {\bf 3,192} & {\bf 3,192} & {\bf 0.212} & {\bf 0.441} \\
+Bambus2 & -21.528 & -27.439 & 93.2 & 12.8 & -21.531 & -27.424 & 2,439 & 2,419 & 0.270 & 0.501\\
+CABOG & -22.550 & -27.749 & 20.2 & 17.9 & -22.550 & -27.714 & 66 & 55 & 0.345 & 0.540\\
+MSR-CA & -21.496 & -27.407 & 22.1 & 19.1 & -21.497 & -27.324 & 2,976 & 2,966 & 0.268 & 0.478\\
+SGA & -20.896 & -27.575 & 4.5 & 2.9 & -21.030 & -27.416 & 51 & 51 & 0.237 & 0.541 \\
+SOAPdenovo & -20.816 & -27.160 & {\bf 131.7} & 14.3 & -20.816 & -27.152 & 660 & 660 & 0.214 & 0.453\\
+Velvet & -20.903 & -27.314 & 15.7 & 14.5 & -20.907 & -27.246 & 353 & 270 & 0.219 & 0.471\\
+\emph{R. sphaeroides} ATCC 17025 & -29.391 & -29.973 & 3,218 & 3,218 & -29.391 & -29.973 & 3,218 & 3,218 & 0.813 & 0.904\\
+\emph{R. capsulatus} & -29.953 & -29.997 & 3,739 & 3,739 & -29.953 & -29.997 & 3,739 & 3,739 & 0.978 & 0.995\\
+\emph{truth} & -20.769 & -27.071 & 3,189 & 3,189 & -20.769 & -27.071 & 3,189 & 3,189 & 0.209 & 0.432\\
+\hline
+\end{tabular}
+\caption[\emph{Rhodobacter sphaeroides} 2.4.1 assembly evaluation]{Assembly likelihood scores for \emph{Rhodobacter sphaeroides} 2.4.1 from the GAGE project~\cite{earl2011assemblathon}.  The results are presented
+separately for the contigs and scaffolds and include the number of
+unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
+mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
+and the reference-corrected N50 contig/scaffold sizes (CN50).
+The best (maximum) value for each
+genome-measure combination is highlighted in bold.
+The results for the reference
+assembly (either complete genome or high-quality draft) is given in the row
+marked \emph{truth}.  In addition, we
+provide the results for a closely related strain and species.
+All values, except the LAP scores, were taken from the
+GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviations for the LAP's reads and LAP's mates scores are 0.00685 and 0.00969, respectively.}
+\label{tab:rhodobacter}
+\end{table}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
+
+
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{table*}[tb!]
+\centering
+\tiny
+%\scalebox{0.50}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & &\\
+\hline
+Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & Unaligned reads (frac) & Unaligned mates (frac)\\
+\hline
+ABySS & {\bf -16.608} & -24.692 & 29.2 & 24.8 & {\bf -16.611} & -24.584 & 34 & 28 & {\bf 0.318} & 0.522\\
+Allpaths-LG & -18.018 & -23.974 & 96.7 & {\bf 66.2} & -18.018 & {\bf -23.760} & 1,092 & {\bf 1,092} & 0.374 & {\bf 0.494}\\
+Bambus2 & -18.083 & -24.256 & 50.2 & 16.7 & -18.085 & -23.899 & 1,084 & 1,084 & 0.375 & 0.503\\
+MSR-CA & -18.282 & -24.258 & 59.2 & 48.2 & -18.282 & -23.926 & {\bf 2,412} & 1,022 & 0.389 & 0.508\\
+SGA & -17.937 & -27.019 & 4 & 4 & -18.250 & -24.906 & 208 & 208 & 0.384 & 0.578\\
+SOAPdenovo & -17.830 & {\bf -23.892} & {\bf 288.2} & 62.7 & -17.830 & -23.862 & 332 & 288 & 0.362 & 0.499\\
+Velvet & -17.867 & -24.258 & 48.4 & 41.5 & -17.867 & -23.925 & 762 & 126 & 0.363 & 0.503\\
+\emph{S. aureus} 04-02981 & -19.960 & -25.314 & 2,821 & 2,821 & -19.960 & -25.314 & 2,821 & 2,821 & 0.456 & 0.572\\
+\emph{S. epidermidis} & -29.635 & -29.951 & 2,499 & 2,499 & -29.635 & -29.951 & 2,499 & 2,499 & 0.972 & 0.988\\
+\emph{truth}  & -17.741 & -23.509 & 2,873 & 2,873 & -17.741 & -23.509 & 2,873 & 2,873 & 0.358 & 0.473\\
+\hline
+\end{tabular}
+\caption[\emph{Staphylococcus aureus} USA300 assembly evaluation.]{Assembly likelihood scores for \emph{Staphylococcus
+aureus} USA300 from the GAGE project~\cite{earl2011assemblathon}.
+The results are presented
+separately for the contigs and scaffolds and include the number of
+unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
+mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
+and the reference-corrected N50 contig/scaffold sizes (CN50).
+The best (maximum) value for each
+genome-measure combination is highlighted in bold.
+The results for the reference
+assembly (either complete genome or high-quality draft) is given in the row
+marked \emph{truth}.  In addition, we
+provide the results for a closely related strain and species.
+All values, except the LAP scores, were taken from the
+GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviations for the LAP's reads and LAP's mates scores are0.00740 and 0.0105, respectively.}
+\label{tab:staph}
+\end{table*}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{table}[tb!]
+\centering
+\tiny
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & & & \\
+\hline
+Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & CGAL Score & Unaligned reads (frac) & Unaligned mates (frac)\\
+\hline
+ABySS & -18.473 & -23.801 & 2 & 2 & -18.474 & -23.787 & 2.1 & 2 & -15.21 x $10^8$ &0.257 & 0.504\\
+Allpaths-LG & -15.813 & -21.413 & 36.5 & 21 & -15.824 & -21.314 & {\bf 81,647} & {\bf 4,702} & -13.11 x $10^8$ &0.115 & 0.239\\
+Bambus2 & -18.606 & -23.474 & 5.9 & 4.3 & -18.642 & -23.343 & 324 & 161 & - & 0.258 & 0.422\\
+CABOG & {\bf -15.625} & {\bf -21.128} & {\bf 45.3} & {\bf 23.7} & {\bf -15.626} & {\bf -21.041} & 393 & 26 & {\bf -12.25 x} $\mathbf{10^8}$ & 0.109 & {\bf 0.229}\\
+MSR-CA & -16.421 & -22.428 & 4.9 & 4.3 & -16.436 & -21.861 & 893 & 94 & - & 0.122 & 0.276\\
+SGA & -15.712 & -22.990 & 2.7 & 2.7 & -16.909 & -22.326 & 83 & 79 & - & 0.134 & 0.328\\
+SOAPdenovo & -15.702 & -21.705 & 14.7 & 7.4 & -15.734 & -21.594 & 455 & 214 & * & {\bf 0.101} & 0.269 \\
+Velvet & -18.000 & -23.468 & 2.3 & 2.1 & -18.140 & -23.375 & 1,190 & 27 & - & 0.214 & 0.442\\
+\emph{truth} & -15.466 & -21.001 & 107,349.50 & 107,349.50 & -15.466 & -21.002 & 107,349.50 & 107,349.50 & -11.25 x $10^8$ & 0.093 & 0.211 \\
+\hline
+\end{tabular}
+\caption[\emph{Homo sapiens} chr 14 assembly evaluation.]{Assembly likelihood scores for human chromosome 14 from the GAGE project~\cite{earl2011assemblathon} using a 10,000 read sample.
+The results are presented
+separately for the contigs and scaffolds and include the number of
+unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
+mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
+and the reference-corrected N50 contig/scaffold sizes (CN50).
+The best (maximum) value for each
+genome-measure combination is highlighted in bold.
+The results for the reference
+assembly (either complete genome or high-quality draft) is given in the row
+marked \emph{truth}.  In addition, we
+provide the results for a closely related strain and species.
+CGAL scores calculated from the long insert library were taken from the CGAL publication.
+The authors only provided scores for the top three assemblies (Bowtie2 could not successfully map reads to the SOAPdenovo assembly).
+All values, except the LAP and CGAL scores, were taken from the
+GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviation for both the LAP's reads and LAP's mates scores is 0.15.}
+\label{tab:hg14}
+\end{table}
+
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
+
 
 In the case of the human chromosome 14 assembly (Table~3), the scaffold-based
 results do not agree with the reference-corrected contiguity values: the CABOG assembler outperforms Allpaths-LG in all but the
@@ -1193,129 +1333,12 @@ Institutes of Health (grant R01-HG-004885 to MP).
 
 %% Use of \listoftables is discouraged.
 %%
-\section{Tables}
+%\section{Tables}
 
-\subsection{Table 1 - \emph{Rhodobacter sphaeroides} 2.4.1 assembly evaluation}
-Assembly likelihood scores for \emph{Rhodobacter sphaeroides} 2.4.1 from the GAGE project~\cite{earl2011assemblathon}.  The results are presented
-separately for the contigs and scaffolds and include the number of
-unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
-mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
-and the reference-corrected N50 contig/scaffold sizes (CN50).
-The best (maximum) value for each
-genome-measure combination is highlighted in bold.
-The results for the reference
-assembly (either complete genome or high-quality draft) is given in the row
-marked \emph{truth}.  In addition, we
-provide the results for a closely related strain and species.
-All values, except the LAP scores, were taken from the
-GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviations for the LAP's reads and LAP's mates scores are 0.00685 and 0.00969, respectively.
+% \begin{landscape}
+% \renewcommand{\baselinestretch}{1}
+% \small\normalsize
 
-\begin{table}[!h]
-\scalebox{0.50}{
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
- & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & & \\
-\hline
-Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & Unaligned reads (fraction) & Unaligned mates (fraction) \\
-\hline
-ABySS & -20.924 & -27.365 & 5.9 & 4.2 & -20.929 & -27.320 & 9 & 5 & 0.228 & 0.524\\
-Allpaths-LG & {\bf -20.795} & {\bf -27.141} & 42.5 & {\bf 34.4} & {\bf -20.796} & {\bf -27.099} & {\bf 3,192} & {\bf 3,192} & {\bf 0.212} & {\bf 0.441} \\
-Bambus2 & -21.528 & -27.439 & 93.2 & 12.8 & -21.531 & -27.424 & 2,439 & 2,419 & 0.270 & 0.501\\
-CABOG & -22.550 & -27.749 & 20.2 & 17.9 & -22.550 & -27.714 & 66 & 55 & 0.345 & 0.540\\
-MSR-CA & -21.496 & -27.407 & 22.1 & 19.1 & -21.497 & -27.324 & 2,976 & 2,966 & 0.268 & 0.478\\
-SGA & -20.896 & -27.575 & 4.5 & 2.9 & -21.030 & -27.416 & 51 & 51 & 0.237 & 0.541 \\
-SOAPdenovo & -20.816 & -27.160 & {\bf 131.7} & 14.3 & -20.816 & -27.152 & 660 & 660 & 0.214 & 0.453\\
-Velvet & -20.903 & -27.314 & 15.7 & 14.5 & -20.907 & -27.246 & 353 & 270 & 0.219 & 0.471\\
-\emph{R. sphaeroides} ATCC 17025 & -29.391 & -29.973 & 3,218 & 3,218 & -29.391 & -29.973 & 3,218 & 3,218 & 0.813 & 0.904\\
-\emph{R. capsulatus} & -29.953 & -29.997 & 3,739 & 3,739 & -29.953 & -29.997 & 3,739 & 3,739 & 0.978 & 0.995\\
-\emph{truth} & -20.769 & -27.071 & 3,189 & 3,189 & -20.769 & -27.071 & 3,189 & 3,189 & 0.209 & 0.432\\
-\hline
-\end{tabular}
-}
-\label{tab:rhodobacter}
-\end{table}
-
-
-\subsection{Table 2 - \emph{Staphylococcus aureus} USA300 assembly evaluation.}
-
-Assembly likelihood scores for \emph{Staphylococcus
-aureus} USA300 from the GAGE project~\cite{earl2011assemblathon}.
-The results are presented
-separately for the contigs and scaffolds and include the number of
-unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
-mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
-and the reference-corrected N50 contig/scaffold sizes (CN50).
-The best (maximum) value for each
-genome-measure combination is highlighted in bold.
-The results for the reference
-assembly (either complete genome or high-quality draft) is given in the row
-marked \emph{truth}.  In addition, we
-provide the results for a closely related strain and species.
-All values, except the LAP scores, were taken from the
-GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviations for the LAP's reads and LAP's mates scores are0.00740 and 0.0105, respectively.
-
-\begin{table}[!h]
-\scalebox{0.50}{
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
- & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & &\\
-\hline
-Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & Unaligned reads (fraction) & Unaligned mates (fraction)\\
-\hline
-ABySS & {\bf -16.608} & -24.692 & 29.2 & 24.8 & {\bf -16.611} & -24.584 & 34 & 28 & {\bf 0.318} & 0.522\\
-Allpaths-LG & -18.018 & -23.974 & 96.7 & {\bf 66.2} & -18.018 & {\bf -23.760} & 1,092 & {\bf 1,092} & 0.374 & {\bf 0.494}\\
-Bambus2 & -18.083 & -24.256 & 50.2 & 16.7 & -18.085 & -23.899 & 1,084 & 1,084 & 0.375 & 0.503\\
-MSR-CA & -18.282 & -24.258 & 59.2 & 48.2 & -18.282 & -23.926 & {\bf 2,412} & 1,022 & 0.389 & 0.508\\
-SGA & -17.937 & -27.019 & 4 & 4 & -18.250 & -24.906 & 208 & 208 & 0.384 & 0.578\\
-SOAPdenovo & -17.830 & {\bf -23.892} & {\bf 288.2} & 62.7 & -17.830 & -23.862 & 332 & 288 & 0.362 & 0.499\\
-Velvet & -17.867 & -24.258 & 48.4 & 41.5 & -17.867 & -23.925 & 762 & 126 & 0.363 & 0.503\\
-\emph{S. aureus} 04-02981 & -19.960 & -25.314 & 2,821 & 2,821 & -19.960 & -25.314 & 2,821 & 2,821 & 0.456 & 0.572\\
-\emph{S. epidermidis} & -29.635 & -29.951 & 2,499 & 2,499 & -29.635 & -29.951 & 2,499 & 2,499 & 0.972 & 0.988\\
-\emph{truth}  & -17.741 & -23.509 & 2,873 & 2,873 & -17.741 & -23.509 & 2,873 & 2,873 & 0.358 & 0.473\\
-\hline
-\end{tabular}
-}
-\label{tab:staph}
-\end{table}
-
-\subsection{Table 3 - \emph{Homo sapiens} chr 14 assembly evaluation.}
-Assembly likelihood scores for human chromosome 14 from the GAGE project~\cite{earl2011assemblathon} using a 10,000 read sample.
-The results are presented
-separately for the contigs and scaffolds and include the number of
-unassembled reads (singletons), the LAP scores computed on unmated reads (LAP reads) or
-mate-pairs (LAP mates), the N50 contig/scaffold sizes (N50),
-and the reference-corrected N50 contig/scaffold sizes (CN50).
-The best (maximum) value for each
-genome-measure combination is highlighted in bold.
-The results for the reference
-assembly (either complete genome or high-quality draft) is given in the row
-marked \emph{truth}.  In addition, we
-provide the results for a closely related strain and species.
-CGAL scores calculated from the long insert library were taken from the CGAL publication.
-The authors only provided scores for the top three assemblies (Bowtie2 could not successfully map reads to the SOAPdenovo assembly).
-All values, except the LAP and CGAL scores, were taken from the
-GAGE publication. A threshold probability of 1e-30 was used for calculating the LAP scores. The standard deviation for both the LAP's reads and LAP's mates scores is 0.15.
-
-\begin{table}[!h]
-\scalebox{0.50}{
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
- & \multicolumn{4}{c|}{Contigs} & \multicolumn{4}{c|}{Scaffolds} & & \\
-\hline
-Assembler & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & LAP reads & LAP mates & N50 (kb) & CN50 (kb) & CGAL Score & Unaligned reads (fraction) & Unaligned mates (fraction)\\
-\hline
-ABySS & -18.473 & -23.801 & 2 & 2 & -18.474 & -23.787 & 2.1 & 2 & -15.21 x $10^8$ &0.257 & 0.504\\
-Allpaths-LG & -15.813 & -21.413 & 36.5 & 21 & -15.824 & -21.314 & {\bf 81,647} & {\bf 4,702} & -13.11 x $10^8$ &0.115 & 0.239\\
-Bambus2 & -18.606 & -23.474 & 5.9 & 4.3 & -18.642 & -23.343 & 324 & 161 & - & 0.258 & 0.422\\
-CABOG & {\bf -15.625} & {\bf -21.128} & {\bf 45.3} & {\bf 23.7} & {\bf -15.626} & {\bf -21.041} & 393 & 26 & {\bf -12.25 x} $\mathbf{10^8}$ & 0.109 & {\bf 0.229}\\
-MSR-CA & -16.421 & -22.428 & 4.9 & 4.3 & -16.436 & -21.861 & 893 & 94 & - & 0.122 & 0.276\\
-SGA & -15.712 & -22.990 & 2.7 & 2.7 & -16.909 & -22.326 & 83 & 79 & - & 0.134 & 0.328\\
-SOAPdenovo & -15.702 & -21.705 & 14.7 & 7.4 & -15.734 & -21.594 & 455 & 214 & * & {\bf 0.101} & 0.269 \\
-Velvet & -18.000 & -23.468 & 2.3 & 2.1 & -18.140 & -23.375 & 1,190 & 27 & - & 0.214 & 0.442\\
-\emph{truth} & -15.466 & -21.001 & 107,349.50 & 107,349.50 & -15.466 & -21.002 & 107,349.50 & 107,349.50 & -11.25 x $10^8$ & 0.093 & 0.211 \\
-\hline
-\end{tabular}
-}
-
-\label{tab:hg14}
-\end{table}
+% \renewcommand{\baselinestretch}{2}
+% \small\normalsize
+% \end{landscape}

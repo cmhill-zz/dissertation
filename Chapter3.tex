@@ -292,13 +292,34 @@ was obtained from the NCBI RefSeq database (NC\_000913.2).
 \url{http://trace.ddbj.nig.ac.jp/DRASearch/run?acc=SRR032209}, which
 consisted of 18,828,274 reads of length 36.
 
-\begin{figure}[!tpb]%figure2
-\begin{center}
-\includegraphics[width=\textwidth]{compression_results.pdf}
-\end{center}
+
+% \begin{landscape}
+% \renewcommand{\baselinestretch}{1}
+% \small\normalsize
+% \begin{quote}
+% \begin{figure}
+% \begin{center}
+% \includegraphics[width=8.2in]{mpc.eps}
+% \end{center}
+% \caption{Schematic illustrating receding horizon control.
+% \label{fig:mpc} }
+% \end{figure}
+% \end{quote}
+% \renewcommand{\baselinestretch}{2}
+% \small\normalsize
+% \end{landscape}
+
+\begin{landscape}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
+\begin{figure}[!tpb]%figure2
+\begin{center}
+\includegraphics[width=1.4\textheight]{compression_results.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+%\begin{quote}
 \caption[Mean squared error versus bits/base-call for different
   compression methods applied to the \textit{Rhodobacter sphaeroides}
   2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
@@ -314,10 +335,11 @@ consisted of 18,828,274 reads of length 36.
   \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
   data.}
   \label{fig:mse_vs_bpbp}
-\end{quote}
 \end{figure}
+\end{quote}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
+\end{landscape}
 
 \subsection{Performance evaluation}
 
@@ -638,18 +660,22 @@ quality results in the lowest proportion of mapped reads 72.8\%.
 % \end{tabular}
 % \end{table*}
 
-\begin{table*}[!tbhp]
+% \begin{landscape}
+% \renewcommand{\baselinestretch}{1}
+% \small\normalsize
+%
+% \renewcommand{\baselinestretch}{2}
+% \small\normalsize
+% \end{landscape}
+
+
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+
+\begin{table}[!tbhp]
 \centering
-\caption[]{Mapping results of decompressed \textsc{fastq} files
-  against \textit{Rhodobacter sphaeroides} reference genome using
-  Bowtie2. Numbers corresponds to the proportion of mapped reads with
-  respect to the uncompressed \textsc{fastq}. ``Shared'' denotes the
-  percentage of mapped reads by both the uncompressed and decompressed
-  data. ``Uncompressed only'' denotes the percentage of reads mapped
-  from the uncompressed data that are not mapped after
-  decompression. ``Compressed only'' denotes the percentage of reads
-  mapped from the decompressed data that were not mapped before
-  compression.}
 \begin{tabular}{lr|cc|cc|cc|cc|cc}
  & & \multicolumn{2}{c|}{MaxQual} & \multicolumn{2}{c|}{MinQual} & \multicolumn{2}{c|}{2-bin} & \multicolumn{2}{c|}{Degree 0} & \multicolumn{2}{c}{Degree 1} \\
 & & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
@@ -688,8 +714,24 @@ quality results in the lowest proportion of mapped reads 72.8\%.
 
 \end{tabular}
 
+\caption[Mapping results of decompressed \textsc{fastq} files
+  against \textit{Rhodobacter sphaeroides} reference genome]{Mapping results of decompressed \textsc{fastq} files
+  against \textit{Rhodobacter sphaeroides} reference genome using
+  Bowtie2. Numbers corresponds to the proportion of mapped reads with
+  respect to the uncompressed \textsc{fastq}. ``Shared'' denotes the
+  percentage of mapped reads by both the uncompressed and decompressed
+  data. ``Uncompressed only'' denotes the percentage of reads mapped
+  from the uncompressed data that are not mapped after
+  decompression. ``Compressed only'' denotes the percentage of reads
+  mapped from the decompressed data that were not mapped before
+  compression.}
+
 \label{tab:aligner}
-\end{table*}
+\end{table}
+
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
 
 
 \section{Discussion}

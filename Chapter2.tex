@@ -4,7 +4,7 @@
 
 \chapter{Comparing and Evaluating Metagenomic Assemblies}
 
-\section{abstract}
+\section{Abstract}
 %\boldmath
 The ever-decreasing costs of sequencing technology has led to a sharp increase in metagenomics projects over the past decade, allowing us to better understand the diversity and function of microbial communities found in the world around us.
 The first step in these analyses is to perform
@@ -237,11 +237,23 @@ This does not change when we handle metagenomic data, since the average coverage
 %We use modified version of Sailfish\cite{sailfish}, a tool to quickly calculate transcript abundances using RNA-seq data, to estimate contig abundances.
 %One of the underlying assumptions of Sailfish is that the coverage
 
-\begin{table*}[tbp]
+
+% \begin{landscape}
+% \renewcommand{\baselinestretch}{1}
+% \small\normalsize
+%
+% \renewcommand{\baselinestretch}{2}
+% \small\normalsize
+% \end{landscape}
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+
+\begin{table}[tbp]
 \renewcommand{\arraystretch}{1.2}
-\caption{Comparison of assembly statistics for HMP mock Even and mock Staggered datasets.\protect\footnotemark  }
-\label{table_example}
 \centering
+\scriptsize
 \begin{tabular}{{l}{l}{c}{c}{c}{c}{c}{c}{c}{c}{c}{c}{c}}
 \hline
 \bfseries Dataset & \bfseries Assembler & \bfseries LAP & \bfseries \#ctgs &  \bfseries Good ctgs & \bfseries Total aln & \bfseries Slt & \bfseries Hvy & \bfseries Ch & \bfseries Size @ 10 Mbp &\bfseries Max ctg size & \bfseries Err per Mbp & \bfseries Aligned reads \\
@@ -262,9 +274,13 @@ Tongue  & Meta-IDBA & -21.368 & 25,698 & 88.70\% & 7 & \textbf{710} & \textbf{2,
 
 \hline
 \end{tabular}
+\caption[Comparison of assembly statistics for HMP mock Even and mock Staggered datasets]{Comparison of assembly statistics for HMP mock Even and mock Staggered datasets.Numbers in bold represent the best value for the specific dataset.}
 \label{tab:hmp}
-\end{table*}
+\end{table}
 
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
 
 
 \subsection{Integration into MetAMOS}
@@ -277,8 +293,6 @@ Users specify the desired assembler using the \verb!-a! parameter of \verb!runPi
 We modified MetAMOS so users can now specify multiple assemblers (comma-separated) after the \verb!-a! parameter, and \verb!runPipeline! will run all assemblers and select the assembly yielding the highest LAP score to be used in downstream analyses.
 %The software implementing our approach is made available, open-source and free of charge, at: \url{http://assembly-eval.sourceforge.net/} and with the MetAMOS package: \url{https://github.com/treangen/MetAMOS}.
 
-
-\footnotetext{Numbers in bold represent the best value for the specific dataset.}
 
 \section{Results}
 \subsection{Likelihood score maximized using correct abundances}
@@ -375,6 +389,20 @@ Generally, the \emph{de novo} LAP scores agree with the referenced-based metrics
 In the mock Even dataset, SOAPdenovo has the greatest LAP score, the highest fraction of contigs that can align to a reference genome without error, total amount of sequence that can be aligned to a reference genome, while also having the lowest amount of misassemblies (including chimeric) and errors per Mbp.
 It is important to note that if user selected an assembly based on the best contiguity at 10Mbp, they would select the MetaVelvet assembly, which contains double the error rate per Mbp as the SOAPdenovo assembly while aligning 2Mbp less to the references.
 
+\begin{figure}[tb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{coverage}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Frequency of contig abundances for assemblies of the HMP mock Staggered dataset]{Frequency of contig abundances for assemblies of the HMP mock Staggered dataset.}
+\label{fig:coverage}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
 Since the abundances of each organism in the mock Even dataset are fairly similar, the mock Staggered abundance distribution creates a more realistic scenario encountered in metagenomic environments.
 Here, the Meta-IDBA assembly has the greatest LAP score, but aligns roughly a third less sequences to the reference genomes than SOAPdenovo.
 The Meta-IDBA assembly contains approximately a tenth of the amount of contigs (4,559 vs. 44,928) as SOAPdenovo.
@@ -401,22 +429,10 @@ Furthermore, the MetAMOS metrics show that the SOAPdenovo assembly contained app
 %These datasets have the advantage over simulated data because it captures the error and bias introduced from the sequence technology.
 
 
-\begin{figure}[htb!]
-\begin{center}
-\includegraphics[width=.8\textwidth]{coverage}
-\end{center}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
-\begin{quote}
-\caption[Frequency of contig abundances for assemblies of the HMP mock Staggered dataset]{Frequency of contig abundances for assemblies of the HMP mock Staggered dataset.}
-\label{fig:coverage}
-\end{quote}
-\end{figure}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
 
-\begin{table}[b]
-\caption{Self-tuning MetAMOS using \emph{C. ruddii} test dataset.}
+\begin{table}[tb!]
 \label{tab:metamos_lap}
 \centering
 \begin{tabular}{{l}{c}{c}{c}{c}}
@@ -429,9 +445,11 @@ Velvet & 3 & -13.157 & 92 & \bf{0} \\
 MetaVelvet & 3 & -13.157 & 92 & \bf{0} \\
 \hline
 \end{tabular}
+\caption[Self-tuning MetAMOS using \emph{C. ruddii} test dataset]{Self-tuning MetAMOS using \emph{C. ruddii} test dataset.}
 \end{table}
 
-
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \subsection{Tuning assembly parameters for MetAMOS}
 Assemblathon1~\cite{earl2011assemblathon} has shown that assembly experts can often get drastically different assemblies using the same assemblers, highlighting the difficulty of choosing the \emph{right} parameters for a given assembler.
