@@ -1,664 +1,242 @@
-%Chapter 3
+%Chapter 2
 
 \renewcommand{\thechapter}{3}
 
-\chapter{Additional Contributions}
+\chapter{Comparing Metagenomic Assemblies}
 
 \section{Abstract}
+%\boldmath
+The ever-decreasing costs of sequencing technology has led to a sharp increase in metagenomics projects over the past decade, allowing us to better understand the diversity and function of microbial communities found in the world around us.
+The first step in these analyses is to perform
+genome assembly to piece together the DNA fragments into complete, or
+near complete, genomes.
+%The first step in these analyses involves the use of tools called assemblers that piece together the DNA fragments into complete or near complete genome sequences.
+Metagenomic assemblers inherit all the difficulties of traditional single genome assembly, but with the additional complexity of trying to resolve assemblies of closely related species with drastically varying abundances.
+Assessing and comparing the quality of single genome assembly still relies on the availability of independently determined standards, such as manually curated genomic sequences.
+These standards are often not possible in metagenomic projects, where a large portion of the organisms and strains are novel.
+Thus, we must rely on \emph{de novo} methods for assessing and comparing assembly qualities.
+Here we describe an extension to our \emph{de novo} LAP framework to evaluate metagenomic assemblies.
+We will show that by modifying our likelihood calculation to take into account abundances of assembled sequences, we can accurately and efficiently compare metagenomic assemblies.
+%We evaluate our extended framework on results generated from the Human Microbiome Project (HMP) and
+We find that our extended LAP framework is able to reproduce results on data from the Human Microbiome Project (HMP) that closely match the reference-based evaluation metrics and outperforms other \emph{de novo} metrics traditionally used to measure assembly quality.
+Finally, we have integrated our LAP framework into the metagenomic analysis pipeline MetAMOS, allowing any user to reproduce quality assembly evaluations with relative ease.
+%Even without knowledge of the true reference sequences, our \emph{de novo} metric
+%Here we introduce an extension to our LAP  \emph{de novo} probabilistic measure of assembly quality, which allows for an objective comparison of multiple assemblies generated from the same set of reads.
+%We define the quality of a sequence produced by an assembler, as the conditional probability of observing the sequenced reads from the assembled sequence.
 
-
-The \textsc{fastq} file format has become the \emph{de facto} standard
-for storing next-generation sequencing data, containing nucleotide
-information along with a quantitative measure of the reliability of
-individual base calls. As the cost of sequencing continues to
-decrease, the rate of sequencing data production is increasing,
-requiring efficient ways of storing and transferring this vast amount
-of data. Most methods on sequencing data compression focus on
-compressing nucleotide information without any loss of information.
-Quality data, however, have different properties than nucleotide data,
-and methods compressing nucleotide sequences efficiently do not
-perform as well on quality sequences. Furthermore, while lossless
-representation is necessary for nucleotide sequences, it is not an
-essential requirement for quality values.
-
-Existing methods for compressing quality sequences mostly focused on
-minimizing the loss of information with less emphasis on effects on
-subsequent analyses. In this paper, we evaluate several different
-compression methods for quality values that compromise accuracy for
-better storage efficiency, and their resulting impact on common
-bioinformatic analyses using sequence read data.
-
-Lossy compression of quality information can greatly decrease storage
-and memory requirements with little discernible effects on subsequent
-analysis results. The three compression strategies in this study were
-able to produce similar results to those obtained with uncompressed
-quality sequences in terms of quality control, genome assembly, and
-alignment of short read to a reference sequence.
 
 \section{Introduction}
+The genome sequence of an organism is a vital resource for biologists trying to better understand its function and evolution.
+Generating this sequence is not an easy task as modern sequencing technologies can only ``read'' small pieces of the genome.
+These sequences, known as \emph{reads}, have to be pieced together by tools called assemblers using a collection of different heuristics since in almost all practical cases, assemblers cannot fully and accurately reconstruct the genome~\cite{myers1995,medvedev2007computability}.
 
-Read data from high-throughput sequencing constitutes the largest
-category of data in genomics research because of great redundancy,
-inclusion of quality values, and read-level naming and
-metadata. Because of this abundance effective compression of read data
-has the potential for substantial improvement in data storage and
-transfer efficiency.
+Practical implementations of assembly algorithms (such as ABySS~\cite{ABySS}, SOAPdenovo~\cite{SOAPdenovo}, Velvet~\cite{Velvet}, etc.) return just an approximate solution that is often fragmented and contains numerous errors.
+Ideally, further experiments would be performed manually to correct the hundreds to thousands of errors~\cite{salzberg2005misassemblies}, and fill in the gaps between the chunks of assembled sequences (called contigs)~\cite{nagarajan2010finishing}.
+However, the additional cost and effort necessary to finish a genome is only justifiable for a few high-priority organisms (typically model organisms).
+Recent technology advances have demonstrated automatically assembled finish-grade quality bacterial genomes~\cite{chin2013nonhybrid, koren2013reducing, ribeiro2012finished}. However, the majority of genomes sequences available today are considered to be in a ``draft'' state, with no clear indication of their respective quality, possibly impacting the conclusions and experiments done on their sequences.
 
-Quality values comprise a standard component of \textsc{fastq}
-files~\cite{Cock:2010ve}, a very common format for sequence read
-data. At the level of sequence read the probability of error for each
-base-call is typically represented by \textsc{phred} quality value,
-which is defined as $Q =
--10\,log_{10}P$~\cite{Ewing:1998ly}. Depending on the sequencing
-technology these quality values can range from 0 to 93, and are
-represented with the \textsc{ascii} characters 33 to 126 (with some
-offset). There is a single quality value per base-call for Illumina
-sequence reads.
+Despite the unresolved challenges of clonal genome assembly, the decreasing costs of sequencing technology has led to a sharp increase in metagenomics projects over the past decade.
+% have been sharply on the rise over the past decade,
+These projects allow us to better understand the diversity and function of microbial communities found in the environment, including the ocean\cite{rusch2007sorcerer,wu2011stalking,yooseph2007sorcerer}, Arctic regions \cite{varin2012metagenomic}, other living organisms\cite{he2013comparative} and the human body\cite{gill2006metagenomic,peterson2009nih}.
+Traditional \emph{de novo} genome assemblers have trouble assembling these datasets due to the presence of closely related species and and the need to distinguish between true polymorphisms and errors arising from the sequencing technology.
+Metagenomic assemblers often use heuristics based on sequencing (Meta-IDBA \cite{peng2011meta} and MetaVelvet\cite{namiki2012metavelvet}) and k-mer (Ray Meta \cite{boisvert2012ray}) coverage to split the assembly graph into subcomponents that represent different organisms, then apply traditional assembly algorithms on the individual organisms.
 
-Quality values can be used throughout bioinformatics pipelines. Among
-the most fundamental uses of sequence quality values is as part of the
-quality assessment and quality control (\textsc{qa/qc}) processes
-prior to subsequent analysis steps. Quality control based on quality
-values generally includes two operations: \textit{i}.~filtering, the
-elimination of reads that on the whole do not meet arbitrary quality
-standards, which reduces the total number of reads; and
-\textit{ii}.~trimming of low quality base-calls from reads, which
-reduces the number total number of bases. Quality values can be used
-by genome assembly software to produce better
-assemblies~\cite[e.g.,][]{Bryant:2009uq,Gnerre:2011kx}. Short-read
-alignment software, such as Bowtie2~\cite{Langmead:2012rw}, use
-quality values to weight mismatches between read and reference
-sequences. Software for detecting single nucleotide polymorphisms
-(\textsc{snp}s) can use quality values~\cite[e.g.,][]{McKenna:2010bh},
-and identified \textsc{snp}s with high-quality calls are deemed more
-reliable than those with low-quality calls, particularly in low
-coverage regions.
+As the number of metagenomic assemblers available to researchers continues to increase, the development of approaches for validating and comparing the output of these tools is of critical importance.
+Despite the incremental improvements in performance, none of the assembler tools available today outperforms the rest in all cases (as highlighted by recent assembly
+bake-offs GAGE\cite{salzberg2011gage} and Assemblathons 1~\cite{earl2011assemblathon} and 2~\cite{bradnam2013assemblathon}).
+Different assemblers ``win'' depending on the specific downstream analyses, structure of the genome, and sequencing technology used.
+These competitions highlight the inherent difficulty of assessing assembly quality -- where do you set the line between increased contiguity and decreasing accuracy of the resulting sequence?
+Evaluating the trade-off between increased contiguity and errors is difficult even when there is a gold standard reference genome to compare to, which is not available in most practical assembly cases.
+Thus, we are forced to heavily rely on \emph{de novo} approaches based on sequence data alone.
+% (including global ``sanity checks,'' such as gene density, which is expected to be high in bacterial genomes).
 
-Previous literature on sequence data compression has largely focused
-on lossless compression of base calls~\cite[reviewed
-  in][]{Deorowicz:2013hq,Giancarlo:2014rw,Giancarlo:2009fk,
-  Nalbantoglu:2010uq,Zhu:2013qr}, although some recent work has
-addressed compression of quality
-values~\cite[e.g.,][]{asnani2012lossy,Canovas:2014fr,Hach:2012ys,
-  janin2013adaptive,Kozanitis:2011kl,Ochoa:2013rt,Tembe:2010ys,
-  Wan:2012kq,DBLP:conf/recomb/YuYB14,zhou2014compression}. Among the
-several challenges for compression of read data is dealing with
-different error profiles resulting from differences in underlying
-chemistries, signal detection and processing mechanisms, inherent
-biases, and other idiosyncratic properties of distinct high-throughput
-sequencing technologies. Sequence reads generated by instruments such
-as an Illumina HiSeq, the focus of this research, are characterized by
-having relatively few insertion and deletion errors, but substitution
-(miscall) errors are much more frequent and have context-specific
-patterns. These errors are non-uniformly distributed over the read
-length (e.g., error rates increase up to $\sim$16$\times$ at the
-3$^{\prime}$ end, and 32.8 -- 67.9\% of reads have low quality tails
-at the 3$^{\prime}$ end~\cite{Minoche:2011km}).
+One objective \emph{de novo} metric, that has been used to evaluate and compare assembly quality, is based on the likelihood that the observed reads are generated from the given assembly, which can be accurately estimated by modeling the sequencing process.
+This metric was proposed by Gene Myers in his pioneering work in the 1990's, where he suggested that the correct assembly must be consistent with the statistical properties of the data generation process.
+This idea was extended and used by recent assembly evaluation frameworks: ALE ~\cite{clark2013ale}, CGAL~\cite{rahman2013cgal}, and LAP~\cite{LAP}.
 
-Although we recognize the need for lossless compression for some
-purposes and contexts (e.g., archiving, provenance), our perspective
-is largely pragmatic with a focus on the use of quality values in
-subsequent analyses. From this perspective some loss of information is
-deemed acceptable if the inferences from analyses are relatively
-unaffected. Here we describe our research investigating lossy
-compression of sequence read quality values, specifically those
-associated with Illumina instruments, with the objective to provide
-some perspective on several strategies rather than to develop a robust
-high-quality software for use. Recognizing these properties of
-Illumina sequence reads motivates our exploration of three general
-classes of lossy compression methods -- binning, modeling, and
-profiling -- and consider an exemplar of each class.~\cite{Canovas:2014fr} and~\cite{janin2013adaptive} evaluated the effects of lossy compression on identifying variants within a data set. We build on these prior works and access the effects of
-% quantifying compression efficiency, we also assess the effects of
-quality value information loss resulting from compression on additional
-subsequent genomic analyses including read preprocessing (filtering
-and trimming), genome assembly, and read mapping.
+%In pioneering work in the 1990's, Gene Myers suggested that the correct assembly given the set of reads must be consistent with the data generation process.
+%This idea was extended and used by assemblers and assembly evaluation software: the arrival-rate statistic (A-statistic) in Celera
+%assembler~\cite{CeleraAssembler} to identify collapsed repeats, and
+%as an objective function in quasi-species (ShoRAH~\cite{SHORAH},
+%ViSpA~\cite{VISPA}), metagenomic (Genovo~\cite{genovo2011}),
+%general-purpose assemblers~\cite{medvedev2009maximum}, and recent assembly
+%evaluation frameworks.
+
+Most of the previous \emph{de novo} and reference-based validation methods have been designed for single genome assembly.
+Currently, there are no universally-accepted reference-based metrics for evaluating metagenomic assemblies.
+Despite reference sequences being available for a small fraction of organisms found in metagenomic environments \cite{angly2006marine,dinsdale2008functional}, it is not clear how to distinguish errors from genomic variants found within a population.
+%In addition to chimeric contigs within a single organism, there are now potential chimeras that span multiple organisms.
+Furthermore, it is not clear how to weigh errors occurring in more abundant organisms.
+Likelihood-based frameworks, such as ALE ~\cite{clark2013ale}, CGAL~\cite{rahman2013cgal}, and LAP~\cite{LAP}, rely on the assumption that the sequencing process is approximately uniform across the genome; however, the sequencing depth across genomes in metagenomic samples can vary greatly~\cite{carrigg2007dna,krsek1999comparison,morgan2010metagenomic,temperton2009bias}.
+
+%Assessing the quality of the sequence output by an assembler is of critical importance for downstream analyses and allows researchers to choose from a collection of genome assembler.
+
+In our paper, we describe an extension to our LAP framework to evaluate metagenomic assemblies.
+We will show that by modifying our likelihood calculation to take into account contig abundances, we can accurately and efficiently evaluate metagenomic assemblies.
+We evaluate our extended framework on data from the Human Microbiome Project (HMP).
+Finally, we show how our LAP framework can be used automatically by the metagenomic assembly pipeline, MetAMOS\cite{treangen2013metamos}, to select the best assembler for a specific dataset, and to provide users with a measure of assembly quality.
+The software implementing our approach is made available, open-source and free of charge, at: \url{http://assembly-eval.sourceforge.net/} and with the MetAMOS package: \url{https://github.com/treangen/MetAMOS}.
+
+%\hfill mds
+
+%\hfill July 17, 2013
+
+%\newpage
+\begin{figure}
+\begin{center}
+\includegraphics[width=4.572in]{metagenome}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[The metagenome of an environment]{The metagenome of an environment can be viewed as the concatenation of the organisms found in the environment whose multiplicity is determined by their abundance. \label{fig:metagenome}}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\newpage
+
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=3in]{metagenome}
+% % where an .eps filename suffix will be assumed under latex,
+% % and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% % via \DeclareGraphicsExtensions.
+% \caption{The metagenome of an environment can be viewed as the concatenation of the organisms found in the environment whose multiplicity is determined by their abundance.}
+% \label{fig:metagenome}
+% \end{figure}
+
 
 \section{Methods}
+\subsection{Likelihood of an assembly}
 
-\subsection{Compression strategies}
+Our LAP framework measures the quality of an assembly as the probability that the observed reads, $R$, are generated from the given assembly, $A$: $\Pr[R|A]]$ \cite{LAP}.
+Assuming that the event of observing each read is independent, then the probability $\Pr[R|A]$ of the read set $R$ being produced from the assembly $A$, is the product of the individual read probabilities, $p_r$.  That is,
+\begin{equation}
+  \label{probability_reads_given_assembly}
+  \Pr[R \vert A]=\prod_{r \in R} p_r
+\end{equation}
 
-\subsubsection{Binning}
+By modeling the data generation process, we can calculate the probability of each read, $p_r$.
+Assuming uniform coverage, where each position in the genome is covered by roughly the same amount of reads as any other position, a read may be sequenced starting from any position of the genome with equal probability.
+In the basic error-free model, if a read matches to one position in the assembly, and its reverse-complement does not match anywhere, then the probability of the read being produced from the assembly is $p_r=\frac{1}{2L}$, where $L$ is the length of the assembly.
+The length of the assembly is doubled due to the double-stranded molecules of DNA that make up the genome.
+Thus, if a read
+%and its reverse-complement
+matches at $n_r$ positions on the assembly, then
+% and its reverse-complement
+\begin{equation}
+  \label{error_free_probability}
+  p_r = \frac{n_r}{2L}
+\end{equation}
 
-Quality values can be binned, and the minimum number of bins that
-allows for a any distinction among quality values is two, i.e., two
-categories ``good'' and ``bad'' quality. We implement 2-bin encoding
-by setting a quality value threshold empirically determined by the
-distribution of quality values across reads. Base-calls are marked
-``bad'' if their quality value falls below the first quartile minus
-1.5 $\times$ the interquartile range (IQR), which is the difference
-between the first and third quartile. 1.5 $\times$ IQR is the value
-used by Tukey's box plot~\cite{mcgill1978variations}. The main
-benefit of this approach is that it is completely data-dependent, and
-no assumptions regarding the distribution of the quality values need
-to be made.
+Ghodsi et. al.~\cite{LAP} detail how to modify the calculation of $p_r$ to handle practical constraints, e.g., sequencing errors and mate pairs.
+They also show that the true genome maximizes $\Pr[R|A]$.
 
-With 2-bin encoding binary encoding is possible, allowing us to use a
-single bit to represent the quality of a base instead of the standard
-8 bits used to store quality values in \textsc{ascii}. An additional
-benefit of 2-bin encoding is the potential for increased adjacency of
-identical values and repeating patterns, properties that may increase
-effectiveness of subsequent compression using established
-algorithms~\cite[e.g.,][]{HUFFMAN:1952nr,Ziv77auniversal,
-  DBLP:journals/tit/ZivL78}.
+%The metric used in accessing the assembly probability is the logarithm of the geometric mean of the read probabilities, referred to as the log average probability (LAP).
+Calculating $\Pr[R|A]$ can be expensive for dataset sizes commonly encountered in sequencing projects (tens to hundreds of millions of reads).
+Thus, we can approximate the likelihood of the assembly by using a random subset of the reads ($R^\prime$).
+To counteract the effect of sample size on the probability, we define the assembly quality as the geometric mean of the read probabilities:
+%
+\begin{align}
+\label{average_log_probability}
+  \operatorname{AP}(R^\prime) =
+  \left(\prod_{r \in R^\prime} p_r\right)^{\frac{1}{\left|R^\prime\right|}} \nonumber  \\
+  \operatorname{LAP}(R^\prime) = \log_{10} \left( \operatorname{AP}(R^\prime) \right) = \frac{\sum_{r \in R^\prime} \log_{10} p_r}{\left|R^\prime\right|}
+\end{align}
+%
+%For the remainder of this paper, we define the assembly quality as the average log likelihood (LAP) of the reads given the assembly.
+%This formulation allows us to estimate the
+The mean of the read probabilities over the sample is expected to be equal to the mean over all reads, but if the sample size is too small, then the accuracy of the estimation will be poor.
 
-The economic costs of memory use for binning, in general terms,
-include no fixed costs, and marginal costs that are a function of the
-number of base-call quality values times the cost of the encoding.
-
-\cite{Wan:2012kq} provide three similar lossy compression strategies based on binning the base error probability distribution: UniBinning, Truncating, and LogBinning.
-UniBinning evenly splits the error probability distribution into a user-defined number of partitions.
-Truncating treats a user-defined number of highest quality values as a single bin.
-LogBinning works similar to UniBinning, except with the \emph{log} of the error probability distribution, which effectively bins the \textsc{ascii} quality values evenly.
-Our 2-bin encoding is a combination of LogBinning and Truncating in that we are placing the highest quality values (as defined above) of the log of the error probability distribution into a single bin.
-
-
-\begin{figure}[!tpb]%figure2
+\begin{figure}
 \begin{center}
-\includegraphics[width=.8\textwidth]{profiles_128.png}
+%\begin{figure*}[tbhp!]
+%\centering
+
+\subfigure[\emph{B. cereus} (1 copy, 5.2MB) and \emph{A. baumannii} (4 copies, 4.0MB)]{\includegraphics[width=4in]{ref_abun_1} \label{fig:ref_abun_1}}
+\hfil
+\subfigure[\emph{B. cereus} (4 copies, 5.2MB) and \emph{A. odontolyticus} (7 copies, 2.4MB)]{\includegraphics[width=4in]{ref_abun_2} \label{fig:ref_abun_2}}
 \end{center}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[Quality profiles obtained by $k$-means clustering on the
-  fragment library from \textit{Rhodobacter sphaeroides} 2.4.1 data
-  set]{Quality profiles obtained by $k$-means clustering on the
-  fragment library from \textit{Rhodobacter sphaeroides} 2.4.1 data
-  set using $k$ = 128, with each row corresponding to a quality
-  profile. Dark to light colors represent low to high quality
-  values. It is readily visible that the two most distinctive features
-  of quality profiles is their drop-off position and average overall
-  quality. One can also see sporadic low-position values in a handful
-  of profiles, likely capturing intermittent problems in the
-  sequencing process affecting thousands of reads at a
-  time.}
-  \label{fig:profiles_128}
+\caption[LAP scores for simulated metagenomic communities.] {LAP scores for simulated metagenomic communities. Each cell (x,y) represents the LAP score for a mixture of \emph{x} copies of the x-label bacteria and \emph{y} copies of the y-label bacteria.  In both groups, the true abundance ratios maximize the LAP score (indicated by a black rectangle in respective plots). \label{fig:ref_abun}}
 \end{quote}
 \end{figure}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
+\newpage
 
-\subsubsection{Modeling}
+\subsection{Extending LAP to metagenomic assemblies}
 
-If quality values are modeled, compression is conceivably possible by
-replacing the original quality values by a representation of the
-model. For example, quality values can be conceptualized as bivariate
-data with the ordered nucleotides (1 to read length) representing the
-abscissa, and quality values representing the ordinate. In this
-research we model read quality values as polynomial functions obtained
-with least-squares fitting, as one approach to compression read
-quality values by modeling.
-
-Despite the fact that polynomial functions have significantly lower
-number of parameters (i.e. one to six coefficients) than a read-length
-string of raw quality values, the necessity of using floating point
-numbers to store coefficients greatly limits the compression potential
-of the method. In order to get meaningful compression on
-single-precision four-byte floating point numbers, one would have to
-relax on the least-squares approximation constraint to obtain
-compressible values on the byte level which is outside the scope of
-this study.
-
-The economic costs of memory use for model-based compression, in
-general terms, include no fixed costs, and marginal costs that are a
-function of the number of reads times the cost representing the model
-parameters.
-
-\textsc{QualComp} is a lossy compression tool that models quality values as a multivariate Gaussian distribution, computing the mean and covariance for each position in the read\cite{Ochoa:2013rt}.
-Once the model parameters are calculated, they are stored by the decoder to later reconstruct a \emph{representative} quality value.
-\textsc{QualComp} takes as input a user-specified rate (bits per read) and then poses an optimization problem of how to allot these bits for a given position while minimizing the \textsc{mse}.
-The quality values can be clustered before hand to produce more accurate models.
-
-\subsubsection{Profiling}
-
-As large sets of quality strings show similar trends of quality over
-their length, it makes sense to identify such common patterns in the
-data and use them as reference profiles to approximate individual
-sequences of quality values. Such patterns can be readily determined by
-clustering data points (i.e. quality vectors) and using the resulting
-cluster centers as representative profiles.
-
-$k$-means clustering is a vector quantization method, partitioning a
-set of samples into $k$ sets that minimize within-cluster sum of
-squares~\cite{macqueen1967some}. Using a random subset of read
-quality values, a compression method can use the computed cluster
-centers as read quality profiles. As the problem is NP-hard, we use a
-heuristic iterative refinement approach by quickly converging to a
-locally optimal minimum provided by R~\cite{hartigan1979algorithm}.
-
-First, the method samples an adjustable number of reads
-randomly from the file to be used as a training set. Quality values
-are represented by vectors containing their \textsc{phred} scores
-corresponding to each position along the read. Subsequently, $k$-means
-clustering is performed on the training set until convergence. The
-obtained cluster centers will be the quality profile prototypes for
-the dataset.
-
-Once the $k$ quality profiles are determined, all reads
-are passed through the trained $k$-means predictor, with the nearest
-quality profile in Euclidean space being assigned to every read
-as their compressed representation.
-
-The compressed quality file therefore consists of an index enumerating
-the $k$ quality profiles, and a binary part containing the assigned
-quality profile index for each read.
-
-Although this approach is not able to capture randomly occurring
-outlier quality values, it ensures that the overall trends in quality
-value patterns are retained. Quality profiles capture different overall
-qualities and different drop-off positions and gradients. An example
-of 128 quality profiles are shown on Figure \ref{fig:profiles_128}.
-
-The economic costs of memory use for profile-based compression, in
-general terms, include fixed costs associated with representing the
-profiles, which is a function of the number of profiles times the cost
-of encoding them, and these fixed costs are amortized over the entire
-set of reads to which they apply. Additionally there are marginal
-costs that are a function of the number of reads encoded.
-
-\subsection{Data sets}
-
-We used several Illumina sequence read data sets in this research,
-which are taken from data from the \textsc{gage} (Genome Assembly
-Gold-Standard Evaluations)~\cite{Salzberg:2012rc} except as
-noted. These data sets are as follows.
-
-\textit{Rhodobacter sphaeroides} 2.4.1, which are generated from a
-fragment library (insert size of 180 nt; 2,050,868 paired-end reads)
-and short-jump library (insert size of 3,500 nt; 2,050,868 reads). The
-corresponding reference sequence was obtained from the NCBI RefSeq
-database (NC\_007488.1, NC\_007489.1, NC\_007490.1, NC\_007493.1,
-NC\_007494.1, NC\_009007.1, NC\_009008.1).
-
-% Will be moved to supplemental.
-%\textit{Stapylococcus aureus} USA300, which are generated from a
-%fragment library (insert size of 180 nt; 1,294,104 paired-end reads)
-%and short-jump library (insert size of 3,500 nt; 3,494,070 reads).
-%The corresponding reference sequence was obtained from the NCBI RefSeq
-%database (NC\_010063.1, NC\_010079.1, NC\_012417.1).
-
-\textit{Homo sapiens} chromosome 14 data, which are generated from a
-fragment library (insert size of 155 nt; 36,504,800 paired-end reads)
-and short-jump library (insert sizes ranging from 2283-2803 nt;
-22,669,408 reads). The corresponding reference sequence was obtained
-from the NCBI RefSeq database (NC\_000014.8).
-
-\textit{Escherichia coli} str. K-12 MG1655 MiSeq data was downloaded
-from \url{http://www.illumina.com/systems/miseq/scientific_data.html},
-which are generated from a fragment library (insert size of 180bp nt;
-1,145,8940 paired-end reads). The corresponding reference sequence
-was obtained from the NCBI RefSeq database (NC\_000913.2).
-
-\textit{Mus musculus} data was downloaded from
-\url{http://trace.ddbj.nig.ac.jp/DRASearch/run?acc=SRR032209}, which
-consisted of 18,828,274 reads of length 36.
+An important simplifying assumption of our framework is that the sequencing process is uniform in coverage.
+In metagenomics, however, the relative abundances of organisms are rarely uniform~\cite{carrigg2007dna,krsek1999comparison,morgan2010metagenomic,temperton2009bias}, reflecting the difference in abundance between the different organisms within a community.
+Here we show that taking this abundance information into account allows us to extend the LAP framework to metagenomic data.
+%This feature makes using the LAP score incorrect out of the box.
+%Later steps in the pipelines often deal with abundance estimation and phylogenetic classification.
+We now assume that while the abundances of each organism may vary dramatically, the sequencing process still has uniform coverage across the \emph{entire} community.
+%It is important to note while the abundances of each organism may vary dramatically, the sequencing process still produces a uniform coverage of the complete environment.
+For example, consider a simple community containing two organisms (A and B), one which is twice as abundant as the other.
+This community, thus, comprises twice as much of A's DNA than that of B.
+Assume, for simplicity, that the community contains exactly three chromosomes (two of A and one of B).
+A random sequencing process would sample each of these equally, and an ideal metagenomic assembler would produce two contigs, one covered twice as deep as the other.
+%the case where we have three bacteria in an environment (1 copy of strain \emph{A}, 2 copies of strain \emph{B}).
+%Now, lets assume we performed enough sequencing to produce a 1x coverage of each individual bacterium.
+%An assembler would only output both bacteria strains, despite the difference in coverage.
 
 
-% \begin{landscape}
-% \renewcommand{\baselinestretch}{1}
-% \small\normalsize
-% \begin{quote}
-% \begin{figure}
-% \begin{center}
-% \includegraphics[width=8.2in]{mpc.eps}
-% \end{center}
-% \caption{Schematic illustrating receding horizon control.
-% \label{fig:mpc} }
-% \end{figure}
-% \end{quote}
-% \renewcommand{\baselinestretch}{2}
-% \small\normalsize
-% \end{landscape}
 
-\begin{landscape}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{quote}
-\begin{figure}[!tpb]%figure2
-\begin{center}
-\includegraphics[width=1.4\textheight]{compression_results.pdf}
-\end{center}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-%\begin{quote}
-\caption[Mean squared error versus bits/base-call for different
-  compression methods applied to the \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} data sets]{Mean squared error versus bits/base-call for different
-  compression methods applied to the \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} data sets. 2B --- 2-bin encoding; P$n$ --- profiling
-  with $n$ profiles; R$n$ --- modeling with polynomial regression
-  models of degree $n$; Q$n$ --- \textsc{q}ual\textsc{c}omp with rate parameter of
-  $n$. Asterisks denote the corresponding lossless compression using
-  \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
-  data.}
-  \label{fig:mse_vs_bpbp}
-\end{figure}
-\end{quote}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
-\end{landscape}
+In essence, we view the collection of individual genomes and their relative abundances as a single \emph{metagenome} where each genome is duplicated based on their abundance (\figurename \ref{fig:metagenome}).
+%Thus, we now assume we have uniform coverage across the entire metagenome.
+This setting is similar to that of repeats in single genome assembly, where a repetitive element can now include an entire genome.
+Like in the case of single genomes, the assembler that correctly estimates these repeat counts maximizes the LAP score.
+In other words, in order to accurately evaluate the metagenomic assemblies using our LAP framework, the abundance (or copy number) of each contig is needed.
+%The assembler that figures out the correct copy number of repeats (in this case, contigs) will have the highest LAP score.
+As most metagenomic assemblers do not report this information,
+here we use the average coverage of the contig (provided by the MetAMOS pipeline) to represent the copy number.
 
-\subsection{Performance evaluation}
+%In order to accurately calculate the LAP of a metagenomic assembly, in addition to the actual assemblies, we need the abundances.
+In the error-free model, we compute the probability of a read, $p_r$, given the assembled sequence and abundance as:
+%
+\begin{equation}
+  \label{meta_read_probability}
+  p_r = \frac{\sum_{c \in \text{Contigs}}\text{abun}(c)*n_{rc}}{2\hat{L}}
+\end{equation}
+%
+\begin{equation}
+  \label{meta_read_length}
+  \hat{L} = \sum_{c \in \text{Contigs}}\text{abun}(c)*L_{c}
+\end{equation}
+%
+where $\text{abun}(c)$ is the abundance of contig c, $n_{rc}$ is the number of times read $r$ occurs in contig $c$, and $\hat{L}$ is the adjusted total assembly length.  In the case where the abundance of each contig is 1, calculating $p_r$ is identical to the original LAP (single genome) formulation.  A similar modification can be done to handle sequencing errors outlined in \cite{LAP}.
 
-As a measure of compression effectiveness we use bits/base-call, and
-define it as the size of the compressed representation of quality
-values (in bits) divided by the number of quality values represented.
-As a measure of information loss we use mean squared error
-(\textsc{mse}) as a loss function, and define it as
-$\frac{1}{n}\sum_{i=1}^{n}{(Q_i'-Q_i)^2}$, where $n$ is the number of
-sequences, $Q_i'$ is the compressed/decompressed quality value, and
-$Q_i$ is the original quality value associated with sequence position
-$i$.
-
-We evaluate effects of information loss from quality value compression
-on quality control steps of read filtering and trimming, which were
-performed using Sickle~\cite{sickle}, and make comparison to
-uncompressed data.
-
-We evaluate effects of information loss from quality value compression
-on \emph{de novo} genome assembly performance using contiguity
-statistics, log average read probability
-(\textsc{lap})~\cite{Ghodsi:2013hb}, and a collection of
-reference-based metrics. The contiguity statistics include N50, which is defined as the median contig
-size (the length of largest contig $c$ such that the total size of the
-contigs larger than $c$ exceeds half of the assembly size) and corrected N50, which is the recalculated N50 size after the contigs are broken apart at locations of errors. The
-\textsc{lap} score can be viewed as a log likelihood score, where a
-value closer to 0 is better. We use a script provided by \textsc{gage}
-reference-based evaluation to count single nucleotide polymorphisms
-(\textsc{snp}s), relocations, translations, and inversions. The
-reference-based metrics are normalized by the length of the assembly
-to facilitate comparison. For the genome assembly we used software
-that makes use quality values in the assembly process:
-\textsc{allpaths-lg}~\cite{Gnerre:2011kx} version r50191 with default
-settings and 32 threads.
-
-\section{Results}
-
-\subsection{Compression effectiveness versus information loss}
-
-We compare the \textsc{mse} versus bits/base-call of the
-\textit{Rhodobacter sphaeroides} 2.4.1, \textit{Homo sapiens}
-chromosome 14, \textit{Escherichia coli} str. K-12 MG1655, and
-\textit{Mus musculus} data sets (Figure \ref{fig:mse_vs_bpbp}). We
-only include the fragment libraries for the \textit{Rhodobacter
-  sphaeroides} 2.4.1, and \textit{Homo sapiens} chromosome 14 data
-sets, but the additional short-jump library results are available in
-the supplementary (TODO:TABLE). Storing the uncompressed quality
-values requires 1 byte per base-call because they are stored in
-\textsc{ascii} format and is denoted by the dotted black asterisk in
-the figure. The lossless compression of each data set using \textsc{bz}ip2
-ranges from 2.19 - 3.10 bits/base-call and is denoted by the colored
-asterisks on the abscissa. The compression methods tend to cluster
-together across the different data sets. Across all data sets, the
-0-degree polynomial regression, profile encodings, and \textsc{q}ual\textsc{c}omp have
-the lowest bits/base-call.
-
-\textsc{q}ual\textsc{c}omp with the rate parameter set to 100 bits/read has the lowest
-\textsc{mse}, but requires 10-15x more storage than the profile
-encoding methods for only a 2-3x reduction in \textsc{mse}. When
-\textsc{q}ual\textsc{c}omp's rate parameter is set to match the profile encoding
-methods, \textsc{q}ual\textsc{c}omp performs slightly worse in terms of \textsc{mse}.
-In the \textit{Rhodobacter sphaeroides} 2.4.1 fragment library,
-\textsc{q}ual\textsc{c}omp with rate 10 bits/read (0.099 bits/bp) has a \textsc{mse} of
-17.29. Using 256-profile encoding requires less storage (0.079
-bits/bp) and has a lower \textsc{mse} (11.85).
-
-As the order of the polynomial increases, the bits/base-call increase
-and the \textsc{mse} decreases at an exponential rate. The 7th-degree
-polynomial regression has the highest bits/base-call and in the
-\textit{Mus musculus} data set, and requires more storage than the
-\textsc{ascii} original quality values. A 7th-degree polynomial
-requires storing eight floating point values, resulting in 32 bytes
-per sequence of quality values. The read length of the \textit{Mus musculus}
-data set is only 26, so the 7th-degree polynomial regression is storing
-six more bytes than necessary for lossless encoding the quality data.
-
-\begin{figure}[!htb]%figure2
-\begin{center}
-\includegraphics[width=4in]{preprocessing_results.pdf}
-\end{center}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{quote}
-\caption[Preprocessing results of \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} data sets]{Preprocessing results of \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} data sets. Sequences were trimmed using Sickle. The
-  total amount of bases filtered by each compression method is
-  compared with the amount of bases filtered using the uncompressed
-  sequences.}
-  \label{fig:preprocessing}
-\end{quote}
-\end{figure}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
-
-\subsection{Effects on sequence read preprocessing}
-
-The majority of compression methods retain more base-pairs after
-preprocessing than the uncompressed sequences (Figure
-\ref{fig:preprocessing}). In general, as a given compression model
-increases in complexity, i.e., as the number of profiles, polynomial
-degrees, or rate increases, the amount of base-pairs kept approaches
-the number base-pairs kept using the uncompressed sequences. The
-compression methods on the \textit{Mus musculus} data set have the
-greatest proportion of retained base-pairs compared to the
-uncompressed sequences. The \textit{Escherichia coli} str. K-12
-MG1655 MiSeq data set has the smallest range.
-
-The 2-bin approach is the only compression method that results in a
-higher number of filtered base-pairs across all data sets. Sickle
-uses a sliding window approach to smooth the read quality values before
-it trims the sequence based on a specific quality threshold. In the
-2-bin approach, there is not an even distribution of values per bin.
-In other words, \emph{bad} quality values may range from 0-33, whereas
-\emph{good} values may only range from 34-40. Thus, mid-range quality
-values that are above the threshold (20 by default) are set below the
-quality threshold when compressed, resulting in an increased number of
-filtered bases.
-
-The 0-degree polynomial regression results in the highest proportion
-of bases kept. If the mean quality value of the read is above
-the filtering threshold, then no base-pairs are trimmed. Only
-reads that are comprised of mainly low quality values will be
-filtered.
-
-It is important to highlight that the even though a compression method
-may result in the same number of filtered base-pairs as the
-uncompressed sequences, it does not mean the \emph{same} base-pairs
-were filtered. The 1st-degree and 5th-degree polynomial regression of
-the \textit{Rhodobacter sphaeroides} fragment library filters nearly
-as many bases as each other. However, if we examine the specific
-reads filtered, the 5th-degree polynomial regression discards
-approximately two thirds less reads than the 1st-degree polynomial
-regression that are kept by the uncompressed reads (4,640 and
-12,066 reads, respectively) (TODO: move to Supplemental Table
-\ref{tab:quality_control}).
-
-\subsection{Effects on genome assembly}
-
-No assembly of the \textit{Rhodobacter sphaeroides} 2.4.1 data set
-outperforms all others in all metrics (Table
-\ref{fig:assembly_ranks}).
-%The assembly of the \textit{Rhodobacter sphaeroides} 2.4.1 data set
-%using the uncompressed reads outperforms all compression methods in
-%terms of \textsc{lap}, NG50, relocations, translations, and
-%inversions.
-Among the compression methods, the 256-, 64-, 128-profile encoding had
-the highest ranks, followed by \textsc{q}ual\textsc{c}omp with rates 10 bits/read, 30
-bits/read, 100 bits/read, then 7th-degree polynomial regression,
-followed by the \textsc{q}ual\textsc{c}omp with rate 6 bits/read, the 2-bin encoding,
-and lastly, the 3rd-degree, 5th-degree, and 0-degree polynomials.
-
-The lossy compression methods largely preserve the contiguity found in
-the assembly produced using the reads with unmodified quality
-values. All compression methods other than 0-degree polynomial
-regression produce an N50 ranging from 3.17--3.22 Mbps (see
-Supplemental Table TODO). Despite the similar contiguity statistics,
-the different compression methods vary noticeably in the amount of
-\textsc{snp}s. The order of polynomial has an inverse relationship
-with the amount of \textsc{snp}s detected. The 2-bin and profile
-methods detected the least amount of \textsc{snp}s compared to the
-reference genome, outperforming the assembly using the original
-quality values. A more in-depth evaluation is needed to determine
-whether these compression methods are missing actual \textsc{snp}s.
-
-It is important to highlight that using uncompressed reads does not
-produce the best assembly in terms of any of the metrics. The
-uncompressed reads scores worse than the top overall assembly
-(256-profile encoding) in terms of assembled bases, missing reference
-bases, N50, \textsc{snp}s, indels $>$5bp, and relocations. The
-assembly using uncompressed reads has an error rate of roughly 8.75
-errors per 100 kb of assembled sequence, while the 256-profile
-encoding has an error rate of 8.02 errors per 100 kb (see Supplemental
-table TODO).
-
-In general, the greater the polynomial order, the better overall
-assembly; however, the 5th-degree polynomial regression performs
-slightly worse than the 3rd-degree polynomial. The respective ranks in
-terms of N50 and relocations are fairly distant, which lowers the
-overall ranking of the 5th-degree polynomial slightly below that for
-3rd-degree polynomial model. The 1st- and 0-degree polynomial
-regression methods perform poor in all metrics except assembled bases.
-One explanation is that the high error portions of reads are being
-marked as high quality, so \textsc{allpaths-lg} is unable to trim or
-error correct the sequences. Assembled sequences that overlap maybe
-unable to align across the errors at the end of the reads, artificially
-inflating the assembled genome size.
-
-Among the different \textsc{q}ual\textsc{c}omp rate parameters, the 10 bits/read rate
-ranked highest overall, outperforming the other rate parameters in
-terms of corrected N50, least missing reference bases, \textsc{snp}s,
-and indels $>$5bp. With the exception of the 6 bits/read rate, the
-assemblies decrease in rank with the increase in the rate parameter in
-terms of corrected N50, and least missing reference bases. This trend
-runs counter to the the decrease in \textsc{mse} of the different
-rates.
+Our prior work has shown we can approximate the probabilities using fast and memory efficient search alignment programs (e.g., Bowtie2~\cite{langmead2012fast}) when it is impractical to calculate the exact probabilities for large read sets.
+We can apply the metagenomics modification above to the alignment tool-based method:
+%
+\begin{equation}
+\label{}
+p_{r} = \frac{\sum_{j \in S_r} \text{abun}(j_{\text{contig}})*p_{r,j_{\text{subs}}}}{2\hat{L}}
+\end{equation}
+where $S_r$ is the set of alignments in the SAM file for the read $r$ and the probability of alignment, $p_{r,j_{\text{subs}}}$, is approximated by $\epsilon^{subs}(1 - \epsilon)^{l - subs}$ where $\epsilon$ is the probability of an error (a mismatch, an insertion, or a deletion).
 
 
-\begin{figure}[!htb]%figure2
-\begin{center}
-\includegraphics[width=.8\textwidth]{rhodo_assembly_results.pdf}
-\end{center}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{quote}
-\caption[Rankings of compression methods based on \textit{Rhodobacter
-    sphaeroides} assembly attributes]{Rankings of compression methods based on \textit{Rhodobacter
-    sphaeroides} assembly attributes sorted by overall
-  rank. Assemblies were constructed using \textsc{allpaths-lg}.
-  Rankings above the median value are in cyan, those below the median
-  value in magenta.}
-  \label{fig:assembly_ranks}
-\end{quote}
-\end{figure}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
 
+%allow the assembler to tell us what copy number it expects for each contig - that is the average coverage for the contig (provided in our analysis by the MetAMOS pipeline).
+%Our LAP framework uses the average per basepair coverage of assembled contigs provided by MetAMOS.
 
-\subsection{Effects on read mapping}
+An important factor in any likelihood-based assembly evaluation framework is the handling of reads that do not align well to the given assembly.
+In practice, unalignable reads are often the result of sequencing errors and contaminants.
+If these reads are given a probability close to 0, then the best assembler would be the one that incorporates the most reads.
+In our original LAP framework, a read that does not align well does not decrease the overall assembly probability more than the probability of an assembly that contains the appended read as an independent contig.
+This does not change when we handle metagenomic data, since the average coverage of the ``new'' contig is one.
 
-Certain short read alignment tools use the quality value
-information when finding potential alignments. Bowtie2 (version 2.2.3)
-was used to evaluate the different decompressed \textsc{fastq}
-files. Bowtie2 uses quality values written in the \textsc{fastq} files
-when mapping reads against a reference genome. The original
-uncompressed and decompressed \textsc{fastq} files were mapped with
-Bowtie2 against \textit{Rhodobacter sphaeroides} reference genome. The
-generated \textsc{sam} file for each compressing approach were
-compared with the uncompressed \textsc{sam} file. The total, shared
-and unique proportional numbers of mapped reads are calculated with
-respect to the uncompressed \textsc{sam} matches as shown in table
-\ref{tab:aligner}. Additionally, to monitor the effect of quality
-values on mapping in general, Bowtie2 was adjusted so that the maximum
-and minimum mismatch penalty were equivalent to maximum and minimum
-quality scores (with parameters: --mp 6,6 and --mp 2,2 respectively).
+%However, commonly used metagenomic abundance tools are often targeted at taxonomic classification~\cite{segata2012metagenomic,brady2009phymm,liu2010metaphyler,huson2007megan}.
+%One strategy to estimate contig abundances is to first perform taxonomic classification on the reads and then align the contigs with the taxonomic database, transitively applying the taxonomic abundances to the contigs.
+%In lieu of taxonomic abundances, our LAP framework uses the average per basepair coverage of assembled contigs provided by MetAMOS.
+%We use modified version of Sailfish\cite{sailfish}, a tool to quickly calculate transcript abundances using RNA-seq data, to estimate contig abundances.
+%One of the underlying assumptions of Sailfish is that the coverage
 
-We evaluate the compression methods using two approaches. In the
-first approach, we order the compression methods based on how similar
-the alignment results are using the original uncompressed quality values, i.e., the
-amount of reads aligned by both the uncompressed and compressed
-methods plus the amount of reads unaligned by both methods minus the
-amount of reads uniquely aligned by the uncompressed and compression
-method. In the second approach, we order the compression methods by
-total proportion of aligned reads.
-
-The best compression method in terms of similarity with the
-uncompressed reads is \textsc{q}ual\textsc{c}omp with rate 100 bits/read, followed by
-\textsc{q}ual\textsc{c}omp with rate 30 bits/read, 256-, and 128-profile encoding, then
-2-bin encoding, 64-profile encoding, \textsc{q}ual\textsc{c}omp with rate 10 bits/read,
-7th-degree polynomial regression, \textsc{q}ual\textsc{c}omp with rate 6 bits/read, and
-finally, 5th-degree through 0-degree polynomial regression.
-
-Ranking the compression methods by overall alignment rate produces an
-identical ordering as above. Aside from 0-degree polynomial
-regression (83.1\%), all other compression methods have an alignment
-rate between 87\% and 86.1\%. The alignment rate of the uncompressed
-reads is 87\%.
-
-Most of the compression methods did not vary greatly in terms of the
-number of reads that were mapped \emph{only} by the compression
-method; however, there is a sizable difference in the amount of reads
-that are originally mapped, but unmapped by the compressed methods.
-\textsc{q}ual\textsc{c}omp with rate 100 bits/read results in the fewest missing
-original read alignments (159). Increasing the regression model
-polynomial degree results in a decreasing amount of reads that are
-originally mapped, but unmapped by the regression model (40,931 to
-1,134 reads for 0-degree and 7th-degree, respectively). There is no
-such trend for reads that are mapped only by the regression model.
-
-Setting all bases as minimum quality results in the highest proportion
-of mapped reads 88.1\%. Conversely, setting all bases as maximum
-quality results in the lowest proportion of mapped reads 72.8\%.
-
-
-% \begin{table*}[!tbhp]
-% \centering
-% \caption[]{Quality filtering/trimming for the uncompressed and
-%   decompressed \textsc{fastq} files. Numbers correspond to the number
-%   of reads that are kept or discarded after applying compression with
-%   respect to the original, uncompressed values.}
-% \label{tab:quality_control}
-% \begin{tabular}{lr|cc|cc|cc|cc|cc}
-%  & & \multicolumn{2}{c|}{MaxQual} & \multicolumn{2}{c|}{MinQual} & \multicolumn{2}{c|}{2-bin} & \multicolumn{2}{c|}{Degree 0} & \multicolumn{2}{c}{Degree 1} \\
-%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
-%   \cline{2-12}
-% & kept & 883576 &   0 &   0 & 883576 & 871035 & 12541 & 728349 & 155227 & 871510 & 12066 \\
-% {\em original} & discarded & 141858 &   0 &   0 & 141858 & 1882 & 139976 & 1475 & 140383 & 9214 & 132644 \\
-% \cline{2-12}
-%  & proportion & 1.000 & 0.000 & 0.000 & 1.000 & 0.851 & 0.149 & 0.712 & 0.288 & 0.859 & 0.141 \\
-% \end{tabular}
-
-% \bigskip
-
-% \begin{tabular}{lr|cc|cc|cc|cc|cc}
-%  & & \multicolumn{2}{c|}{Degree 3} & \multicolumn{2}{c|}{Degree 5} & \multicolumn{2}{c|}{Degree 7} & \multicolumn{2}{c|}{Profile (64)} & \multicolumn{2}{c}{Profile (128)} \\
-%  & & kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
-% \cline{2-12}
-% & kept & 872006 & 11570 & 878936 & 4640 & 877802 & 5774 & 876149 & 7427 & 877513 & 6063 \\
-% {\em original}  &  discarded & 10369 & 131489 & 10004 & 131854 & 8821 & 133037 & 15795 & 126063 & 17453 & 124405 \\
-% \cline{2-12}
-% & proportion & 0.860 & 0.140 & 0.867 & 0.133 & 0.865 & 0.135 & 0.870 & 0.130 & 0.873 & 0.127 \\
-% \end{tabular}
-
-% \bigskip
-
-% \begin{tabular}{lr|cc|cc|cc|cc|cc}
-% &  & \multicolumn{2}{c|}{Profile (256)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (6)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (10)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (30)} & \multicolumn{2}{c}{\textsc{q}ual\textsc{c}omp (100)} \\
-%  & &  kept & discarded & kept & discarded & kept & discarded & kept & discarded & kept & discarded \\
-% \cline{2-12}
-% & kept & 881215 & 2361 & 878702 & 4874 & 879682 & 3894 & 881948 & 1628 & 881939 & 1637 \\
-% {\em original}  & discarded & 15985 & 125873 & 13434 & 128424 & 12855 & 129003 & 10872 & 130986 & 7179 & 134679 \\
-% \cline{2-12}
-% & proportion & 0.875 & 0.125 & 0.870 & 0.130 & 0.870 & 0.130 & 0.871 & 0.129 & 0.867 & 0.133 \\
-% \end{tabular}
-% \end{table*}
 
 % \begin{landscape}
 % \renewcommand{\baselinestretch}{1}
@@ -668,65 +246,36 @@ quality results in the lowest proportion of mapped reads 72.8\%.
 % \small\normalsize
 % \end{landscape}
 
-
-
 \begin{landscape}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 
-\begin{table}[!tbhp]
+\begin{table}[tbp]
+\renewcommand{\arraystretch}{1.2}
 \centering
-\begin{tabular}{lr|cc|cc|cc|cc|cc}
- & & \multicolumn{2}{c|}{MaxQual} & \multicolumn{2}{c|}{MinQual} & \multicolumn{2}{c|}{2-bin} & \multicolumn{2}{c|}{Degree 0} & \multicolumn{2}{c}{Degree 1} \\
-& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
-\cline{2-12}
-& mapped & 746716 & 145897 & 892613 &   0 & 891864 & 749 & 851682 & 40931 & 883390 & 9223 \\
-{\em original} & unmapped &   0 & 132821 & 10821 & 122000 & 186 & 132635 &  67 & 132754 &  55 & 132766 \\
-\cline{2-12}
-%& sum & 746716 & 278718 & 903434 & 122000 & 892050 & 133384 & 851749 & 173685 & 883445 & 141989 \\
-& proportion & 0.728 & 0.272 & 0.881 & 0.119 & 0.870 & 0.130 & 0.831 & 0.169 & 0.862 & 0.138 \\
+\scriptsize
+\begin{tabular}{{l}{l}{c}{c}{c}{c}{c}{c}{c}{c}{c}{c}{c}}
+\hline
+\bfseries Dataset & \bfseries Assembler & \bfseries LAP & \bfseries \#ctgs &  \bfseries Good ctgs & \bfseries Total aln & \bfseries Slt & \bfseries Hvy & \bfseries Ch & \bfseries Size @ 10 Mbp &\bfseries Max ctg size & \bfseries Err per Mbp & \bfseries Aligned reads \\
+\hline\hline
+
+mockE & SOAPdenovo & \textbf{-27.031} & 63107 & \textbf{99.3\%} & \textbf{51} & \textbf{166} & 131          & \textbf{1} & 28,208          & 249,819          & \textbf{5.8}  & \textbf{85.75\%} \\
+mockE & Velvet     & -28.537          & 12,830 & 96.2\%          & 41          & 256          & \textbf{100} & 2          & 42,269          & 179,673          & 8.7  & 83.30\%        \\
+mockE & MetaVelvet & -27.102          & 22,772 & 96.8\%          & 49          & 462          & 156          & 4          & \textbf{62,138} & \textbf{367,458} & 12.7    & 85.65\%      \\
+mockE & Meta-IDBA  & -31.166          & 22,032 & 95.4\%          & 47          & 362          & 151          & 3          & 26,141          & 249,069          & 11  & 81.81\%\\
+\\
+mockS & SOAPdenovo & -60.161          & 44,928 & \textbf{98.8\%} & \textbf{28} & 135          & 98           & \textbf{0} & 5,672           & 186,064          & \textbf{8.3} & 69.78\%  \\
+mockS & Velvet     & -60.711          & 21,050 & 95.8\%          & \textbf{28} & 485          & 115          & 1          & 6,060           & 119,120          & 21.5          & 67.26\% \\
+mockS & MetaVelvet & -60.442          & 20,551 & 95.3\%          & \textbf{28} & 517          & 143          & 3          & 6,685           & \textbf{217,330} & 20.1         & 67.72\% \\
+mockS & Meta-IDBA  & \textbf{-58.851} & 4,559  & 92.5\%          & 18          & \textbf{101} & \textbf{83}  & \textbf{0} & \textbf{13,150} & 119,604          & 10.2  & \textbf{70.67\%}\\
+\\
+Tongue  & SOAPdenovo & \textbf{-13.844} & 35,230 & \textbf{89.10\%} & \textbf{11} & 1,138 & 2,618 & \textbf{0} & 11,359 & \textbf{238,051} & \textbf{341.5} & \textbf{88.14\%}\\
+Tongue  & Meta-IDBA & -21.368 & 25,698 & 88.70\% & 7 & \textbf{710} & \textbf{2,087} & \textbf{0} & 4,215 & 59,188 & 399.6 & 58.89\% \\
+
+\hline
 \end{tabular}
-
-\bigskip
-
-\begin{tabular}{lr|cc|cc|cc|cc|cc}
- & & \multicolumn{2}{c|}{Degree 3} & \multicolumn{2}{c|}{Degree 5} & \multicolumn{2}{c|}{Degree 7} & \multicolumn{2}{c|}{Profile (64)} & \multicolumn{2}{c}{Profile (128)} \\
-& & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
-\cline{2-12}
-& mapped & 889537 & 3076 & 891019 & 1594 & 891479 & 1134 & 891753 & 860 & 891952 & 661 \\
-{\em original} & unmapped & 117 & 132704 & 155 & 132666 & 154 & 132667 & 144 & 132677 & 143 & 132678 \\
-\cline{2-12}
-%& sum & 889654 & 135780 & 891174 & 134260 & 891633 & 133801 & 891897 & 133537 & 892095 & 133339 \\
-& proportion & 0.868 & 0.132 & 0.869 & 0.131 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 \\
-\end{tabular}
-
-\bigskip
-
-\begin{tabular}{lr|cc|cc|cc|cc|cc}
-&  & \multicolumn{2}{c|}{Profile (256)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (6)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (10)} & \multicolumn{2}{c|}{\textsc{q}ual\textsc{c}omp (30)} & \multicolumn{2}{c}{\textsc{q}ual\textsc{c}omp (100)} \\
-& &  mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped & mapped & unmapped \\
-\cline{2-12}
-& mapped & 892051 & 562 & 891375 & 1238 & 891777 & 836 & 892233 & 380 & 892454 & 159 \\
-{\em original}  & unmapped & 119 & 132702 & 304 & 132517 & 265 & 132556 & 220 & 132601 & 172 & 132649 \\
-\cline{2-12}
-%& sum & 892170 & 133264 & 891679 & 133755 & 892042 & 133392 & 892453 & 132981 & 892626 & 132808 \\
-& proportion & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 & 0.870 & 0.130 \\
-
-\end{tabular}
-
-\caption[Mapping results of decompressed \textsc{fastq} files
-  against \textit{Rhodobacter sphaeroides} reference genome]{Mapping results of decompressed \textsc{fastq} files
-  against \textit{Rhodobacter sphaeroides} reference genome using
-  Bowtie2. Numbers corresponds to the proportion of mapped reads with
-  respect to the uncompressed \textsc{fastq}. ``Shared'' denotes the
-  percentage of mapped reads by both the uncompressed and decompressed
-  data. ``Uncompressed only'' denotes the percentage of reads mapped
-  from the uncompressed data that are not mapped after
-  decompression. ``Compressed only'' denotes the percentage of reads
-  mapped from the decompressed data that were not mapped before
-  compression.}
-
-\label{tab:aligner}
+\caption[Comparison of assembly statistics for HMP mock Even and mock Staggered datasets]{Comparison of assembly statistics for HMP mock Even and mock Staggered datasets.Numbers in bold represent the best value for the specific dataset.}
+\label{tab:hmp}
 \end{table}
 
 \renewcommand{\baselinestretch}{2}
@@ -734,112 +283,326 @@ quality results in the lowest proportion of mapped reads 72.8\%.
 \end{landscape}
 
 
+\subsection{Integration into MetAMOS}
+
+In addition to being a standalone framework, the software implementing our metagenomic LAP approach comes packaged with the MetAMOS pipeline.
+This allows users the option to run MetAMOS with different assemblers and have our framework automatically select the assembly with the highest LAP score without any prior knowledge from the user.
+The first step of the MetAMOS pipeline is to \verb!Preprocess! the reads, optionally filtering out low quality reads.
+Those reads are used by the next step \verb!Assemble!.
+Users specify the desired assembler using the \verb!-a! parameter of \verb!runPipeline!.
+We modified MetAMOS so users can now specify multiple assemblers (comma-separated) after the \verb!-a! parameter, and \verb!runPipeline! will run all assemblers and select the assembly yielding the highest LAP score to be used in downstream analyses.
+%The software implementing our approach is made available, open-source and free of charge, at: \url{http://assembly-eval.sourceforge.net/} and with the MetAMOS package: \url{https://github.com/treangen/MetAMOS}.
+
+
+\section{Results}
+\subsection{Likelihood score maximized using correct abundances}
+A key property of our framework is that the correct copy numbers (abundances) and assemblies maximizes our LAP score.
+To illustrate this property, we simulated two metagenomic communities and calculated the LAP of the reference genomes with a combination of abundances.
+The first simulated community consisted of \emph{Bacillus cereus} and \emph{Acinetobacter baumannii} at a ratio of 1:4.
+We generated 200bp reads at 20x coverage of the metagenome (20x of \emph{B. cereus} and 80x of \emph{A baumannii}).
+We calculated the LAP scores of the error-free reference genomes for all combinations of abundances (ranging from 1 copy to 8 copies) for each bacteria.
+%We calculated the LAP score on error-free reference assemblies with all combinations of abundances from 1 copy to 8 copies for each bacteria.
+The second simulated community consisted of \emph{Bacillus cereus} and \emph{Actinomyces odontolyticus} at a ratio of 4:7.
+We generated 200bp reads at 20x coverage of the metagenome (80x of \emph{B. cereus} and 140x of \emph{A odontolyticus}).
+We calculated the LAP scores of the error-free reference genomes for all combinations of abundances (ranging from 1 copy to 13 copies) for each bacteria.
+
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{ref_abun_2}
+% where an .eps filename suffix will be assumed under latex,
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{LAP scores for simulated B. cereus (4x, 5.2MB) and A. odontolyticus (7x, 2.4MB)}
+%\label{fig:ref_abun_2}
+%\end{figure}
+
+We expect the highest LAP scores for the assemblies that contain the correct abundance ratios (1:4 or 2:8 in the first community, and 4:7 in the second community).
+%1:4 , 2:8 boxes to be highest in figure A, and 4:7, 8:14, etc. in panel 2.  Y
+As seen in Figs. \ref{fig:ref_abun_1} and \ref{fig:ref_abun_2}, our LAP score is able to accurately reflect the varying organism abundance ratios present in the sample.
+The LAP score increases as the estimates approach the true abundance ratios, with the true ratio yielding the highest LAP scores in both communities.
+
+\begin{figure}[htb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{errors}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Synthetic errors in simulated \emph{E. coli} and \emph{B. cereus} (1 copy, 5.2Mbp) community]{Synthetic errors in simulated \emph{E. coli} (5 copies, 4.9Mbp) \emph{B. cereus} (1 copy, 5.2Mbp) community.}
+\label{fig:errors}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+\subsection{Impact of errors on synthetic metagenomes}
+
+One of the often overlooked aspects of metagenomic assembly evaluation is the weighing of errors that occur in contigs with different abundances.
+%In single genome assembly, errors are often not weighted since the genome has uniform coverage.
+%When detecting errors with the aid of a reference, all substitution errors occurring within a genome are weighted the same (ignoring additional information, such as whether it occurs in a genic or regulatory element).
+%When organism abundances are uniform, the weight of an assembly error is also uniform.
+In metagenomic samples the relative organism abundances can vary by orders of magnitudes.
+A typical reference-based evaluation would equally weight the errors irrespective of the abundance of the erroneous contigs.
+The proposed metagenomic LAP score, however, automatically handles this situation and appropriately weighs errors according to genome abundance.
+%Thus, errors in highly abundant organisms will have more of an impact on the LAP score than errors in organism of lower abundance.
+To illustrate this, we simulated a small metagenomic community consisting of \emph{Escherichia coli} and \emph{Bacillus cereus} at a 5:1 ratio.
+We introduced an increasing number of common assembly errors (single-base substitutions, insertions, deletions, and inversions) into the two organisms assemblies and observed the resulting LAP score.
+
+As shown in \figurename \ref{fig:errors}, the higher the number of synthetic errors, the lower the LAP score.
+Insertions/deletions were more deleterious to the LAP score than substitutions, since in addition to causing a mismatch, an insertion/deletion changes the overall genome size.
+Although inversions did not change the overall genome size (and would therefore not be detected by simplistic measures such as N50), these errors had the greatest impact on the LAP score because they prevented the alignment of reads across the boundaries of the inversions.
+%With substitutions and indels, reads were still able to align across the error and only incurred the additional mismatch penalty.
+%Conversely, read alignment tools will fail to detect read alignments that span the borders of the inversions.
+
+%Whereas substitutions, insertions, and deletions still allowed reads to align albeit with a lower probability, reads that inversions are essentially treated as complete
+
+As expected, errors introduced into the more abundant organism, \emph{E. coli}, had a greater affect on the LAP score than those inserted into \emph{B. cereus}.
+Our LAP score was able to accurately weigh the errors by the abundance of each organism.
+
+
+\subsection{Likelihood scores correlate with reference-based metrics}
+%c|c|c|c|c|c
+
+
+With real metagenomic samples, it is difficult to make evaluations given the lack of high quality references.
+Using purely simulated data has the issue of not accurately capturing the error and bias introduced by sequencing technology.
+Thus, to evaluate our LAP score, we use two `mock' communities (Even and Staggered) provided by the Human Microbiome Project (HMP) consortium\cite{mitreva2012structure,methe2012framework}.
+These communities were created using specific DNA sequences from organisms with known reference genomes (consisting of over 20 bacterial genomes and a few eukaryotes) and abundances.
+The mock Even community consisted of 100,000 16S copies per organism per aliquot, while the mock Staggered community consisted of 1,000 to 1,000,000 16S copies per organism per aliquot.
+Data used from the HMP mock communities are available at \url{http://www.ncbi.nlm.nih.gov/bioproject/48475}.
+We calculated the LAP score on assemblies produced by MetAMOS~\cite{treangen2013metamos} using several assemblers: SOAPdenovo~\cite{SOAPdenovo}, Metavelvet~\cite{namiki2012metavelvet}, Velvet~\cite{Velvet}, and Meta-IDBA~\cite{peng2011meta}.
+The additional \emph{de novo} and reference-based metrics for the assemblies were taken from MetAMOS~\cite{treangen2013metamos}.  These metrics include:
+   \begin{itemize}
+   \item number contigs (\# ctgs) -- total number of contigs/scaffolds in the assembly
+   \item good contigs (Good Ctgs) -- fraction of contigs that mapped without errors to reference genomes
+   \item total aligned (Total aln) -- total amount of sequence (in Mbp) that can be aligned to the reference genomes
+   \item slight mis-assemblies (Slt) -- alignments that cover 80\% or more of the aligned contig in a single match (Slt)
+   \item heavy misassemblies (Hvy) -- alignments that cover less than 80\% of the aligned contig in a single match or have two or more matches to a single reference
+   \item chimeras (Ch) -- contigs with matches to two distinct reference genomes
+   \item size at 10 megabases (Size @ 10 Mbp) - the size of the largest contig $c$ such that the sum of all contigs larger than $c$ is more than 10 Mbp (similar to the commonly used N50 size)
+   \item max contig size (Max ctg size) -- size of the largest contig in the assembly
+   \item errors per megabase (Err per Mbp) -- average number of errors per Mbp in the assembly
+   \end{itemize}
+
+Generally, the \emph{de novo} LAP scores agree with the referenced-based metrics (Table \ref{tab:hmp}).
+In the mock Even dataset, SOAPdenovo has the greatest LAP score, the highest fraction of contigs that can align to a reference genome without error, total amount of sequence that can be aligned to a reference genome, while also having the lowest amount of misassemblies (including chimeric) and errors per Mbp.
+It is important to note that if user selected an assembly based on the best contiguity at 10Mbp, they would select the MetaVelvet assembly, which contains double the error rate per Mbp as the SOAPdenovo assembly while aligning 2Mbp less to the references.
+
+\begin{figure}[tb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{coverage}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Frequency of contig abundances for assemblies of the HMP mock Staggered dataset]{Frequency of contig abundances for assemblies of the HMP mock Staggered dataset.}
+\label{fig:coverage}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+Since the abundances of each organism in the mock Even dataset are fairly similar, the mock Staggered abundance distribution creates a more realistic scenario encountered in metagenomic environments.
+Here, the Meta-IDBA assembly has the greatest LAP score, but aligns roughly a third less sequences to the reference genomes than SOAPdenovo.
+The Meta-IDBA assembly contains approximately a tenth of the amount of contigs (4,559 vs. 44,928) as SOAPdenovo.
+The SOAPdenovo assembly contains a greater number of contigs at a very low abundance (\figurename \ref{fig:coverage}).
+On large contigs Meta-IDBA performs better than SOAPdenovo and has a lower error rate (see \figurename 4 in \cite{treangen2013metamos}).
+However, Meta-IDBA assembles a smaller fraction of the low-abundance genomes than SOAPdenovo, leading fewer sequences to align.
+The LAP score penalizes misassemblies within abundant contigs in the SOAPdenovo results.
+
+
+%Given how the mock Staggered community was constructed (each ratio of 16S copies per aliquot occurred roughly the same number of times), the frequency of contig abundances should be approximately uniform for the community.
+%The SOAPdenovo assembly was able to align more reads, but the reads were localized in these low coverage regions.
+%The distribution of contig abundances in the Meta-IDBA assembly was closer to the expected distribution than the SOAPdenovo assembly.
+
+%The Meta-IDBA assembly a far more uniform frequency of contig abundances compared to the SOAPdenovo assembly.
+
+Next, we applied our framework on real data where we did not know the actual genomes comprising the sample (HMP tongue dorsum female sample, SRS077736) (Table \ref{tab:hmp}).
+Although we do not know for certain which organisms are present in the sample, the HMP identified a reference genome set with high similarity to the sequences within the sample (HMP Shotgun Community profiling SRS077736).
+The reference-based error metrics only consider chimeric errors due to the possibility of structural difference between an organism and its version in the reference database.
+We calculated the LAP of the assemblies using a single library consisting of 42,013,917 reads.
+The SOAPdenovo assembly had a far greater LAP score than the Meta-IDBA assembly.
+The higher score is due to the SOAPdenovo assembly recruiting more reads (88.14\% to 58.89\%) in relation to its genome size (46Mbp to 37Mbp) than the Meta-IDBA assembly.
+Furthermore, the MetAMOS metrics show that the SOAPdenovo assembly contained approximately 60 less errors per Mbp than the Meta-IDBA assembly.
+
+%These datasets have the advantage over simulated data because it captures the error and bias introduced from the sequence technology.
+
+
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+
+\begin{table}[tb!]
+\label{tab:metamos_lap}
+\centering
+\begin{tabular}{{l}{c}{c}{c}{c}}
+\hline
+\bfseries Assembler & \bfseries Contigs & \bfseries LAP & \bfseries N50 (Kbp) & \bfseries  Errors \\
+\hline \hline
+newbler  & \bf{1} & \bf{-13.064} & \bf{156} & 1 \\
+SOAPdenovo & 23 & -14.238 & 9 & \bf{3} \\
+Velvet & 3 & -13.157 & 92 & \bf{0} \\
+MetaVelvet & 3 & -13.157 & 92 & \bf{0} \\
+\hline
+\end{tabular}
+\caption[Self-tuning MetAMOS using \emph{C. ruddii} test dataset]{Self-tuning MetAMOS using \emph{C. ruddii} test dataset.}
+\end{table}
+
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+\subsection{Tuning assembly parameters for MetAMOS}
+Assemblathon1~\cite{earl2011assemblathon} has shown that assembly experts can often get drastically different assemblies using the same assemblers, highlighting the difficulty of choosing the \emph{right} parameters for a given assembler.
+Our metagenomic LAP framework comes packaged with the MetAMOS pipeline, allowing users the option to run MetAMOS with different assemblers and automatically select the assembly with the highest LAP score.
+This step occurs without any prior knowledge from the user.
+
+We showcase the ease of use of the automated assembler selection within MetAMOS using the \emph{Carsonella ruddii} (156Kbp) dataset packaged with MetAMOS (Table ~\ref{tab:metamos_lap}).
+Errors were found using DNADIFF~\cite{phillippy2008genome} and MUMmer~\cite{delcher2003using}.
+The newbler assembly produced one contig containing the complete \emph{C. ruddii} genome.
+The SOAPdenovo assembly produced a severely fragmented assembly with the most number of errors.
+The MetaVelvet and Velvet produced identical assemblies, containing 3 contigs of sizes 92Kbp, 65Kbp, and 1.7Kbp, but contained an additional 158bp compared to the \emph{C. ruddii} genome.
+Upon closer inspection, there were overlaps between the contigs ranging from 38bp to 73bp.
+This is not surprising given MetaVelvet's and Velvet's de bruijn graph-based approach could not resolve repetitive regions between the contigs.
+Newbler, on the other hand, contained only a single insertion error.
+The LAP score of the Newbler assembly was greater due to more reads being able to align across the regions that were broken apart in the MetaVelvet and Velvet assemblies.
+Additionally, the Newbler assembly did not contain the duplicated sequence found in the other assemblies.
+MetAMOS was able to select the most likely assembly without requiring any additional input from the user.
+
 \section{Discussion}
 
-\subsection{Lossy compression acceptable for subsequent biological analyses}
+In this paper, we have proposed an extension to our LAP framework to perform \emph{de novo} comparisons of metagenomic assemblies.
+Unlike traditional \emph{de novo} metrics used for measuring assembly quality, our extended LAP score correlates well with reference-based measures of metagenomic assembly quality.
+However, in this study, we have realized that there is a lack of reference-based metrics when evaluating metagenomic assemblies.
+Misjoins betweens organisms may be more deleterious than misjoins within a single genome.
+Furthermore, current reference-based metrics do not take into account the relative abundances of the organisms when evaluating metagenomic assemblies.
+The metrics provided by MetAMOS do not factor in the contig abundances when examining assembly errors.
+This made it difficult to compare our LAP score to their reference-based metrics because, intuitively, an error in a highly abundant organism should be \emph{worse} than an error in a rare, low coverage organism.
+Our LAP score implicitly weighs the errors in abundant contigs more than those in lesser abundant contigs.
+In our results, we have proposed one such reference-based metric that scales the errors by the relative abundance of the contig it occurs within.
 
-The primary concern of using lossy compression methods is naturally
-the extent of information loss, that we quantified by \textsc{mse} in
-this study. \textsc{mse} and compressibility provide information in
-the theoretical context to the methods, but they are not the end-all
-of evaluation criteria. The performance of compressed datasets in
-different subsequent analyses and applications are just as
-important. Our benchmarks showed that some of the compression methods
-with high error rates are still practical for certain kinds of
-applications. Many subsequent tools proved to have enough additional
-redundancy built-in to handle such loss in information. Passing the
-decompressed quality values through quality control software shows
-that most methods filter nearly as many bases as using original
-quality sequences. Assemblers performing sequence alignment use
-percent similarity scores that are typically robust to standard
-sequencing errors.
+It is important to note that we have only focused on the complete reconstruction of the metagenome from the set of reads.
+Assembly algorithms are designed with specific biological applications in mind, such as, the conservative reconstruction of the genic regions.
+Studies focusing on the genic regions may tolerate large-scale rearrangements as long as the genic regions were correctly assembled.
+Conversely, other studies may want to focus on the reconstruction and detection of rare pathogenic bacteria in an environment.
+These application specific assembly algorithms all attempt to optimize their formulation of the assembly problem.
 
-\subsection{Extension of 2-bin encoding}
+Our metagenomic LAP extension relies heavily on the idea that the sequencing process of the metagenome is roughly uniform, and that the reads are independently sampled from the genome.
+Biases exist in all steps of the sequencing process, from the extraction of DNA from organisms with different cell membranes/walls~\cite{carrigg2007dna,krsek1999comparison} to the sequencing protocol used~\cite{morgan2010metagenomic,temperton2009bias}.
+In the future, we would like to implement a more specific model that better captures the sequencing process.
 
-2-bin encoding has the nice property of being simple to compute and
-has good bits/base-call values. The 2-bin encoding suffers from having
-a high \textsc{mse}, but fortunately, we have shown that in the case
-of genome assembly, 2-bin encoding outperforms all polynomial
-regressions encodings with degree less than 3. 2-bin encoding of the
-fragment and short-jump libraries of \textit{Rhodobacter sphaeroides}
-have \textsc{mse}s of $2.42\times$ and $10.76\times$ the 3rd-degree
-polynomial regression encodings, respectively. This further highlights
-the importance of using additional contextual information of the
-subsequent analyses when evaluating compressed quality values.
+%De novo metric, more misleading in assemblies -> chimera
 
-A potential extension to 2-bin encoding is to incorporate an
-additional bin (\emph{okay}). The \emph{okay} value can be used where
-the base qualities fall within a 2-bin range. Because the distribution
-of quality values is skewed towards higher quality, we need to
-experiment with different cutoffs for the \emph{okay} value and
-determine if the additional storage is noticeable in subsequent
-analyses.
+%We would like to stress that \emph{de novo} measures of assembly quality, such as ours, are critically needed by researchers attempting to assemble of yet unknown genomes.
 
-\subsection{Extension of polynomial regression}
+Results from GAGE~\cite{salzberg2011gage} and Assemblathon~\cite{earl2011assemblathon,bradnam2013assemblathon} have shown that the specific characteristics of the data being assembled has a great impact on the performance of the assembler.
+This problem is magnified in metagenomic assembly.
+By integrating our LAP framework in MetAMOS, we have allowed researchers to accurately and effortlessly run and evaluate assemblies without any prior knowledge on evaluating assembly quality.
 
-The downside of modeling quality sequences using polynomial regression is that the model often requires a high number of degrees to achieve the same \textsc{mse} as the profile and \textsc{QualComp} methods.
-However, storing a high number of coefficients requires more storage than losslessly compressing the original data.
-In order to increase the compressibility of modeling, we can attempt to store the \emph{profiles} of certain polynomial functions.
-In other words, we can use a spline (a function that is piecewise-defined by polynomial functions) to represent a given quality sequence.
-Similar to our profile-encoding method, the user can specify how many polynomial functions they wish to store.
-Then a quality sequence can be divided evenly into a given number of segments, and each segment can be annotated with a polynomial function profile that closely matches its quality sequence.
+In our framework, we use the average coverage of the contig (provided by MetAMOS) to estimate abundance.
+There are issues with this measure as it is possible that mis-assembled repeats within a contig will affect our estimate of depth of coverage and could impact our underlying statistics.
+A better approach is to use something more robust than the mean coverage, such as the median coverage, to avoid being influenced by such regions.
+While the user can supply the median coverage to our standalone framework, future work includes building this feature into MetAMOS.
+Another approach involves breaking contigs at regions of differing coverage (using tools such as AMOSvalidate\cite{phillippy2008genome}), so there will be less deviation in the average coverage within the contig.
 
-\subsection{Potential for operations on compressed data}
+It should be noted that in some cases it may not be tractable to run the complete collection of assemblers with MetAMOS.
+In such cases, we should first employ heuristics (such as \cite{chikhi2013informed}) to aid in selecting potential assemblers (and parameters) to run.
+For the assembler selection process, we can use the LAP framework's sampling procedure in combination with calculating read probabilities in parallel to reduce runtime.
 
-Perhaps one of the greatest potential benefits of compressing quality
-values is the potential to perform quality control and possibly other
-operations directly on the compressed representations of the
-data. This is easiest to to consider for profile-based
-compression. The $k$ profiles can be evaluated for (pre-)processing
-operations such as filtering and trimming, and the operations
-transitively applied to the entire set of reads, thus saving
-substantial computation associated with evaluating the full set of
-reads.
-
-\subsection{Future of lossy compression in bioinformatics analyses}
-
-We have simply provided here the initial steps in analyzing the effect
-of lossy compression on quality values using a single,
-high-coverage bacterial data set. More work needs to be done using
-additional biological data sets, such as human and mouse, along with
-different sequencing technologies. A more direct comparison against
-related lossy compression tools, such as
-\textsc{SlimGene}~\cite{Kozanitis:2011kl} and
-\textsc{\textsc{q}ual\textsc{c}omp}~\cite{Ochoa:2013rt}, needs to be
-performed. Additionally, other types of sequencing data can be
-analyzed apart from the Illumina data examined here. For example, the
-PacBio sequencing instruments produce very long reads (with average
-read lengths on the order of 10 kbp), but with the trade-off of having
-a high error-rate ($\sim$15\%). Unlike the class of quality values we
-have examined here, the distribution of erroneous bases is relatively
-uniform~\cite{Ferrarini:2013vf}. The assembly complexity of bacterial
-genomes can be greatly simplified, producing near complete genome
-assemblies, by utilizing a single run of these long
-reads~\cite{Koren:2013ye}. If long read sequencing technologies such
-as PacBio become more widely adopted, it would be of huge benefit to
-examine the potential of lossy compression algorithms on not only the
-quality values, but the biological sequencing data themselves.
+Our goal was to provide a global measure of how good a metagenomic assembly may be, not to detect assembly errors.
+Other likelihood-based frameworks, such as ALE, use frequencies of certain sequences to aid in detection of possible chimeric contigs.
+We are able to apply similar modifications to our LAP framework to find regions of possible misassembly.
+Finally, we plan to extend our framework to give a more detailed breakdown of the LAP scores of segments assembled using the same subset of reads across different assemblies.
+The goal would be to take high-scoring assembled segments from individual assemblies to recreate an assembly with overall greater likelihood.
+This approach will be of great benefit to the field of metagenomic assembly since assemblers are often designed with different constraints and goals in mind, e.g., low memory footprint, assembling high/low coverage organisms, or tolerating population polymorphisms.
+For example, on the mock Staggered dataset, Meta-IDBA best assembled the most abundant genomes while SOAPdenovo had a better representation of the low abundance organisms.
+Providing a systematic way of combining assembler approaches using our LAP score will produce better assemblies for downstream analyses.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% An example of a floating figure using the graphicx package.
+% Note that \label must occur AFTER (or within) \caption.
+% For figures, \caption should occur after the \includegraphics.
+% Note that IEEEtran v1.7 and later has special internal code that
+% is designed to preserve the operation of \label within \caption
+% even when the captionsoff option is in effect. However, because
+% of issues like this, it may be the safest practice to put all your
+% \label just after \caption rather than within \caption{}.
 %
-%     please remove the " % " symbol from \centerline{\includegraphics{fig01.eps}}
-%     as it may ignore the figures.
+% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
+% option should be used if it is desired that the figures are to be
+% displayed while in draft mode.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{myfigure}
+% where an .eps filename suffix will be assumed under latex,
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{Simulation Results}
+%\label{fig_sim}
+%\end{figure}
+
+% Note that IEEE typically puts floats only at the top, even when this
+% results in a large percentage of a column being occupied by floats.
+
+
+% An example of a double column floating figure using two subfigures.
+% (The subfig.sty package must be loaded for this to work.)
+% The subfigure \label commands are set within each subfloat command, the
+% \label for the overall figure must come after \caption.
+% \hfil must be used as a separator to get equal spacing.
+% The subfigure.sty package works much the same way, except \subfigure is
+% used instead of \subfloat.
+%
+%\begin{figure*}[!t]
+%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
+%\label{fig_second_case}}}
+%\caption{Simulation results}
+%\label{fig_sim}
+%\end{figure*}
+%
+% Note that often IEEE papers with subfigures do not employ subfigure
+% captions (using the optional argument to \subfloat), but instead will
+% reference/describe all of them (a), (b), etc., within the main caption.
+
+
+% An example of a floating table. Note that, for IEEE style tables, the
+% \caption command should come BEFORE the table. Table text will default to
+% \footnotesize as IEEE normally uses this smaller font for tables.
+% The \label must come after \caption as always.
+%
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+%\caption{An Example of a Table}
+%\label{table_example}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c|}
+%\hline
+%One & Two\\
+%\hline
+%Three & Four\\
+%\hline
+%\end{tabular}
+%\end{table}
+
+
+% Note that IEEE does not put floats in the very first column - or typically
+% anywhere on the first page for that matter. Also, in-text middle ("here")
+% positioning is not used. Most IEEE journals/conferences use top floats
+% exclusively. Note that, LaTeX2e, unlike IEEE journals/conferences, places
+% footnotes above bottom floats. This can be corrected via the \fnbelowfloat
+% command of the stfloats package.
+
+
 
 \section{Conclusion}
-
-In this paper we have examined lossy compression on sequence quality
-values and their effect on subsequent analyses. Although most previous
-examinations on lossy compression primarily focused on information
-loss, we have shown that typically used bioinformatics software today
-have additional built-in sensitivity to handle significant loss of
-information in the compressed quality values.
-
-\section*{Acknowledgement}
-We thank the 2014 Bioinformatics
-Exchange for Students and Teachers (\textsc{best}) Summer School,
-funded by the offices of the Dean of The Graduate School at University
-of Maryland and the Rektor of University of T\"{u}bingen, where this
-research was initiated.
+In this paper we have described an extension to our \emph{de novo} assembly evaluation framework (LAP) for comparing metagenomic assemblies.
+We showed that the true metagenome and correct relative abundances maximizes our extended LAP score.
+Furthermore, we have integrated our framework into the metagenomic assembly pipeline MetAMOS, showing that any user is able to reproduce quality evaluations of metagenomic assemblies with relative ease.

@@ -1,3 +1,5 @@
+\renewcommand{\thechapter}{4}
+\chapter{Regression Testing of Genome Assemblers}
 \section{Introduction}
 
 The issues with testing ``non-testable programs'' were first raised by Davis
@@ -43,7 +45,7 @@ correctness ({\it quality} \cite{monya2012}) of an assembly -- the
 correct/expected solution is not known.  In software testing terms, the {\it
 test oracle} is unavailable.
 Moreover, when researchers develop a new
-assembler, they often run it on a new data set, making comparisons difficult.
+assembler, they often run it on a new dataset, making comparisons difficult.
 Monya \cite{monya2012} notes that the bioinformatics community needs to find
 ``{\it ways to assess and improve assemblers in general.}''
 
@@ -55,7 +57,7 @@ whether bugs have not degraded a software's output is by using what we call a
 {\it diff}-based approach, i.e., running test cases on the old and new versions
 of the code and identifying differences in the tests' outcome
 \cite{Orso:2008:BBR:1401827.1401835}.  Thus, regression testing employed by
-assemblers may compare the text output of an assembler on test data sets with
+assemblers may compare the text output of an assembler on test datasets with
 previously computed assemblies to determine if the code changes produced a
 different assembly.  Comparing the raw text outputs of an assembler is not
 robust enough to capture whether there were actual differences in the quality
@@ -175,8 +177,8 @@ Illustrates the benefits of developing a regression testing framework for untest
 We believe that this research is both timely and relevant.  As sequencing
 technology becomes cheaper, assemblers will operate on increasingly larger data
 sets, \emph{requiring} large multi-core machines in order to assemble these
-data sets in a reasonable time frame.  Developers need to design test cases
-that match the complexity and size of practical data sets to adequately test
+datasets in a reasonable time frame.  Developers need to design test cases
+that match the complexity and size of practical datasets to adequately test
 their assembler.  Depending on the underlying algorithms, concurrent programs
 may produce different outputs.  Assemblers may produce slightly different
 assemblies than their single-threaded version, making it difficult to compare
@@ -200,7 +202,7 @@ Without an oracle, it is hard to check whether a sequence has been mapped to \em
 
 Literature has witnessed several techniques developed to address the lack of oracle in software testing. The first technique is \emph{dual coding}
 or ``pseudo-oracle'' \cite{weyuker1982testing}, where developers independently create a program with the same specification as
-the original. Identical input data sets are used and outputs from both programs are, then, compared.
+the original. Identical input datasets are used and outputs from both programs are, then, compared.
 The extra overhead involved in creating a duplicate program as complex as genome assembler often makes this technique impractical.
 In order to reduce this overhead in some instances,
 McMinn \cite{McMinn:2009:SFD:1569901.1570127} proposed program transformation which automatically creates pseudo-oracles
@@ -259,7 +261,7 @@ matches at $n_r$ positions on the assembly of length $L$, then
 \end{equation}
 The assembly length is doubled due to the double-stranded nature of DNA molecules.
 
-Modifying the calculation of $p_r$ to handle practical contraints such as sequencing errors, paired-reads, and large data sets are detailed in \cite{LAP}.
+Modifying the calculation of $p_r$ to handle practical contraints such as sequencing errors, paired-reads, and large datasets are detailed in \cite{LAP}.
 %Ghodsi et al. details how to modify the calculation of $p_r$ to handle practical constraints, e.g., sequencing errors and mate pairs (reads that are experimentally known to be separated by a given length).
 
 
@@ -302,7 +304,7 @@ We are able to determine that these assemblies are of equivalent quality, unlike
 
 %Ghodsi defines the quality of an assembly as the likelihood that the observed reads are generated from the given assembly.  By modeling the data generation process, we can calculate the probability of each read.  The logarithm of the geometric mean of the read probabilities (Log Average Probability - LAP) is the metric provided by Ghodsi’s framework.  The framework is able to handle the addition of mate pairs.  Ghodsi shows that the true genome maximizes their likelihood metric.
 
-We use LAP in our framework over CGAL and ALE because the LAP score can be calculated accurately and efficiently using a sample of the reads, making it practical for large data sets.
+We use LAP in our framework over CGAL and ALE because the LAP score can be calculated accurately and efficiently using a sample of the reads, making it practical for large datasets.
 
 
 \subsubsection{Read-pair coverage}
@@ -348,7 +350,7 @@ MetAMOS generates a summary HTML page for the assembly quality results.
 
 To illustrate the inadequacy of the \emph{diff}-based approach, %we use two assemblers, SOAPdenovo and minimus.
 we first generate assemblies with SOAPdenovo and Minimus using bacterial sequences from a recent high-profile assembly competition, GAGE \cite{salzberg2012gage}.
-The \emph{Rhodobacter sphaeroides} data set contains 1,408,188 reads of length 101 bps.
+The \emph{Rhodobacter sphaeroides} dataset contains 1,408,188 reads of length 101 bps.
 %, known as base-pairs (bp).
 Assemblies are created using the original reads, along with a shuffled version of the original reads and compared using unix command \textbf{diff}.
 Since SOAPdenovo allows the use of multiple threads, we run the assembler using one and eight (the default in SOAPdenovo) threads.
@@ -366,7 +368,7 @@ By doing a \textbf{diff} of the text outputs, we are unable to determine if ther
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[LAP scores for original and shuffled \emph{R. sphaeroides} data set.]{SOAPdenovo assemblies of the 1,408,188 \emph{R. sphaeroides} error-corrected reads.  The LAP was determined using a sample of 100,000 reads.  The assemblies produced from the original reads and shuffled reads are within the acceptable standard deviation.}
+\caption[LAP scores for original and shuffled \emph{R. sphaeroides} dataset.]{SOAPdenovo assemblies of the 1,408,188 \emph{R. sphaeroides} error-corrected reads.  The LAP was determined using a sample of 100,000 reads.  The assemblies produced from the original reads and shuffled reads are within the acceptable standard deviation.}
 \label{fig:modified_read_asm_param}
 \end{quote}
 \end{figure}
@@ -384,7 +386,7 @@ For SOAPdenovo, the LAP of the assemblies generated from the original and shuffl
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-  \caption[LAP scores for SOAPdenovo assemblies across various versions]{LAP scores for SOAPdenovo assemblies produced from different versions, using \emph{R. sphaeroides}, \emph{S. aureus}, and \emph{C. Rudii} data sets.
+  \caption[LAP scores for SOAPdenovo assemblies across various versions]{LAP scores for SOAPdenovo assemblies produced from different versions, using \emph{R. sphaeroides}, \emph{S. aureus}, and \emph{C. Rudii} datasets.
   %416,798,  704,094 error-corrected mate pairs with insert size of 180bp).
   The LAP was determined using all reads.  LAPs approaching zero represent more probable assemblies.
   %SOAPdenovo assemblies produced using versions 1-1.03 are equivalent.  Assembly quality improves in version 1.04, but drops back down in 1.05.
@@ -400,35 +402,35 @@ The purpose of regression testing is to ensure that a code change does not intro
 Ideally, we want to use our framework alongside the development of an assembler to evaluate how code changes affect assembly quality.
 Fortunately, SOAPdenovo's source code and previous versions are available for download.
 We have created custom assembler specification files for each of the 11 assembler versions so that they can be run by MetAMOS\cite{treangen2011metamos}.
-We evaluate the different versions of SOAPdenovo using LAP and REAPR on the \emph{Rhodobacter sphaeroides}, \emph{Staphylococcus aureus}, and \emph{Carsonella ruddii} data sets (Fig. \ref{fig:soapdenovo_versions}).
-The \emph{R. sphaeroides} data set contains 762,266 Quake-corrected \cite{kelley2010quake} read-pairs with insert sizes of 180bps.
-The \emph{S. aureus} data set contains 408,285 Quake-corrected read-pairs with insert sizes of 180bps.
-%For the \emph{R. sphaeroides} and \emph{S. aureus} data sets, we use Quake-corrected \cite{kelley2010quake} reads.
-The \emph{Carsonella ruddii} data set contains 50,000 read-pairs with insert sizes ranging from 500bps to 3,500bps and comes packaged as test data for MetAMOS.
+We evaluate the different versions of SOAPdenovo using LAP and REAPR on the \emph{Rhodobacter sphaeroides}, \emph{Staphylococcus aureus}, and \emph{Carsonella ruddii} datasets (Fig. \ref{fig:soapdenovo_versions}).
+The \emph{R. sphaeroides} dataset contains 762,266 Quake-corrected \cite{kelley2010quake} read-pairs with insert sizes of 180bps.
+The \emph{S. aureus} dataset contains 408,285 Quake-corrected read-pairs with insert sizes of 180bps.
+%For the \emph{R. sphaeroides} and \emph{S. aureus} datasets, we use Quake-corrected \cite{kelley2010quake} reads.
+The \emph{Carsonella ruddii} dataset contains 50,000 read-pairs with insert sizes ranging from 500bps to 3,500bps and comes packaged as test data for MetAMOS.
 We assemble the data using MetAMOS with our custom SOAPdenovo assemblers, then run the LAP and REAPR tools on the resulting assemblies at the contig-level.
 %MetAMOS provides a summary file of the LAP and REAPR scores
 SOAPdenovo is a de Bruijn assembler and requires the user to specify a parameter, k-mer, to construct the de Bruijn graph.
-For each data set we construct assemblies using two different k-mer sizes: 31 and 55.
+For each dataset we construct assemblies using two different k-mer sizes: 31 and 55.
 The default binaries for SOAPdenovo versions 1.00 - 1.05 were only able to build assemblies using k-mer sizes <=31.
 Versions 2.00 and higher were used to process up to 127-mers.
-%The read-pair data sets for these organisms will aid us in testing how their
-%We use the mate pair data sets for these organisms in order to test the scaffolding updates of SOAPdenovo.
-%The \emph{S. aureus} and \emph{R. sphaeroides} data set contains 416,798 and  mate pairs.
+%The read-pair datasets for these organisms will aid us in testing how their
+%We use the mate pair datasets for these organisms in order to test the scaffolding updates of SOAPdenovo.
+%The \emph{S. aureus} and \emph{R. sphaeroides} dataset contains 416,798 and  mate pairs.
 
-The respective assemblies of each data set using 31-mers are identical across SOAPdenovo versions 1 to 1.03.
+The respective assemblies of each dataset using 31-mers are identical across SOAPdenovo versions 1 to 1.03.
 %Assemblies produced from SOAPdenovo versions 1 through 1.03 are identical in both test cases.
 The changelists for versions 1.01 through 1.03 state that only bugs were fixed.
 The bug fixes in these versions are not covered by our test cases.
 The changelist for version 1.04 mentions an improved gap filling module, which is used during the scaffolding step of assembly.
-Our framework detects an increase in assembly quality between version 1.04 and the previous versions across the \emph{S. aureus}, \emph{R. sphaeroides}, and \emph{C. Rudii} data sets.
+Our framework detects an increase in assembly quality between version 1.04 and the previous versions across the \emph{S. aureus}, \emph{R. sphaeroides}, and \emph{C. Rudii} datasets.
 The LAP indicates a more probable assembly was produced in 1.04.
 This positive change in assembly quality is supported by our REAPR results.
-The percentage of error-free bases increased from 78.34\% to 81.93\% and 65.28\% to 72.75\% in the \emph{S. aureus} and \emph{R. sphaeroides} data sets, respectively.
+The percentage of error-free bases increased from 78.34\% to 81.93\% and 65.28\% to 72.75\% in the \emph{S. aureus} and \emph{R. sphaeroides} datasets, respectively.
 A breakdown of the \emph{S. Aureus} (31-mer) assemblies are given in Table \ref{table:soapdenovo_crudii}.
 REAPR agrees with the LAP scores, showing a correlation with the percentage of error-free bases across the different versions of SOAPdenovo.
 %The sharp decline in assembly quality at version 2.00 is detected by both LAP and REAPR.
 
-Interestingly, SOAPdenovo version 2.00 produces a less likely assembly for the \emph{S. aureus} and \emph{R. sphaeroides} data sets (using 31-mers) than the earlier versions.
+Interestingly, SOAPdenovo version 2.00 produces a less likely assembly for the \emph{S. aureus} and \emph{R. sphaeroides} datasets (using 31-mers) than the earlier versions.
 Our framework detects that this code change produced a lower quality assembly in terms of LAP and percentage of error-free bases, signaling that developers need to investigate further.
 SOAPdenovo versions beyond 2.00 appear to have fixed the issue resulting in the lower quality assemblies.
 
@@ -443,7 +445,7 @@ SOAPdenovo versions beyond 2.00 appear to have fixed the issue resulting in the 
 
 \begin{table}[tb!]
 \begin{center}
-\caption{Regression testing results for different SOAPdenovo versions using \emph{S. Aureus} (31-mer) data set.  The percentage of error-free basepairs are calculated using REAPR. N50 is a commonly-used metric to measure contiguity.}
+\caption{Regression testing results for different SOAPdenovo versions using \emph{S. Aureus} (31-mer) dataset.  The percentage of error-free basepairs are calculated using REAPR. N50 is a commonly-used metric to measure contiguity.}
 \begin{tabular}{l|ccc}
 Assembler & LAP        & Error-free bps (\%) & N50 (bps)    \\
 \hline
@@ -480,8 +482,8 @@ Minimus consists of three core modules: \texttt{hash-overlap}, \texttt{tigger}, 
 \texttt{Hash-overlap} computes the overlaps between reads using a special type of hash seed called a \emph{minimizer}\cite{roberts2004reducing}.
 The \texttt{tigger} uses the computed overlaps to assemble reads into individual contigs.
 The \texttt{make-consensus} module then improves the layout of the contigs using alignment data from the reads.
-For our tests, we seed faults into the \texttt{hash-overlap} and \texttt{tigger} modules and produce assemblies using the Influenza-A and zebrafish gene data sets packaged with Minimus.
-In order to find the shared regions of code executed between both data sets, we first obtain the code coverage (summarized in Table \ref{Tab:codecoverage}).
+For our tests, we seed faults into the \texttt{hash-overlap} and \texttt{tigger} modules and produce assemblies using the Influenza-A and zebrafish gene datasets packaged with Minimus.
+In order to find the shared regions of code executed between both datasets, we first obtain the code coverage (summarized in Table \ref{Tab:codecoverage}).
 
 
 
@@ -514,7 +516,7 @@ Zebrafish & 5606 / 46333 = 12.1\%  & 3108 / 19019 = 16.3\% & 4247 / 21029 = 20.2
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[LAP scores for fault-seeded versions of Minimus]{The LAP of fault-seeded versions of Minimus using the Influenza-A and zebrafish gene data sets.  Faults 1, 2, and 3 were inserted into the \textbf{hash-overlapper} module and Faults 4, and 5 were inserted into the \textbf{tigger} module. All faults were detected in the zebrafish gene data set; however, faults 1 and 3 were not detected in the Influenza-A data set.}
+\caption[LAP scores for fault-seeded versions of Minimus]{The LAP of fault-seeded versions of Minimus using the Influenza-A and zebrafish gene datasets.  Faults 1, 2, and 3 were inserted into the \textbf{hash-overlapper} module and Faults 4, and 5 were inserted into the \textbf{tigger} module. All faults were detected in the zebrafish gene dataset; however, faults 1 and 3 were not detected in the Influenza-A dataset.}
 \label{fig:minimus_fault_seeded}
 \end{quote}
 \end{figure}
@@ -524,24 +526,24 @@ Zebrafish & 5606 / 46333 = 12.1\%  & 3108 / 19019 = 16.3\% & 4247 / 21029 = 20.2
 We insert three faults into the \texttt{hash-overlap} module.
 The first fault allows all errors to be accepted between overlaps that contain a minimizer.
 Accepting all overlaps, regardless of quality, will increase the number of reads that can be combined.
-This fault produces an identical assembly as the fault-free version of the code in the Influenza-A data set, thus is not detected by our framework.
-A noticeable drop in assembly quality is detected in the zebrafish gene data set.
+This fault produces an identical assembly as the fault-free version of the code in the Influenza-A dataset, thus is not detected by our framework.
+A noticeable drop in assembly quality is detected in the zebrafish gene dataset.
 
 The next two faults modify the functionality of the minimizers.
 Minimizers need to be sorted so a more computationally expensive dynamic programming algorithm can be used to connect them across mismatching sequence.
 Both faults attempt to break the initialization and sorting of the minimizers.
-The faults produced assemblies of lower quality in the zebrafish gene data set; however, only one fault produced a lower quality assembly of the Influenza-A data set.
+The faults produced assemblies of lower quality in the zebrafish gene dataset; however, only one fault produced a lower quality assembly of the Influenza-A dataset.
 
 We insert two faults into the \texttt{tigger} module.
 The first fault disrupts a method that hides transitive edges within the assembly graph.
 An edge between nodes \emph{A} and \emph{C} is transitive if there exists an edge between nodes \emph{A} and \emph{B} and an edge between nodes \emph{B} and \emph{C}.
 Without the ability to hide transitive edges, Minimus will encounter more nodes that have multiple outgoing edges.
 Minimus will be unable to compress these paths into unitigs, resulting in additional contigs.
-Our framework correctly detects the drop in assembly quality in both the zebrafish gene and Influenza-A data sets.
+Our framework correctly detects the drop in assembly quality in both the zebrafish gene and Influenza-A datasets.
 
 The second fault is related to the first, but breaks Minimus's ability to remove nodes from the graph that are contained by an overlap between two other nodes.
 %While this fault still allows minimus to remove transitive edges, unitigs created can erroneously contain duplicate sequence.
-Our framework correctly detects the resulting drop in assembly quality across both test data sets.
+Our framework correctly detects the resulting drop in assembly quality across both test datasets.
 The Influenza-A assembly produced using this faulted version has the same N50 size as the fault-free version of Minimus.
 The N50 size is the weighted median
 contig size, i.e., the length of largest contig c such that
@@ -568,13 +570,13 @@ MetAMOS provides a standard generic assembler format for developers where they c
 This gives users the ability to specify a single parameter in MetAMOS, which is then automatically translated to the appropriate runtime parameter for the corresponding assemblers.
 
 
-A frequently used strategy to test software without an oracle is to run the program on a simplified data set for which the correctness of the result can be accurately determined \cite{weyuker1982testing}.
+A frequently used strategy to test software without an oracle is to run the program on a simplified dataset for which the correctness of the result can be accurately determined \cite{weyuker1982testing}.
 In general, software is often tested this way, since exhausting testing is not practical.
-A simplified data set may uncover some easy to find faults, but the complex cases are usually more error-prone.
+A simplified dataset may uncover some easy to find faults, but the complex cases are usually more error-prone.
 The Minimus test cases, Influenza-A and zebrafish gene, contain only 151 and 153 reads, respectively.
-However, typical assembly data sets consist of millions of reads, such as the \emph{S. aureus} and \emph{R. shpaeroides} data sets presented in Section \ref{results}.
-Two of the faults we seeded do not affect the assembly quality of Influenza-A data set, but do affect the zebrafish gene assembly quality.
-The zebrafish gene data set executes 0.8\% and 0.2\% and more code in the \texttt{hash-overlap} and \texttt{tigger} modules, respectively.
+However, typical assembly datasets consist of millions of reads, such as the \emph{S. aureus} and \emph{R. shpaeroides} datasets presented in Section \ref{results}.
+Two of the faults we seeded do not affect the assembly quality of Influenza-A dataset, but do affect the zebrafish gene assembly quality.
+The zebrafish gene dataset executes 0.8\% and 0.2\% and more code in the \texttt{hash-overlap} and \texttt{tigger} modules, respectively.
 Although the faults are inserted into shared sections of code, it is difficult to determine how much more complex the state of the assembler becomes due to the increase code execution.
 
 Ideally, once a fault is discovered, a test case is added that exercises the code path containing the fault.
@@ -598,7 +600,7 @@ Otherwise, results published from these users could lead to incorrect biological
 
 % possibly resulting in different contigs.
 %In the which could bypass the desired section of code to be tested.
-%The fault-seeding experiment shows that some faults do not affect the assembly quality of the Influenza-A data set,
+%The fault-seeding experiment shows that some faults do not affect the assembly quality of the Influenza-A dataset,
 
 
 
@@ -608,7 +610,7 @@ Otherwise, results published from these users could lead to incorrect biological
 \label{conclusion}
 Assembler developers face a difficult task: iteratively improving their assemblers to handle the exponential increases in biological data, while ensuring that changes at each step do not introduce any bugs.
 %As assemblers develop, it is difficult to determine if code changes affect the quality of the assembly.
-Traditional methods of comparing the text outputs of assemblers are unable to detect trivial differences in assemblies that are the result of using multi-core systems (a \emph{requirement} to process increasingly large data sets) or the circular nature of bacterial genomes.
+Traditional methods of comparing the text outputs of assemblers are unable to detect trivial differences in assemblies that are the result of using multi-core systems (a \emph{requirement} to process increasingly large datasets) or the circular nature of bacterial genomes.
 We have developed a regression testing framework for genome assembly software that leverages existing assembly tools to accurately evaluate changes in assembly quality that traditional regression testing methods do not.
 We have examined the change in assembly quality over the version history of the popular assembler, SOAPdenovo.
 Lastly, our regression testing framework was able to detect manually inserted faults into the Minimus assembler.
@@ -618,13 +620,13 @@ In cases where our framework detects non-trivial changes in assembly quality, it
 %We accurately detect changes in assembly quality by leveraging existing assembly tools.
 %Our framework detects changes in assembly quality that traditional regression testing methods do not.
 
-\section{Acknowledgment}
-
-
-The authors would like to thank members of the Memon and Pop labs for their support and valuable discussions.
-This work was supported by NIH grant R01-AI-100947 to MP.
-
-The contributions of SK were funded under Agreement No. HSHQDC-07-C-00020 awarded by the Department of Homeland Security Science and Technology Directorate (DHS/S\&T) for the management and operation of the National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and Development Center. The views and conclusions contained in this document are those of the authors and should not be interpreted as necessarily representing the official policies, either expressed or implied, of the U.S. Department of Homeland Security. In no event shall the DHS, NBACC, or Battelle National Biodefense Institute (BNBI) have any responsibility or liability for any use, misuse, inability to use, or reliance upon the information contained herein. The Department of Homeland Security does not endorse any products or commercial services mentioned in this publication.
+% \section{Acknowledgment}
+%
+%
+% The authors would like to thank members of the Memon and Pop labs for their support and valuable discussions.
+% This work was supported by NIH grant R01-AI-100947 to MP.
+%
+% The contributions of SK were funded under Agreement No. HSHQDC-07-C-00020 awarded by the Department of Homeland Security Science and Technology Directorate (DHS/S\&T) for the management and operation of the National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and Development Center. The views and conclusions contained in this document are those of the authors and should not be interpreted as necessarily representing the official policies, either expressed or implied, of the U.S. Department of Homeland Security. In no event shall the DHS, NBACC, or Battelle National Biodefense Institute (BNBI) have any responsibility or liability for any use, misuse, inability to use, or reliance upon the information contained herein. The Department of Homeland Security does not endorse any products or commercial services mentioned in this publication.
 
 \section{Availability}
 Software to calculate the LAP is available for download at \url{assembly-eval.sourceforge.net}.

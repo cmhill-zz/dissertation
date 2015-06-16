@@ -1,9 +1,10 @@
-\section{abstract}
+\section{K-mulus: Strategies for BLAST in the Cloud}
+\subsection{Abstract}
 With the increased availability of next-generation sequencing technologies, researchers are gathering more data than they are able to process and analyze. One of the most widely performed analysis is identifying regions of similarity between DNA or protein sequences using the Basic Local Alignment Search Tool, or BLAST. Due to the large amount of sequencing data produced, parallel implementations of BLAST are needed to process the data in a timely manner.  While these implementations have been designed for those researchers with access to computing grids, recent web-based services, such as Amazon's Elastic Compute Cloud, now offer scalable, pay-as-you-go computing.  In this paper, we present K-mulus, an application that performs distributed BLAST queries via Hadoop MapReduce using a collection of established parallelization strategies. In addition, we provide a method to speedup BLAST by clustering the sequence database to reduce the search space for a given query.  Our results show that users must take into account the size of the BLAST database and memory of the underlying hardware to efficiently carry out the BLAST queries in parallel.  Finally, we show that while our database clustering and indexing approach offers a significant theoretical speedup, in practice the distribution of protein sequences prevents this potential from being realized.
 
 %
-%\input{section_introduction.tex}
-\section{Introduction}
+%\input{subsection_introduction.tex}
+\subsection{Introduction}
 Identifying regions of similarity between DNA or protein sequences is one of the most widely studied problems in bioinformatics. These similarities can be the result of functional, structural, or evolutionary relationships between the sequences. As a result, many tools have been developed with the intention of efficiently searching for these similarities \cite{altschul1990basic,eddy2009new,kent2002blat}. The most widely used application is the Basic Local Alignment Search Tool, or BLAST\cite{altschul1990basic}.
 
 With the increased availability of next-generation sequencing technologies, researchers are gathering more data than ever before. This large influx of data has become a major issue as researchers have a difficult time processing and analyzing it. For this reason, optimizing the performance of BLAST and developing new alignment tools has been a well researched topic over the past few years. Take the example of environmental sequencing projects, in which the biodiversity of various environments, including the human microbiome, is analyzed and characterized to generate on the order of several terabytes of data\cite{peterson2009nih}. One common way in which biologists use these massive quantities of data is by running BLAST on large sets of unprocessed, repetitive reads to identify putative genes\cite{li2010est,murray2002identification}. Unfortunately, performing this task in a timely manner while dealing with terabytes of data far exceeds the capabilities of most existing BLAST implementations.
@@ -37,12 +38,12 @@ Finally, we describe a k-mer indexing heuristic to achieve speedups by generatin
 %After the database is partitioned by cluster, a lightweight k-mer index is generated for each partition. During a query, the k-mers of the query sequences can be quickly compared against these indices to determine if the cluster contains potential matches. In this way, a query sequence need only be compared against a subset of the original database, thereby reducing the search space.
 
 
-%\input{section_methods.tex}
-\section{Methods}
+%\input{subsection_methods.tex}
+\subsection{Methods}
 
 %\emph{mpiBLAST}\cite{darling2003design}  Although K-mulus and mpiBLAST’s both divide the database into smaller chunks, mpiBLAST chunks the data arbitrarily, while K-mulus does so according to similarity-based clustering.
 
-\subsection{MapReduce}
+\subsubsection{MapReduce}
 The MapReduce framework was created by Google to support large-scale parallel execution of data intensive applications using commodity hardware\cite{dean2008mapreduce}.
 Unlike other parallel programming framework where developers must explicitly handle inter-process communication, MapReduce developers only have to focus on two major functions, called \emph{map} and \emph{reduce}.
 
@@ -56,7 +57,7 @@ For more details and examples, please see \cite{dean2008mapreduce}.
 %Even though each mapper node is assigned a block of a text, the \emph{map} function is called separately on each line of the text.
 %The \emph{map} function would split the line by whitespace and for each word, it would output key-value pairs of the form (\emph{word}, 1). Finally, when all mappers have finished, the reducers will each receive a key, and a list of values. In this case, the list of values is exclusively composed of 1's. The reducer would then sum all the entries in the list, and output the final key-value pair, which corresponds to (\emph{word}, count).
 
-\subsection{Parallelization Strategies}
+\subsubsection{Parallelization Strategies}
 
 \begin{figure}[!htb]%figure2
 \begin{center}
@@ -118,7 +119,7 @@ During runtime, each \emph{map} function receives a chunk of the query sequences
 For each database partition $i$, the \emph{map} function randomly selects a replicate to send the query chunk to in the form of a tuple ($db_{i,\text{replicate\_num}}$, query chunk).
 The reducer receives a collection of query chunks for a given database partition and replicate and BLASTs the query chunk against the database partition.
 
-\subsection{K-mer Indexing}
+\subsubsection{K-mer Indexing}
 One of the original algorithms that BLAST uses is ``seed and extend'' alignment. This approach requires that there be at least one k-mer (sequence sub-string of length k) match between query and database sequence before running the expensive alignment algorithm between them\cite{altschul1990basic}. Using this rule, BLAST can bypass any database sequence which does not share any common k-mers with the query. Using this heuristic, we can design a distributed version of BLAST using the MapReduce model. One aspect of BLAST which we take advantage of is the database indexing of k-mers. While some versions of BLAST have adopted database k-mer indexing for DNA databases, it seems that this approach has not been feasibly scaled to protein databases\cite{morgulis2008database}. For this reason, BLAST iterates through nearly every database sequence to find k-mer hits. Here we describe an approach for K-mulus that attempts to optimize this process by using lightweight database indexing to allow query iteration to bypass certain partitions of the database.
 
 In order to cluster the database, for each sequence, we first create a vector of bits in which the value at each position indicates the presence of a specific sequence k-mer. The index of each k-mer in the vector is trivial to compute.
@@ -129,10 +130,10 @@ We also keep track of the centers for each cluster as they play the crucial role
 After the database has been clustered, we compare the input query sequences to all centers. The key idea is that by comparing the input query sequence to the cluster centers, we can determine whether a potential match is present in a given cluster. If this is the case, we run the BLAST algorithm on the query sequence and the database clusters that we determined as relevant for the query.
 
 
-%\input{section_results.tex}
-\section{Results}
+%\input{subsection_results.tex}
+\subsection{Results}
 
-\subsection{Comparison of Parallelization Approaches on a Modest Size Cluster}
+\subsubsection{Comparison of Parallelization Approaches on a Modest Size Cluster}
 
 \begin{figure}[!htb]%figure2
 \begin{center}
@@ -167,7 +168,7 @@ Our hybrid query and database segmentation approach resulted in a 44\% decrease 
 Considering that the memory of each node in our cluster was 2GB, and the \emph{nr} database was 9GB, we partitioned the database into 5 chunks, each roughly 2GB in size.
 This allows the databases to fit completely into memory at each node.
 
-\subsection{Analysis of Database k-mer Index}
+\subsubsection{Analysis of Database k-mer Index}
 
 
 \begin{figure}[!htb]%figure2
@@ -186,7 +187,7 @@ This allows the databases to fit completely into memory at each node.
 
 
 Using our clustering and k-mer index approach, we show noticeable speedups on well clustered data.
-To demonstrate this we simulated an ideal data set of 1,000 sequences, where the sequences were composed of one of two disjoint sets of 3-mers.
+To demonstrate this we simulated an ideal dataset of 1,000 sequences, where the sequences were composed of one of two disjoint sets of 3-mers.
 The database sequences were clustered into two even-size clusters.
 The sample query was 10,000 sequences, also comprising one of two disjoint sets of 3-mers.
 Figure \ref{fig:db_index} shows the result of running BLAST on the query using Hadoop's streaming extension with query segmentation (the method used by CloudBLAST to execute BLAST queries) and K-mulus.
@@ -196,10 +197,10 @@ In practice, this degree of separability is nearly impossible to replicate, but 
 For a more practical BLAST query using the \emph{nr} database, our database and k-mer indexing approach took 2.75x as long compared to the naive Hadoop streaming method using a realistic query of 30,000 sequences from the HMP project. The poor performance is due to the very high k-mer overlap between clusters and uneven cluster sizes.
 Due to the high k-mer overlap, each query sequence is being replicated and compared against nearly all clusters.
 
-K-mulus' database clustering and k-mer indexing approach shows poor performance due entirely to noisy, overlapping clusters. In the worst case, K-mulus will map every query to every cluster and devolve to a naive parallelized BLAST on database segments, while also including some overhead due to database indexing. This is close to the behavior we observed when running our clustering and k-mer index experiments on the \emph{nr} database. In order to describe the best possible clusters we could have generated from a database, we considered a lower limit on the exact k-mer overlap between single sequences in the \emph{nr} database (Fig. \ref{fig:kmer_intersection}). We generated this plot by taking 50 random samples of 3000 \emph{nr} sequences each, computing the pairwise k-mer intersection between them, and plotting a histogram of the magnitude of pairwise k-mer overlap. This shows that there are very few sequences in the \emph{nr} database which have no k-mer overlap which makes the generation of disjoint clusters impossible. Furthermore, this plot is optimistic in that it does not include BLAST’s neighboring words, nor does it illustrate comparisons against cluster centers which will have intersection greater than or equal to that of a single sequence.
+K-mulus' database clustering and k-mer indexing approach shows poor performance due entirely to noisy, overlapping clusters. In the worst case, K-mulus will map every query to every cluster and devolve to a naive parallelized BLAST on database segments, while also including some overhead due to database indexing. This is close to the behavior we observed when running our clustering and k-mer index experiments on the \emph{nr} database. In order to describe the best possible clusters we could have generated from a database, we considered a lower limit on the exact k-mer overlap between single sequences in the \emph{nr} database (Fig. \ref{fig:kmer_intersubsection}). We generated this plot by taking 50 random samples of 3000 \emph{nr} sequences each, computing the pairwise k-mer intersubsection between them, and plotting a histogram of the magnitude of pairwise k-mer overlap. This shows that there are very few sequences in the \emph{nr} database which have no k-mer overlap which makes the generation of disjoint clusters impossible. Furthermore, this plot is optimistic in that it does not include BLAST’s neighboring words, nor does it illustrate comparisons against cluster centers which will have intersubsection greater than or equal to that of a single sequence.
 
-One strategy to improve the separability of the clusters and reduce the k-mer intersection between clusters is to use repeat masking software.
-In order to show the improvement offered by repeat masking, we ran SEG\cite{wootton1993statistics} on the sequences before computing the intersection (Fig. \ref{fig:kmer_intersection}). On average, SEG resulted in a 6\% reduction in the number of exact k-mer overlap between two given sequences. Repeat masking caused a significant, favorable shift in k-mer intersection and would clearly improve clustering results. However, the \emph{nr} database had so much existing k-mer overlap that using SEG preprocessing would have almost no effect on the speed of K-mulus' clustering and k-mer index approach.
+One strategy to improve the separability of the clusters and reduce the k-mer intersubsection between clusters is to use repeat masking software.
+In order to show the improvement offered by repeat masking, we ran SEG\cite{wootton1993statistics} on the sequences before computing the intersubsection (Fig. \ref{fig:kmer_intersubsection}). On average, SEG resulted in a 6\% reduction in the number of exact k-mer overlap between two given sequences. Repeat masking caused a significant, favorable shift in k-mer intersubsection and would clearly improve clustering results. However, the \emph{nr} database had so much existing k-mer overlap that using SEG preprocessing would have almost no effect on the speed of K-mulus' clustering and k-mer index approach.
 
 \begin{figure}[!htb]%figure2
 \begin{center}
@@ -208,8 +209,8 @@ In order to show the improvement offered by repeat masking, we ran SEG\cite{woot
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-  \caption{Pair-wise k-mer intersection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences.}
-  \label{fig:kmer_intersection}
+  \caption{Pair-wise k-mer intersubsection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences.}
+  \label{fig:kmer_intersubsection}
 \end{quote}
 \end{figure}
 \renewcommand{\baselinestretch}{2}
@@ -217,8 +218,8 @@ In order to show the improvement offered by repeat masking, we ran SEG\cite{woot
 
 
 
-%\input{section_discussion.tex}
-\section{Discussion}
+%\input{subsection_discussion.tex}
+\subsection{Discussion}
 
 With Amazon EC2 and other cloud platforms supporting Hadoop, developers should not make assumptions about the underlying hardware.
 Here we have provided K-mulus, which gives users the versatility to handle the common ways to perform distributed BLAST queries in the cloud without making assumptions of the underlying hardware and data.
@@ -231,10 +232,10 @@ By providing users with the different parallel strategies, they are free to choo
 We have also provided a way to speed up BLAST queries by clustering and indexing the database using MapReduce.
 The speedup potential is largely dependent on the clusterability of the data.
 Protein sequences lie in high-dimensional non-Euclidean space, so by comparing them, we encounter the curse of dimensionality, where almost all pairs of sequences are equally far away from one another.
-This problem maybe slightly alleviated if we are trying to cluster multiple data sets of highly redundant sequences (multiple deep coverage whole genome sequencing projects with distinct, non-intersecting k-mer spectra).
+This problem maybe slightly alleviated if we are trying to cluster multiple datasets of highly redundant sequences (multiple deep coverage whole genome sequencing projects with distinct, non-intersecting k-mer spectra).
 Future work includes clustering and indexing the query sequences, which may have higher redundancy than the database sequences.
 %Users of NCBI's BLAST web interface are given the option to BLAST their query sequences against non-redundant databases by default, suggesting that non-redundant databases are most often used.
-%However, clustering these databases with a stringent enough criteria to get few k-mer intersections often results in clusters of very little size\cite{li2002tolerating}.
+%However, clustering these databases with a stringent enough criteria to get few k-mer intersubsections often results in clusters of very little size\cite{li2002tolerating}.
 %When the size of the database clusters are a fraction of the available memory, we have shown that this is quite inefficient.
 %One potential improvement is to use a hierarchical clustering algorithm that proceeds until we have enough sequences to fill up the available memory of a node in our cluster.
 
@@ -255,10 +256,10 @@ With a four character alphabet and simplified substitution rules, nucleotides ar
 
 It should be noted that the parallelization strategies presented here would also benefit other commonly used bioinformatics tools.  Short read alignment tools (such as Bowtie2\cite{langmead2012fast}) can be parallelized by partitioning the reference index as well as the query sequences.  More work needs to be done to determine the best parallelization strategies for these tools running on commodity clusters.
 
-\subsubsection{Availability}
-Java source code for K-mulus are located at: \url{https://github.com/biocloud/k-mulus}
-
-\subsubsection{Acknowledgments}
-We would like to thank Mohammadreza Ghodsi for advice on clustering, Daniel Sommer for advice on Hadoop, Lee Mendelowitz for manuscript feedback, Katherine Fenstermacher for the name K-mulus, and the other members of the Pop lab for valuable discussions on all aspects of our work.
-
-This work is supported in part by grants from the National Science Foundation, grant IIS-0844494 to MP.
+% \subsubsubsection{Availability}
+% Java source code for K-mulus are located at: \url{https://github.com/biocloud/k-mulus}
+%
+% \subsubsubsection{Acknowledgments}
+% We would like to thank Mohammadreza Ghodsi for advice on clustering, Daniel Sommer for advice on Hadoop, Lee Mendelowitz for manuscript feedback, Katherine Fenstermacher for the name K-mulus, and the other members of the Pop lab for valuable discussions on all aspects of our work.
+%
+% This work is supported in part by grants from the National Science Foundation, grant IIS-0844494 to MP.
