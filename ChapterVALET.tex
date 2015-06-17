@@ -84,38 +84,66 @@ Grab a handful to compare with new assemblies.
 Show that window length doesn’t matter when comparing.
 Does window length matter when comparing assemblies.
 
+We examine the sensitivity of VALET on toy simulated metagenomic community consisting of four bacteria at varying abundances: \emph{Bacteroides vulgatus} (80x), \emph{Bacillus cereus} (60x), \emph{Actinomyces odontolyticus} (40x), and \emph{Acinetobacter baumannii} (20x).
+Approximately four million reads are sequenced using \textsc{wgsim}~\cite{li2013wgsim}.
+The dataset is assembled using IDBA-UD~\cite{peng2012idba}, MetaVelvet~\cite{namiki2012metavelvet}, SPAdes~\cite{bankevich2012spades}, and SOAPdenovo2~\cite{luo2012soapdenovo2}.
+We run VALET on the assemblies and compare the errors found with those reference-based mis-assemblies detected by QUAST (Table~\ref{simulated_community} and Figure~\ref{fig:mock_frc}).
+
+Across all assemblers, VALET is able to detect greater than 80\% of mis-assemblies detected by QUAST with all mis-assemblies being found in the IDBA-UD and SOAPdenovo2 assemblies.
+IDBA-UD, MetaVelvet, and SPAdes assemblies contain roughly the same amount of sequence (16.3-16.5 Mbp), while SOAPdenovo2 contains roughly 4 Mbp less.
+IDBA-UD has the greatest NA50 (206.7 Kbp), followed by SPAdes (128.1 Kbp), MetaVelvet (29.5 Kbp), and SOAPdenovo2 (10.8 Kbp)
+%IDBA-UD has the greatest NA50 (208.8 Kbp), followed by SPAdes (130.9 Kbp), MetaVelvet (29.5 Kbp), and SOAPdenovo2 (10.8 Kbp)
+These rankings match the those provided by VALET in Figure~\ref{fig:mock_frc}.
 
 \begin{landscape}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{table}[tb!]
 \centering
-\caption{My caption}
-\label{my-label}
 \small
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
   \hline
-  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signature} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
+  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signatures} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
+  \hline
   Assembler   & Len (Mbp) & Ctgs  & N50 (Kbp) & NA50  & Errs & Num   & Valid & Sens     & Num & Valid & Sens    & Mismatches per Kbp \\
   \hline
   IDBA-UD     & 16.5      & 200   & 208.8     & 206.7 & 36   & 804   & 36    & 100.00\% & 25  & 8     & 22.20\% & 23.95              \\
-  Metavelvet  & 16.3      & 1,117 & 29.5      & 29.5  & 21   & 2,802 & 19    & 90.50\%  & 4   & 2     & 9.50\%  & 35.52              \\
+  MetaVelvet  & 16.3      & 1,117 & 29.5      & 29.5  & 21   & 2,802 & 19    & 90.50\%  & 4   & 2     & 9.50\%  & 35.52              \\
   SPAdes      & 16.4      & 330   & 130.9     & 128.1 & 37   & 1,117 & 31    & 83.80\%  & 17  & 4     & 10.80\% & 22.43              \\
   Soapdenovo2 & 12.3      & 2,161 & 10.8      & 10.8  & 1    & 4,983 & 1     & 100.00\% & 2   & 0     & 0\%     & 13.37 \\
   \hline
 \end{tabular}
+\caption[VALET results for simulated mock community]{VALET results for simulated mock community consisting of four bacteria at varying abundances: \emph{Bacteroides vulgatus} (80x), \emph{Bacillus cereus} (60x), \emph{Actinomyces odontolyticus} (40x), and \emph{Acinetobacter baumannii} (20x). Reads were assembled using the four provided assemblers. General assembly statistics include length in Mbp (Len), number of contigs (Ctgs), N50 contig size (N50), N50 of contigs after broken at mis-assemblies (NA50), number of errors detected by QUAST (Errs), number of flagged regions by VALET (Num), number of flagged regions that overlap an error found by QUAST (Valid), sensitivity (Sens), and mismatches per Kbp.}
+\label{simulated_community}
 \end{table}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
 \end{landscape}
 
-\subsection{Mis-Assemblies in the Human Microbiome Pilot Project}
-Text for this sub-section…
-\subsection{Mis-Assemblies in the Human Microbiome Project}
-Text for this sub-section…
-Plot of aggregate mis-assemblies across all samples.
-Coverage vs. \# of assemblies (or slope of line).
-Grab a few samples to re-run and plot improved assemblies (show plots).
+
+\begin{figure}[tb!]
+\begin{center}
+\includegraphics[width=4.86in]{figures/mock_frc}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[RC plot of a simulated mock community]{FRC plot provided by VALET of a simulated mock community.}
+\label{fig:mock_frc}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+
+
+%
+% \subsection{Mis-Assemblies in the Human Microbiome Pilot Project}
+% Text for this sub-section…
+% \subsection{Mis-Assemblies in the Human Microbiome Project}
+% Text for this sub-section…
+% Plot of aggregate mis-assemblies across all samples.
+% Coverage vs. \# of assemblies (or slope of line).
+% Grab a few samples to re-run and plot improved assemblies (show plots).
 \subsection{Synthetic Metagenomic Community}
 
 A major challenge of evaluating assemblies of environmental datasets is that a sizeable portion of the organsisms are unknown or lack a draft genome to compare against.
@@ -135,18 +163,19 @@ Fortunately, VALET is able to accurately assess the quality of the two assemblie
 \small\normalsize
 \begin{table*}[tb!]
 \centering
-\caption{My caption}
 \footnotesize
 \label{synthetic_valet}
 \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
   \hline
-  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signature} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
+  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signatures} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
+  \hline
   Assembler & Len (Mbp) & Ctgs   & N50 (Kbp) & NA50 (Kbp) & Errs   & Num       & Valid  & Sens    & Num    & Valid  & Sens    & Mismatches per Kbp \\
   \hline
   MEGAHIT   & 192.3     & 19,145 & 38.9      & 33.5       & 770    & 30,377    & 268    & 34.80\% & 2,239  & 100    & 13.00\% & 92.24              \\
   Omega     & 194       & 10,284 & 44.1      & 11.9       & 56,917 & 1,425,127 & 55,108 & 96.10\% & 17,758 & 13,935 & 96.80\% & 98.55 \\
   \hline
 \end{tabular}
+\caption[VALET results for assemblies of the Shakya et al.~\cite{shakya2013comparative} dataset]{VALET results for assemblies of the Shakya et al.~\cite{shakya2013comparative} dataset. General assembly statistics include length in Mbp (Len), number of contigs (Ctgs), N50 contig size (N50), N50 of contigs after broken at mis-assemblies (NA50), number of errors detected by QUAST (Errs), number of flagged regions by VALET (Num), number of flagged regions that overlap an error found by QUAST (Valid), sensitivity (Sens), and mismatches per Kbp.}
 \end{table*}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
@@ -158,10 +187,22 @@ Fortunately, VALET is able to accurately assess the quality of the two assemblie
 \subsection{What is a mis-assembly?}
 
 In practice, VALET has high sensitivity, but also a high false positive rate.
+While we can tune parameters, such as window size, to trade-off between the measures, the high false positive rate still remains fairly prevalent.
 We investigated a small number of these regions flagged by VALET, but not marked by QUAST.
 One contig, roughly 25 Kbp in size, had a 5 Kbp region at the start of the contig marked as high coverage (Figure~\ref{fig:rrna_misassembly}).
 This region was roughly 4x the median coverage of the remaining contig.
-We BLAST'd this region NCBI
+Using NCBI's BLAST~\cite{blast} and reference database, the region aligned to the organism \emph{Nostoc} sp. PCC 7120.
+Upon closer inspection, this region contained 16S, 23S, and 5S rRNA genes and was found at \emph{four} locations in  \emph{Nostoc} sp. PCC 7120.
+This region was only found once in the assembly, so all the sequences from the other duplicates aligned to this region, inflating the coverage.
+This noticeable and consistent increase in coverage caused VALET to mark it as mis-assembled.
+Unsurprisingly, QUAST did not mark this as a mis-assembly because the actual sequence within this region matched the reference.
+
+This highlights an important issue prevalent in metagenomic assemblers.
+A more \emph{correct} assembly would include an additional contig consisting solely of the ribosomal genes.
+Then during the abundance estimation step of VALET, a quarter of the sequences would align to the original contig due to the flanking unique region and the remaining three quarters would align solely to the new contig containing the ribosomal genes.
+VALET would no longer mark this region in the original contig.
+
+missing abundances.
 
 \begin{figure}[tb!]
 \begin{center}
@@ -170,18 +211,24 @@ We BLAST'd this region NCBI
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[Flagged mis-assembly]{}
+\caption[Ribosomal genes found in region marked by VALET]{A closer examination of a region flagged by VALET, but no mis-assembly reported by QUAST. This region contained 16S, 23S, and 5S rRNA genes and was found at \emph{four} locations in the \emph{Nostoc} sp. PCC 7120 genome.}
 \label{fig:rrna_misassembly}
 \end{quote}
 \end{figure}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
 
+Assemblathon1~\cite{earl2011assemblathon} has stated that assemblers have trouble with polymorphism and heterozygosity.
+This problem is compounded in metagenomic assemblies due to closely-related strains having uneven abundances.
+MetaCompass~\cite{metacompass}, a reference-based metagenomic assembler, was used to assemble the HMP Sample SRS024655 (retroauricular crease of a male).
+A ~25 Kbp region was flagged as having low coverage by VALET, but not reported by QUAST (Figure~\cite{fig:p_acnes}).
+After further investigation, the ~25 Kbp region belonged exclusively to the one of the reference genomes chosen by MetaCompass: \emph{Propionibacterium acnes} KPA171202.
+The higher coverage flanking regions aligned to both \emph{Propionibacterium acnes} KPA171202 and \emph{Propionibacterium acnes} ATCC 11828.
+\emph{Propionibacterium acnes} KPA171202 contains nearly 70 Kbp of insertions.
+Despite being found at a lower abundance, the KPA171202 strain of \emph{Propionibacterium acnes} was chosen for the reference-guided assembly because all reads that were align to the ATCC 11828 strain also aligned to the KPA171202 strain.
+Since the KPA171202 strain was actually found in the dataset, QUAST detected no structural errors.
+A more \emph{correct} assembly would include both complete genomes.
 
-rRNA plot.
-missing abundances.
-
-Compressed population of similar bacteria.
 \begin{landscape}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
@@ -192,7 +239,7 @@ Compressed population of similar bacteria.
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[Flagged mis-assembly]{}
+\caption[Examining a 25 Kbp region flagged by VALET]{A 25 Kbp low coverage region flagged by VALET, but no mis-assembly reported by QUAST. The low coverage region was due to MetaCompass erronaeously collapsing two strains of \emph{Propionibacterium acnes}.}
 \label{fig:p_acnes}
 \end{quote}
 \end{figure}
@@ -200,4 +247,8 @@ Compressed population of similar bacteria.
 \small\normalsize
 \end{landscape}
 
-\section{Conclusions}
+\section{Conclusion}
+
+VALET is the first \emph{de novo} pipeline for detecting mis-assemblies in metagenomic datasets.
+VALET searches for regions of the assembly that are statistically inconsistent with characteristics of the data generation process.
+We evaluated VALET on a simulated and synthetic metagenomic mock community and show how it outperforms other \emph{de novo} metrics.
