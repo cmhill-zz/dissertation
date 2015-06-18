@@ -76,13 +76,18 @@ analyses and experiments that rely on their primary sequence.
 
 \subsection{Assessing the Quality of an Assembly}
 
-Assessing the quality of the sequence output by an assembler is, thus,
+% Currently, there are two ways to evaluate assemblies -
+% reference-based and \emph{de novo} evaluation. When a reference
+% genome is available, an assembly quality can be estimated
+% based on percentage of a true genome reconstructed (comple- teness statistics) or some biologically relevant scores such as a number of bases covered by GenBank or a number of amino
+
+Assessing the quality of the sequence output by an assembler is
 of critical importance, not just to inform downstream analyses, but
 also to allow researchers to choose from among a rapidly increasing
 collection of genome assemblers. Despite apparent incremental
 improvements in the performance of genome assemblers, none of the
 software tools available today outperforms the rest in all assembly
-tasks.  As highlighted by recent assembly
+tasks. As highlighted by recent assembly
 bake-offs~\cite{earl2011assemblathon,salzberg2011gage}, different
 assemblers ``win the race'' depending on the specific characteristics
 of the sequencing data, the structure of the genome being assembled,

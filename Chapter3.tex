@@ -149,24 +149,6 @@ The software implementing our approach is made available, open-source and free o
 % %This formulation allows us to estimate the
 % The mean of the read probabilities over the sample is expected to be equal to the mean over all reads, but if the sample size is too small, then the accuracy of the estimation will be poor.
 
-\begin{figure}
-\begin{center}
-%\begin{figure*}[tbhp!]
-%\centering
-
-\subfigure[\emph{B. cereus} (1 copy, 5.2MB) and \emph{A. baumannii} (4 copies, 4.0MB)]{\includegraphics[width=4in]{ref_abun_1} \label{fig:ref_abun_1}}
-\hfil
-\subfigure[\emph{B. cereus} (4 copies, 5.2MB) and \emph{A. odontolyticus} (7 copies, 2.4MB)]{\includegraphics[width=4in]{ref_abun_2} \label{fig:ref_abun_2}}
-\end{center}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{quote}
-\caption[LAP scores for simulated metagenomic communities.] {LAP scores for simulated metagenomic communities. Each cell (x,y) represents the LAP score for a mixture of \emph{x} copies of the x-label bacteria and \emph{y} copies of the y-label bacteria.  In both groups, the true abundance ratios maximize the LAP score (indicated by a black rectangle in respective plots). \label{fig:ref_abun}}
-\end{quote}
-\end{figure}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
-\newpage
 
 \subsection{Extending LAP to metagenomic assemblies}
 
@@ -259,6 +241,7 @@ We modified MetAMOS so users can now specify multiple assemblers (comma-separate
 %The software implementing our approach is made available, open-source and free of charge, at: \url{http://assembly-eval.sourceforge.net/} and with the MetAMOS package: \url{https://github.com/treangen/MetAMOS}.
 
 
+
 \section{Results}
 \subsection{Likelihood score maximized using correct abundances}
 A key property of our framework is that the correct copy numbers (abundances) and assemblies maximizes our LAP score.
@@ -287,19 +270,25 @@ We expect the highest LAP scores for the assemblies that contain the correct abu
 As seen in Figs. \ref{fig:ref_abun_1} and \ref{fig:ref_abun_2}, our LAP score is able to accurately reflect the varying organism abundance ratios present in the sample.
 The LAP score increases as the estimates approach the true abundance ratios, with the true ratio yielding the highest LAP scores in both communities.
 
-\begin{figure}[htb!]
+\begin{figure}
 \begin{center}
-\includegraphics[width=.8\textwidth]{errors}
+%\begin{figure*}[tbhp!]
+%\centering
+
+\subfigure[\emph{B. cereus} (1 copy, 5.2MB) and \emph{A. baumannii} (4 copies, 4.0MB)]{\includegraphics[width=4in]{ref_abun_1} \label{fig:ref_abun_1}}
+\hfil
+\subfigure[\emph{B. cereus} (4 copies, 5.2MB) and \emph{A. odontolyticus} (7 copies, 2.4MB)]{\includegraphics[width=4in]{ref_abun_2} \label{fig:ref_abun_2}}
 \end{center}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[Synthetic errors in simulated \emph{E. coli} and \emph{B. cereus} (1 copy, 5.2Mbp) community]{Synthetic errors in simulated \emph{E. coli} (5 copies, 4.9Mbp) \emph{B. cereus} (1 copy, 5.2Mbp) community.}
-\label{fig:errors}
+\caption[LAP scores for simulated metagenomic communities.] {LAP scores for simulated metagenomic communities. Each cell (x,y) represents the LAP score for a mixture of \emph{x} copies of the x-label bacteria and \emph{y} copies of the y-label bacteria.  In both groups, the true abundance ratios maximize the LAP score (indicated by a black rectangle in respective plots). \label{fig:ref_abun}}
 \end{quote}
 \end{figure}
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
+%\newpage
+
 
 \subsection{Impact of errors on synthetic metagenomes}
 
@@ -325,6 +314,20 @@ Although inversions did not change the overall genome size (and would therefore 
 As expected, errors introduced into the more abundant organism, \emph{E. coli}, had a greater affect on the LAP score than those inserted into \emph{B. cereus}.
 Our LAP score was able to accurately weigh the errors by the abundance of each organism.
 
+
+\begin{figure}[htb!]
+\begin{center}
+\includegraphics[width=.8\textwidth]{errors}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\caption[Synthetic errors in simulated \emph{E. coli} and \emph{B. cereus} (1 copy, 5.2Mbp) community]{Synthetic errors in simulated \emph{E. coli} (5 copies, 4.9Mbp) \emph{B. cereus} (1 copy, 5.2Mbp) community.}
+\label{fig:errors}
+\end{quote}
+\end{figure}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
 
 \subsection{Likelihood scores correlate with reference-based metrics}
 %c|c|c|c|c|c
