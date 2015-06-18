@@ -138,7 +138,7 @@ single bit to represent the quality of a base instead of the standard
 benefit of 2-bin encoding is the potential for increased adjacency of
 identical values and repeating patterns, properties that may increase
 effectiveness of subsequent compression using established
-algorithms~\cite[e.g.,][]{HUFFMAN:1952nr,Ziv77auniversal,
+algorithms~\cite{HUFFMAN:1952nr,Ziv77auniversal,
   DBLP:journals/tit/ZivL78}.
 
 The economic costs of memory use for binning, in general terms,
@@ -386,7 +386,7 @@ chromosome 14, \textit{Escherichia coli} str. K-12 MG1655, and
 only include the fragment libraries for the \textit{Rhodobacter
   sphaeroides} 2.4.1, and \textit{Homo sapiens} chromosome 14 data
 sets, but the additional short-jump library results are available in
-the supplementary (TODO:TABLE). Storing the uncompressed quality
+the Supplementary of the submitted manuscript. Storing the uncompressed quality
 values requires 1 byte per base-call because they are stored in
 \textsc{ascii} format and is denoted by the dotted black asterisk in
 the figure. The lossless compression of each dataset using \textsc{bz}ip2
@@ -478,8 +478,7 @@ as many bases as each other. However, if we examine the specific
 reads filtered, the 5th-degree polynomial regression discards
 approximately two thirds less reads than the 1st-degree polynomial
 regression that are kept by the uncompressed reads (4,640 and
-12,066 reads, respectively) (TODO: move to Supplemental Table
-\ref{tab:quality_control}).
+12,066 reads, respectively).
 
 \subsubsection{Effects on genome assembly}
 
@@ -500,7 +499,7 @@ The lossy compression methods largely preserve the contiguity found in
 the assembly produced using the reads with unmodified quality
 values. All compression methods other than 0-degree polynomial
 regression produce an N50 ranging from 3.17--3.22 Mbps (see
-Supplemental Table TODO). Despite the similar contiguity statistics,
+Supplementary of manuscript). Despite the similar contiguity statistics,
 the different compression methods vary noticeably in the amount of
 \textsc{snp}s. The order of polynomial has an inverse relationship
 with the amount of \textsc{snp}s detected. The 2-bin and profile
@@ -516,8 +515,7 @@ uncompressed reads scores worse than the top overall assembly
 bases, N50, \textsc{snp}s, indels $>$5bp, and relocations. The
 assembly using uncompressed reads has an error rate of roughly 8.75
 errors per 100 kb of assembled sequence, while the 256-profile
-encoding has an error rate of 8.02 errors per 100 kb (see Supplemental
-table TODO).
+encoding has an error rate of 8.02 errors per 100 kb.
 
 In general, the greater the polynomial order, the better overall
 assembly; however, the 5th-degree polynomial regression performs

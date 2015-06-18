@@ -129,7 +129,7 @@ Original vs. shuffled reads & Not equal & Not equal \\
 \small\normalsize
 
 
-In this paper, we present a novel assembler-specific regression testing
+In this chapter, we present a novel assembler-specific regression testing
 framework that uses two assembly evaluation mechanisms: \emph{assembly likelihood}, calculated using LAP\cite{LAP}, and \emph{read-pair coverage}, calculated using REAPR\cite{hunt2013reapr}, to determine if code modifications result in non-trivial
 changes in assembly quality. The log average probability, LAP, is
 the log of the geometric mean of the probability that the observed reads are generated from the given assembly.
@@ -151,7 +151,7 @@ changes in assembly quality produced from permuted input reads and using
 multi-core systems, which fail to be detected using traditional regression
 testing methods.
 
-Our paper makes the following contributions:
+Here we make the following contributions:
 
 \begin{itemize}
 
@@ -184,7 +184,8 @@ may produce different outputs.  Assemblers may produce slightly different
 assemblies than their single-threaded version, making it difficult to compare
 the raw text outputs.
 
-\noindent{\bf Structure of the paper:} In the next section,
+% \noindent{\bf Structure of the paper:}
+In the next section,
 we describe how the problem of testing without an oracle is not limited to bioinformatics, and the different strategies typically used and their limitations.
 In Section~\ref{methods}, we describe our regression testing approach, briefly outlining the theory behind assembly likelihood and read-pair coverage and why they are our main measure of assembly quality.
 % we provide an overview of our approach via an example, showing how {\it diff} is not a correct means of assessing differences in assembly quality.
@@ -361,7 +362,7 @@ By doing a \textbf{diff} of the text outputs, we are unable to determine if ther
 %We evaluate our assembly regression testing framework using sequencing data from the GAGE assembly competition \cite{salzberg2012gage}.  We run SOAPdenovo and minimus on the \emph{Rhodobacter sphaeroides} fragment library (1,408,188 reads of length 101 bp) using the original reads, along with a shuffled version of the reads.  Since SOAPdenovo allows the use of multiple threads, we run the assembler using one and eight threads.
 
 
-\begin{figure}[!htb]%figure2
+\begin{figure}[!tb]%figure2
 \begin{center}
   \includegraphics[width=\linewidth]{figures/modified_read_asm_param.eps}
 \end{center}
@@ -379,7 +380,7 @@ Next, we evaluate the \emph{Rhodobacter sphaeroides} assemblies using our propos
 The LAP is able to accurately detect trivial changes in assembly quality that raw text comparisons cannot (Fig. \ref{fig:modified_read_asm_param}).
 For SOAPdenovo, the LAP of the assemblies generated from the original and shuffled reads are within the acceptable standard deviation.  Furthermore, assemblies produced using 1 and 8 threads contain nearly identical LAPs.
 
-\begin{figure}[!htb]%figure2
+\begin{figure}[!tb]%figure2
 \begin{center}
   \includegraphics[width=\linewidth]{figures/soapdenovo_versions.pdf}
 \end{center}
