@@ -133,7 +133,7 @@ many of which provide redundant information~\cite{vezzi2012feature}.
 
 \section{Contributions of this dissertation}
 
-In Chapter 2, we present an objective and holistic approach for evaluating and
+In Chapter 2, we present our LAP framework, an objective and holistic approach for evaluating and
 comparing the quality of assemblies derived from a same dataset.  Our
 approach defines the quality of an assembly as the likelihood that the
 observed reads are generated from the given assembly, a value which can
@@ -146,8 +146,8 @@ competitions.
 In Chapter 3, we extend our \emph{de novo} LAP framework to evaluate metagenomic assemblies.
 We will show that by modifying our likelihood calculation to take into account abundances of assembled sequences, we can accurately and efficiently compare metagenomic assemblies.
 %We evaluate our extended framework on results generated from the Human Microbiome Project (HMP) and
-We find that our extended LAP framework is able to reproduce results on data from the Human Microbiome Project (HMP) that closely match the reference-based evaluation metrics and outperforms other \emph{de novo} metrics traditionally used to measure assembly quality.
-Finally, we have integrated our LAP framework into the metagenomic analysis pipeline MetAMOS, allowing any user to reproduce quality assembly evaluations with relative ease.
+We find that our extended LAP framework is able to reproduce results on data from the Human Microbiome Project (HMP)~\cite{mitreva2012structure,methe2012framework} that closely match the reference-based evaluation metrics and outperforms other \emph{de novo} metrics traditionally used to measure assembly quality.
+Finally, we have integrated our LAP framework into the metagenomic analysis pipeline MetAMOS~\cite{treangen2013metamos}, allowing any user to reproduce quality assembly evaluations with relative ease.
 
 In Chapter 4, we provide a novel regression testing framework for genome assemblers.
 Our framework that uses two assembly evaluation mechanisms: \emph{assembly likelihood}, calculated using our LAP framework\cite{LAP}, and \emph{read-pair coverage}, calculated using REAPR\cite{hunt2013reapr}, to determine if code modifications result in non-trivial
@@ -155,9 +155,9 @@ changes in assembly quality.
 %We evaluate our framework using popular assemblers SOAPdenovo \cite{li2010novo} and Minimus \cite{sommer2007minimus}.
 We study assembler evolution in two contexts. First,
 we examine how assembly quality changes
-throughout the version history of the popular assembler SOAPdenovo. Second,
+throughout the version history of the popular assembler SOAPdenovo~\cite{luo2012soapdenovo2}. Second,
 we show that our framework can correctly evaluate decrease in assembly quality
-using fault-seeded versions of another assembler Minimus.
+using fault-seeded versions of another assembler Minimus~\cite{sommer2007minimus}.
 Our results show that our framework accurately detects trivial
 changes in assembly quality produced from permuted input reads and using
 multi-core systems, which fail to be detected using traditional regression
@@ -166,6 +166,6 @@ testing methods.
 In Chapter 5, we build on the pipeline described in Chapter 4 and introduce VALET, a \emph{de novo} pipeline for finding mis­assemblies within metagenomic assemblies.
 We flag regions of the genome that are statistically inconsistent with the data generation process and underlying species abundances.
 VALET is the first tool to accurately and efficiently find mis­assemblies in metagenomic datasets.
-We provide a detailed list of predicted mis­assemblies in the Human Microbiome Project and use these findings to suggest improvements for future metagenomic assemblers.
+We run VALET on publicaly available datasets and use the findings to suggest improvements for future metagenomic assemblers.
 
 In Chapter 6, we discuss our other contributions to bioinformatics relating to the domains of clustering, compression, and cloud computing.

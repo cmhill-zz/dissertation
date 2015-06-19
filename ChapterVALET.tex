@@ -61,7 +61,7 @@ It is alignment-free since it relies on the exact matches of small $k$ length su
 \subsection{Depth of coverage analysis}
 The sequencing process of randomly-sheared fragments follows a Poisson distribution~\cite{lander1988genomic}.  Regions within assembled contigs that show high variance in coverage may be potential mis-assemblies.  Areas of high and low depths of coverage could be compressed/expanded repeats, chimeric contigs, and other types of contamination.
 
-First, we learn the distribution of per-base coverages across a given contig.  Using this distribution, bases are marked if their coverage falls below or above a certain threshold.  We set the lower cutoff as the first quartile minus 1.5 * the interquartile range (IQR), which is the difference between the first and third quartile. 1.5 * IQR is the value used by Tukey’s box plot~\cite{mcgill1978variations}.  Regions whose coverage is greater than the third quartile plus 1.5 * IQR are marked as high coverage.
+In order to find these regions of high/low coverage, we first learn the distribution of per-base coverages across a given contig.  Using this distribution, bases are marked if their coverage falls below or above a certain threshold.  We set the lower cutoff as the first quartile minus 1.5 * the interquartile range (IQR), which is the difference between the first and third quartile. 1.5 * IQR is the value used by Tukey’s box plot~\cite{mcgill1978variations}.  Regions whose coverage is greater than the third quartile plus 1.5 * IQR are marked as high coverage.
 %The main benefit of this approach is that it is completely data-dependent. No prior assumptions of the distribution of the quality values need to be made.
 
 Using the per-base coverages may result in a large number of regions erroneously marked as mis-assemblies due to the inherent noisiness of the data, so we also provide a sliding window approach to smooth out the per-base coverages. The larger the window, the less regions will be marked as mis-assemblies.
@@ -141,30 +141,6 @@ IDBA-UD has the greatest corrected N50 (206.7 Kbp), followed by SPAdes (128.1 Kb
 %IDBA-UD has the greatest NA50 (208.8 Kbp), followed by SPAdes (130.9 Kbp), MetaVelvet (29.5 Kbp), and SOAPdenovo2 (10.8 Kbp)
 These rankings match those provided by VALET (Figure~\ref{fig:mock_frc}).
 
-\begin{landscape}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{table}[tb!]
-\centering
-\small
-\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
-  \hline
-  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signatures} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
-  \hline
-  Assembler   & Len (Mbp) & Ctgs  & N50 (Kbp) & NA50  & Errs & Num   & Valid & Sens     & Num & Valid & Sens    & Mismatches per Kbp \\
-  \hline
-  IDBA-UD     & 16.5      & 200   & 208.8     & 206.7 & 36   & 804   & 36    & 100.00\% & 25  & 8     & 22.20\% & 23.95              \\
-  MetaVelvet  & 16.3      & 1,117 & 29.5      & 29.5  & 21   & 2,802 & 19    & 90.50\%  & 4   & 2     & 9.50\%  & 35.52              \\
-  SPAdes      & 16.4      & 330   & 130.9     & 128.1 & 37   & 1,117 & 31    & 83.80\%  & 17  & 4     & 10.80\% & 22.43              \\
-  Soapdenovo2 & 12.3      & 2,161 & 10.8      & 10.8  & 1    & 4,983 & 1     & 100.00\% & 2   & 0     & 0\%     & 13.37 \\
-  \hline
-\end{tabular}
-\caption[VALET results for simulated mock community]{VALET results for simulated mock community consisting of four bacteria at varying abundances: \emph{Bacteroides vulgatus} (80x), \emph{Bacillus cereus} (60x), \emph{Actinomyces odontolyticus} (40x), and \emph{Acinetobacter baumannii} (20x). Reads were assembled using the four provided assemblers. General assembly statistics include length in Mbp (Len), number of contigs (Ctgs), N50 contig size (N50), N50 of contigs after broken at mis-assemblies (NA50), number of errors detected by QUAST (Errs), number of flagged regions by VALET (Num), number of flagged regions that overlap an error found by QUAST (Valid), sensitivity (Sens), and mismatches per Kbp.}
-\label{simulated_community}
-\end{table}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
-\end{landscape}
 
 
 \begin{figure}[tb!]
@@ -198,11 +174,39 @@ Fortunately, Shakya et al. provide a \emph{gold standard} synthetic metagenomic 
 We assemble these 53.4 million reads (101 bp in length) using two recent metagenomic assemblers: Omega~\cite{haider2014omega} and MEGAHIT\cite{li2015megahit}.
 We run VALET on the assemblies and compare the errors found with those reference-based mis-assemblies detected by QUAST (Table~\ref{synthetic_valet}).
 
+
 While the MEGAHIT and Omega assemblies are close in total size (192.3 Mbp vs. 194 Mbp, respectively), MEGAHIT has nearly twice as many contigs as Omega (19,145 vs. 10,284).
 QUAST detects far more mis-assemblies in the Omega assembly compared to MEGAHIT (56,917 vs. 770, respectively).
 VALET detects 34.80\% and 96.10\% of these mis-assemblies found by QUAST in the MEGAHIT and Omega assemblies, respectively.
 While Omega has a higher N50 than MEGAHIT (44.1 Kbp vs. 38.9 Kbp), after breaking at mis-assemblies, the N50 drops well below MEGAHIT's (11.9 Kbp vs. 33.5 Kbp), illustrating why the N50 metric is not always a good indicator of assembly quality.
 Fortunately, VALET is able to accurately assess the quality of the two assemblies without using the reference genomes.
+
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{table}[tb!]
+\centering
+\small
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
+  \hline
+  \multicolumn{6}{|c}{} & \multicolumn{3}{|c|}{Mis-assembly signatures} & \multicolumn{3}{c|}{Suspicious regions}   &  \\
+  \hline
+  Assembler   & Len (Mbp) & Ctgs  & N50 (Kbp) & NA50  & Errs & Num   & Valid & Sens     & Num & Valid & Sens    & Mismatches per Kbp \\
+  \hline
+  IDBA-UD     & 16.5      & 200   & 208.8     & 206.7 & 36   & 804   & 36    & 100.00\% & 25  & 8     & 22.20\% & 23.95              \\
+  MetaVelvet  & 16.3      & 1,117 & 29.5      & 29.5  & 21   & 2,802 & 19    & 90.50\%  & 4   & 2     & 9.50\%  & 35.52              \\
+  SPAdes      & 16.4      & 330   & 130.9     & 128.1 & 37   & 1,117 & 31    & 83.80\%  & 17  & 4     & 10.80\% & 22.43              \\
+  Soapdenovo2 & 12.3      & 2,161 & 10.8      & 10.8  & 1    & 4,983 & 1     & 100.00\% & 2   & 0     & 0\%     & 13.37 \\
+  \hline
+\end{tabular}
+\caption[VALET results for simulated mock community]{VALET results for simulated mock community consisting of four bacteria at varying abundances: \emph{Bacteroides vulgatus} (80x), \emph{Bacillus cereus} (60x), \emph{Actinomyces odontolyticus} (40x), and \emph{Acinetobacter baumannii} (20x). Reads were assembled using the four provided assemblers. General assembly statistics include length in Mbp (Len), number of contigs (Ctgs), N50 contig size (N50), N50 of contigs after broken at mis-assemblies (NA50), number of errors detected by QUAST (Errs), number of flagged regions by VALET (Num), number of flagged regions that overlap an error found by QUAST (Valid), sensitivity (Sens), and mismatches per Kbp.}
+\label{simulated_community}
+\end{table}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
+
 
 \begin{landscape}
 \renewcommand{\baselinestretch}{1}
@@ -239,7 +243,7 @@ One contig, roughly 25 Kbp in size, had a 5 Kbp region at the start of the conti
 This region was roughly 4x the median coverage of the remaining contig.
 Using NCBI's BLAST~\cite{blast} and reference database, the region aligned to the organism \emph{Nostoc} sp. PCC 7120.
 Upon closer inspection, this region contained 16S, 23S, and 5S rRNA genes and was found at \emph{four} locations in  \emph{Nostoc} sp. PCC 7120.
-This region was only found once in the assembly, so all the sequences from the other duplicates aligned to this region, inflating the coverage.
+This region was only found once in the assembly, so all the sequences from the repeats aligned to this region, inflating the coverage.
 This noticeable and consistent increase in coverage caused VALET to mark it as mis-assembled.
 Unsurprisingly, QUAST did not mark this as a mis-assembly because the actual sequence within this region matched the reference.
 

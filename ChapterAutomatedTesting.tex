@@ -87,7 +87,7 @@ GAGCATCTTTATTGGAGATGTGCCACAGCACATT
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[FASTA file containing two entries that represent the same circular sequence.]{FASTA file containing two entries that represent the same circular sequence. Each entry consists of a single line descriptor starting with the $>$ symbol, followed by the biological sequence. Text comparison tools would detect that these two sequences are different.}
+\caption[FASTA file containing two entries that represent the same circular sequence]{FASTA file containing two entries that represent the same circular sequence. Each entry consists of a single line descriptor starting with the $>$ symbol, followed by the biological sequence. Text comparison tools would detect that these two sequences are different.}
 \label{fig:circular_genome}
 \end{quote}
 \end{figure}
@@ -114,7 +114,7 @@ By doing a \textbf{diff} of the text outputs we are unable to determine if there
 \begin{table}[h]
 %\processtable{Using rhodobacter ALLPATHS-LG corrected fragment library.}
 %{\tiny
-\caption{For Minimus and SOAPdenovo, we check if assemblies produced from the original and shuffled reads are the same by doing a \textbf{diff} of the resulting assembly text files.  In addition, we also find that the assemblies produced using different number of threads differ in SOAPdenovo.  Assemblers used rhodobacter ALLPATHS-LG corrected fragment library. 1408188 reads.}
+\caption{For Minimus and SOAPdenovo, we check if assemblies produced from the original and shuffled reads are the same by doing a \textbf{diff} of the resulting assembly text files.  In addition, we also find that the assemblies produced using different number of threads differ in SOAPdenovo.  Assemblers used rhodobacter ALLPATHS-LG corrected fragment library. 1,408,188 reads.}
 \label{Tab:01}
 \begin{tabular}{r|cc}
 & Minimus & SOAPdenovo \\ \hline
@@ -350,7 +350,7 @@ MetAMOS generates a summary HTML page for the assembly quality results.
 
 
 To illustrate the inadequacy of the \emph{diff}-based approach, %we use two assemblers, SOAPdenovo and minimus.
-we first generate assemblies with SOAPdenovo and Minimus using bacterial sequences from a recent high-profile assembly competition, GAGE \cite{salzberg2012gage}.
+we first generate assemblies with SOAPdenovo and Minimus using bacterial sequences from a recent high-profile assembly competition, GAGE~\cite{salzberg2011gage}.
 The \emph{Rhodobacter sphaeroides} dataset contains 1,408,188 reads of length 101 bps.
 %, known as base-pairs (bp).
 Assemblies are created using the original reads, along with a shuffled version of the original reads and compared using unix command \textbf{diff}.
@@ -369,7 +369,7 @@ By doing a \textbf{diff} of the text outputs, we are unable to determine if ther
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[LAP scores for original and shuffled \emph{R. sphaeroides} dataset.]{SOAPdenovo assemblies of the 1,408,188 \emph{R. sphaeroides} error-corrected reads.  The LAP was determined using a sample of 100,000 reads.  The assemblies produced from the original reads and shuffled reads are within the acceptable standard deviation.}
+\caption[LAP scores for original and shuffled \emph{R. sphaeroides} dataset]{SOAPdenovo assemblies of the 1,408,188 \emph{R. sphaeroides} error-corrected reads.  The LAP was determined using a sample of 100,000 reads.  The assemblies produced from the original reads and shuffled reads are within the acceptable standard deviation.}
 \label{fig:modified_read_asm_param}
 \end{quote}
 \end{figure}
@@ -412,7 +412,7 @@ We assemble the data using MetAMOS with our custom SOAPdenovo assemblers, then r
 %MetAMOS provides a summary file of the LAP and REAPR scores
 SOAPdenovo is a de Bruijn assembler and requires the user to specify a parameter, k-mer, to construct the de Bruijn graph.
 For each dataset we construct assemblies using two different k-mer sizes: 31 and 55.
-The default binaries for SOAPdenovo versions 1.00 - 1.05 were only able to build assemblies using k-mer sizes <=31.
+The default binaries for SOAPdenovo versions 1.00 - 1.05 were only able to build assemblies using $k$-mer sizes $<=$ 31.
 Versions 2.00 and higher were used to process up to 127-mers.
 %The read-pair datasets for these organisms will aid us in testing how their
 %We use the mate pair datasets for these organisms in order to test the scaffolding updates of SOAPdenovo.

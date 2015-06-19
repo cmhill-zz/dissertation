@@ -327,7 +327,7 @@ SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics on
     Abstract = {BACKGROUND: The generation and analysis of high-throughput sequencing data are becoming a major component of many studies in molecular biology and medical research. Illumina's Genome Analyzer (GA) and HiSeq instruments are currently the most widely used sequencing devices. Here, we comprehensively evaluate properties of genomic HiSeq and GAIIx data derived from two plant genomes and one virus, with read lengths of 95 to 150 bases.
 RESULTS: We provide quantifications and evidence for GC bias, error rates, error sequence context, effects of quality filtering, and the reliability of quality values. By combining different filtering criteria we reduced error rates 7-fold at the expense of discarding 12.5% of alignable bases. While overall error rates are low in HiSeq data we observed regions of accumulated wrong base calls. Only 3% of all error positions accounted for 24.7% of all substitution errors. Analyzing the forward and reverse strands separately revealed error rates of up to 18.7%. Insertions and deletions occurred at very low rates on average but increased to up to 2% in homopolymers. A positive correlation between read coverage and GC content was found depending on the GC content range.
 CONCLUSIONS: The errors and biases we report have implications for the use and the interpretation of Illumina sequencing data. GAIIx and HiSeq data sets show slightly different error profiles. Quality filtering is essential to minimize downstream analysis artifacts. Supporting previous recommendations, the strand-specificity provides a criterion to distinguish sequencing errors from low abundance polymorphisms.},
-    Author = {Minoche, AE and Dohm, JC and Himmelbauer, H},
+    Author={Minoche, Andr{\'e} E and Dohm, Juliane C and Himmelbauer, Heinz and others},
     Date-Added = {2014-09-27 14:59:19 +0000},
     Date-Modified = {2014-09-27 15:00:13 +0000},
     Doi = {10.1186/gb-2011-12-11-r112},
@@ -499,26 +499,6 @@ CONCLUSION: Critically, the error properties were largely free of the context-sp
     Url = {http://www.agilemanifesto.org/},
     Year = 2001,
     Bdsk-Url-1 = {http://www.agilemanifesto.org/}}
-
-@article{Langmead:2012rw,
-    Abstract = {As the rate of sequencing increases, greater throughput is demanded from read aligners. The full-text minute index is often used to make alignment very fast and memory-efficient, but the approach is ill-suited to finding longer, gapped alignments. Bowtie 2 combines the strengths of the full-text minute index with the flexibility and speed of hardware-accelerated dynamic programming algorithms to achieve a combination of high speed, sensitivity and accuracy.},
-    Author = {Langmead, Ben and Salzberg, Steven L},
-    Date-Added = {2014-09-23 20:40:05 +0000},
-    Date-Modified = {2014-09-23 20:40:05 +0000},
-    Doi = {10.1038/nmeth.1923},
-    Journal = {Nat Methods},
-    Journal-Full = {Nature methods},
-    Mesh = {Algorithms; Computational Biology; Databases, Genetic; Genome, Human; Humans; Sequence Alignment; Sequence Analysis, DNA},
-    Month = {Apr},
-    Number = {4},
-    Pages = {357-9},
-    Pmc = {PMC3322381},
-    Pmid = {22388286},
-    Pst = {epublish},
-    Title = {Fast gapped-read alignment with Bowtie 2},
-    Volume = {9},
-    Year = {2012},
-    Bdsk-Url-1 = {http://dx.doi.org/10.1038/nmeth.1923}}
 
 @article{Earl:2011fv,
     Abstract = {Low-cost short read sequencing technology has revolutionized genomics, though it is only just becoming practical for the high-quality de novo assembly of a novel large genome. We describe the Assemblathon 1 competition, which aimed to comprehensively assess the state of the art in de novo assembly methods when applied to current sequencing technologies. In a collaborative effort, teams were asked to assemble a simulated Illumina HiSeq data set of an unknown, simulated diploid genome. A total of 41 assemblies from 17 different groups were received. Novel haplotype aware assessments of coverage, contiguity, structure, base calling, and copy number were made. We establish that within this benchmark: (1) It is possible to assemble the genome to a high level of coverage and accuracy, and that (2) large differences exist between the assemblies, suggesting room for further improvements in current methods. The simulated benchmark, including the correct answer, the assemblies, and the code that was used to evaluate the assemblies is now public and freely available from http://www.assemblathon.org/.},
@@ -727,7 +707,7 @@ RESULTS: Our tests indicate that SCALCE can improve the compression rate achieve
 AVAILABILITY: Our algorithm, SCALCE (Sequence Compression Algorithm using Locally Consistent Encoding), is implemented in C++ with both gzip and bzip2 compression options. It also supports multithreading when gzip option is selected, and the pigz binary is available. It is available at http://scalce.sourceforge.net.
 CONTACT: fhach@cs.sfu.ca or cenk@cs.sfu.ca
 SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics online.},
-    Author = {Hach, F and Numanagic, I and Alkan, C and Sahinalp, SC},
+    Author={Hach, Faraz and Numanagi{\'c}, Ibrahim and Alkan, Can and Sahinalp, S Cenk},
     Date-Added = {2013-05-27 17:39:21 +0000},
     Date-Modified = {2013-05-27 17:39:57 +0000},
     Doi = {10.1093/bioinformatics/bts593},
@@ -911,7 +891,7 @@ SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics on
     Bdsk-Url-1 = {http://dx.doi.org/10.1093/nar/gkp931}}
 
 @article{DBLP:journals/tit/ZivL78,
-    Author = {Ziv, J and Lempel, A},
+    Author={Ziv, Jacob and Lempel, Abraham},
     Bibsource = {DBLP, http://dblp.uni-trier.de},
     Date-Added = {2013-05-23 17:22:22 +0000},
     Date-Modified = {2013-05-25 17:04:21 +0000},
@@ -986,7 +966,7 @@ SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics on
     Abstract = {BACKGROUND: New rapid high-throughput sequencing technologies have sparked the creation of a new class of assembler. Since all high-throughput sequencing platforms incorporate errors in their output, short-read assemblers must be designed to account for this error while utilizing all available data.
 RESULTS: We have designed and implemented an assembler, Quality-value guided Short Read Assembler, created to take advantage of quality-value scores as a further method of dealing with error. Compared to previous published algorithms, our assembler shows significant improvements not only in speed but also in output quality.
 CONCLUSION: QSRA generally produced the highest genomic coverage, while being faster than VCAKE. QSRA is extremely competitive in its longest contig and N50/N80 contig lengths, producing results of similar quality to those of EDENA and VELVET. QSRA provides a step closer to the goal of de novo assembly of complex genomes, improving upon the original VCAKE algorithm by not only drastically reducing runtimes but also increasing the viability of the assembly algorithm through further error handling capabilities.},
-    Author = {Bryant, Jr, DW and Wong, W-K and Mockler, TC},
+    Author={Bryant, Douglas W and Wong, Weng-Keen and Mockler, Todd C},
     Date-Added = {2013-05-19 14:24:05 +0000},
     Date-Modified = {2013-05-19 14:26:27 +0000},
     Doi = {10.1186/1471-2105-10-69},
@@ -1419,7 +1399,7 @@ AVAILABILITY: The Jellyfish software is written in C++ and is GPL licensed. It i
 
 @article{Cock:2010ve,
     Abstract = {FASTQ has emerged as a common file format for sharing sequencing read data combining both the sequence and an associated per base quality score, despite lacking any formal definition to date, and existing in at least three incompatible variants. This article defines the FASTQ format, covering the original Sanger standard, the Solexa/Illumina variants and conversion between them, based on publicly available information such as the MAQ documentation and conventions recently agreed by the Open Bioinformatics Foundation projects Biopython, BioPerl, BioRuby, BioJava and EMBOSS. Being an open access publication, it is hoped that this description, with the example files provided as Supplementary Data, will serve in future as a reference for this important file format.},
-    Author = {Cock, PJA and Fields, CJ and Goto, N and Heuer, ML and Rice, PM},
+    Author={Cock, Peter JA and Fields, Christopher J and Goto, Naohisa and Heuer, Michael L and Rice, Peter M},
     Date-Added = {2013-05-02 20:47:09 +0000},
     Date-Modified = {2013-05-02 20:48:37 +0000},
     Doi = {10.1093/nar/gkp1137},
@@ -1439,11 +1419,11 @@ AVAILABILITY: The Jellyfish software is written in C++ and is GPL licensed. It i
 
 @article{Ewing:1998ly,
     Abstract = {Elimination of the data processing bottleneck in high-throughput sequencing will require both improved accuracy of data processing software and reliable measures of that accuracy. We have developed and implemented in our base-calling program phred the ability to estimate a probability of error for each base-call, as a function of certain parameters computed from the trace data. These error probabilities are shown here to be valid (correspond to actual error rates) and to have high power to discriminate correct base-calls from incorrect ones, for read data collected under several different chemistries and electrophoretic conditions. They play a critical role in our assembly program phrap and our finishing program consed.},
-    Author = {Ewing, B and Green, P},
+    Author={Ewing, Brent and Green, Phil},
     Date-Added = {2013-05-02 20:44:01 +0000},
     Date-Modified = {2013-05-02 20:50:52 +0000},
-    Journal = {Genome Res},
-    Journal-Full = {Genome research},
+    Journal = {Genome Research},
+    Journal-Full = {Genome Research},
     Mesh = {Base Sequence; Chimera; Cloning, Molecular; Data Interpretation, Statistical; Discriminant Analysis; Genetic Vectors; Human Genome Project; Humans; Probability; Quality Control; Reproducibility of Results; Sequence Analysis, DNA; Software},
     Month = {Mar},
     Number = {3},

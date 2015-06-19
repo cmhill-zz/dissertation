@@ -57,7 +57,7 @@ For more details and examples, please see \cite{dean2008mapreduce}.
 %Even though each mapper node is assigned a block of a text, the \emph{map} function is called separately on each line of the text.
 %The \emph{map} function would split the line by whitespace and for each word, it would output key-value pairs of the form (\emph{word}, 1). Finally, when all mappers have finished, the reducers will each receive a key, and a list of values. In this case, the list of values is exclusively composed of 1's. The reducer would then sum all the entries in the list, and output the final key-value pair, which corresponds to (\emph{word}, count).
 
-\subsubsection{Parallelization Strategies}
+\subsubsection{Parallelization strategies}
 
 \begin{figure}[!htb]%figure2
 \begin{center}
@@ -66,7 +66,7 @@ For more details and examples, please see \cite{dean2008mapreduce}.
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption{Query segmentation approach for parallelizing BLAST.}
+\caption[Query segmentation approach for parallelizing BLAST]{Query segmentation approach for parallelizing BLAST.}
 \label{fig:strategies}
 \end{quote}
 \end{figure}
@@ -76,7 +76,7 @@ For more details and examples, please see \cite{dean2008mapreduce}.
 
 K-mulus uses three main strategies to perform distributed BLAST queries using Hadoop MapReduce.
 As we will show, the efficacy of these strategies are all dependent on the underlying hardware and data being used.
-\subsubsection{Query Segmentation.}
+\subsubsection{Query segmentation.}
 Arguably the simplest way to parallelize an application using MapReduce is to set the \emph{map} function to the given application and execute it on subsets of the input.
 The individual results of the \emph{map} functions are then aggregated by a single \emph{reducer}.
 This query segmentation is the default implementation of CloudBLAST\cite{matsunaga2008cloudblast}, a popular MapReduce implementation of BLAST.
@@ -94,7 +94,7 @@ Each \emph{map} function simply executes the included BLAST binary against the i
 Although there is no need to use a reducing step for this strategy, one reducer can be used to aggregate the results.
 %By using Hadoop, we do not have to worry load balancing and communication between nodes.
 
-\subsubsection{Database Segmentation.}
+\subsubsection{Database segmentation.}
 
 Instead of segmenting the query, we can segment the database into a predetermined number of chunks.
 By segmenting the database, we can reduce the overhead of disk I/O for databases that do not fit completely into memory.
@@ -107,7 +107,7 @@ Since BLAST takes into account the size of the database when computing alignment
 Fortunately, BLAST provides the user an option to specify the effective length of the complete database.
 %In order to determine the k and $\lambda$ values (statistical parameters dependent upon the alignment scoring and the background amino acid frequencies), a test query of one sequence must be performed against against the entire non-segmented database.
 
-\subsubsection{Hybrid Approach.}
+\subsubsection{Hybrid approach.}
 One potential problem with the database segmentation approach is that if we evenly partition the database across all nodes in our cluster, then the database chunks may only fill up a small portion of the available memory.
 In this case, we must use a hybrid approach, where we segment the database into the least number of chunks that can fit entirely into memory.
 %When the database is too large to fit in memory, but segmenting the database results in very small chunks, then we must use a hybrid approach.
@@ -119,7 +119,7 @@ During runtime, each \emph{map} function receives a chunk of the query sequences
 For each database partition $i$, the \emph{map} function randomly selects a replicate to send the query chunk to in the form of a tuple ($db_{i,\text{replicate\_num}}$, query chunk).
 The reducer receives a collection of query chunks for a given database partition and replicate and BLASTs the query chunk against the database partition.
 
-\subsubsection{K-mer Indexing}
+\subsubsection{K-mer indexing}
 One of the original algorithms that BLAST uses is ``seed and extend'' alignment. This approach requires that there be at least one k-mer (sequence sub-string of length k) match between query and database sequence before running the expensive alignment algorithm between them\cite{altschul1990basic}. Using this rule, BLAST can bypass any database sequence which does not share any common k-mers with the query. Using this heuristic, we can design a distributed version of BLAST using the MapReduce model. One aspect of BLAST which we take advantage of is the database indexing of k-mers. While some versions of BLAST have adopted database k-mer indexing for DNA databases, it seems that this approach has not been feasibly scaled to protein databases\cite{morgulis2008database}. For this reason, BLAST iterates through nearly every database sequence to find k-mer hits. Here we describe an approach for K-mulus that attempts to optimize this process by using lightweight database indexing to allow query iteration to bypass certain partitions of the database.
 
 In order to cluster the database, for each sequence, we first create a vector of bits in which the value at each position indicates the presence of a specific sequence k-mer. The index of each k-mer in the vector is trivial to compute.
@@ -133,7 +133,7 @@ After the database has been clustered, we compare the input query sequences to a
 %\input{subsection_results.tex}
 \subsection{Results}
 
-\subsubsection{Comparison of Parallelization Approaches on a Modest Size Cluster}
+\subsubsection{Comparison of parallelization approaches on a modest size cluster}
 
 \begin{figure}[!htb]%figure2
 \begin{center}
@@ -142,7 +142,7 @@ After the database has been clustered, we compare the input query sequences to a
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption{Runtimes of different BLAST parallelization approaches.}
+\caption[Runtimes of different BLAST parallelization approaches]{Runtimes of different BLAST parallelization approaches.}
 \label{fig:parallel_approaches}
 \end{quote}
 \end{figure}
@@ -168,7 +168,7 @@ Our hybrid query and database segmentation approach resulted in a 44\% decrease 
 Considering that the memory of each node in our cluster was 2GB, and the \emph{nr} database was 9GB, we partitioned the database into 5 chunks, each roughly 2GB in size.
 This allows the databases to fit completely into memory at each node.
 
-\subsubsection{Analysis of Database k-mer Index}
+\subsubsection{Analysis of database $k$-mer index}
 
 
 \begin{figure}[!htb]%figure2
@@ -178,7 +178,7 @@ This allows the databases to fit completely into memory at each node.
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption{Runtimes of database segmentation with k-mer index approach.}
+\caption[Runtimes of database segmentation with k-mer index approach]{Runtimes of database segmentation with k-mer index approach.}
 \label{fig:db_index}
 \end{quote}
 \end{figure}
@@ -209,7 +209,7 @@ In order to show the improvement offered by repeat masking, we ran SEG\cite{woot
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-  \caption{Pair-wise k-mer intersubsection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences.}
+  \caption[Pair-wise k-mer intersubsection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences]{Pair-wise k-mer intersubsection of 50 random samples of 3000 original and repeat-masked \emph{nr} sequences.}
   \label{fig:kmer_intersubsection}
 \end{quote}
 \end{figure}

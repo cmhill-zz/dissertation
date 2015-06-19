@@ -33,22 +33,22 @@ Dissertation directed by: & {\large  Professor Mihai Pop} \\
 % Researchers fill in gaps, and correct mistakes in the sequence.
 % It is not an easy task determining what parts of the genome are missing, what parts are mistakes, and what are due to experimental artifacts from the sequencing machine.
 
-The current revolution in genomics has been made possible by software tools called genome assemblers, which stitch together DNA fragments ``read'' by sequencing machines into complete or nearly complete genome sequences. Despite decades of research in this field and the development of dozens of genome assemblers, assessing and comparing the quality of assembled genome sequences still relies on the availability of independently determined standards, such as manually curated genome sequences, or independently produced mapping data. The focus of this work was to develop reference-free computational methods to accurately compare and evaluate genome assemblies.
+The current revolution in genomics has been made possible by software tools called genome assemblers, which stitch together DNA fragments ``read'' by sequencing machines into complete or nearly complete genome sequences. Despite decades of research in this field and the development of dozens of genome assemblers, assessing and comparing the quality of assembled genome sequences still heavily relies on the availability of independently determined standards, such as manually curated genome sequences, or independently produced mapping data. The focus of this work is to develop reference-free computational methods to accurately compare and evaluate genome assemblies.
 
 %In the first part of my talk, I will describe our de novo probabilistic measure of assembly quality which allows for an objective comparison of multiple assemblies generated from the same set of reads. I will detail extensions to our probabilistic framework that allows for an accurate evaluatation of metagenomic assemblies in addition to single genomes.
 
-Here we introduce a reference-free likelihood-based measure of assembly quality which allows for an objective comparison of multiple assemblies generated from the same set of reads. We define the quality of a sequence produced by an assembler as the conditional probability of observing the sequenced reads from the assembled sequence. A key property of our metric is that the true genome sequence maximizes the score, unlike other commonly used metrics.
+We introduce a reference-free likelihood-based measure of assembly quality which allows for an objective comparison of multiple assemblies generated from the same set of reads. We define the quality of a sequence produced by an assembler as the conditional probability of observing the sequenced reads from the assembled sequence. A key property of our metric is that the true genome sequence maximizes the score, unlike other commonly used metrics.
 
 Despite the unresolved challenges of single genome assembly, the decreasing costs of sequencing technology has led to a sharp increase in metagenomics projects over the past decade.
 These projects allow us to better understand the diversity and function of microbial communities found in the environment, including the ocean, Arctic regions, other living organisms, and the human body.
-We extend our likelihood-based framework and show that we can accurately evaluate assemblies of these complex bacterial communities.
+We extend our likelihood-based framework and show that we can accurately compare assemblies of these complex bacterial communities.
 
 
 %While our previous research has focus on comparing the overall quality of the genome assembly,
 
 After an assembly has been produced, it is not an easy task determining what parts of the underlying genome are missing, what parts are mistakes, and what parts are due to experimental artifacts from the sequencing machine.
 Here we introduce VALET, the first reference-free pipeline that flags regions in metagenomic assemblies that are statistically inconsistent with the data generation process.
-VALET has detected mis-assemblies in publicly available datasets and highlights the current shortcomings in available metagenomic assemblers.
+VALET detects mis-assemblies in publicly available datasets and highlights the current shortcomings in available metagenomic assemblers.
 
 By providing the computational methods for researchers to accurately evaluate their assemblies, we decrease the chance of incorrect biological conclusions and misguided future studies.
 

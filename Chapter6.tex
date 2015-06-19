@@ -4,6 +4,8 @@
 
 \chapter{Additional Contributions}
 
+During my time at the University of Maryland, I have had the privellage to work on a wide array of interesting problems in key areas of bioinformatics. In this chapter, I describe my contributions to the field of lossy compression and clustering.
+
 \section{Lossy Compression of DNA Sequence Quality Values}
 
 \subsection{Abstract}
@@ -25,7 +27,7 @@ essential requirement for quality values.
 
 Existing methods for compressing quality sequences mostly focused on
 minimizing the loss of information with less emphasis on effects on
-subsequent analyses. In this paper, we evaluate several different
+subsequent analyses. In this chapter, we evaluate several different
 compression methods for quality values that compromise accuracy for
 better storage efficiency, and their resulting impact on common
 bioinformatic analyses using sequence read data.
@@ -68,7 +70,7 @@ standards, which reduces the total number of reads; and
 reduces the number total number of bases. Quality values can be used
 by genome assembly software to produce better
 assemblies~\cite{Bryant:2009uq,Gnerre:2011kx}. Short-read
-alignment software, such as Bowtie2~\cite{Langmead:2012rw}, use
+alignment software, such as Bowtie2~\cite{langmead2012fast}, use
 quality values to weight mismatches between read and reference
 sequences. Software for detecting single nucleotide polymorphisms
 (\textsc{snp}s) can use quality values~\cite{McKenna:2010bh},
@@ -77,11 +79,7 @@ reliable than those with low-quality calls, particularly in low
 coverage regions.
 
 Previous literature on sequence data compression has largely focused
-on lossless compression of base calls~\cite[reviewed
-  in][]{Deorowicz:2013hq,Giancarlo:2014rw,Giancarlo:2009fk,
-  Nalbantoglu:2010uq,Zhu:2013qr}, although some recent work has
-addressed compression of quality
-values~\cite{asnani2012lossy,Canovas:2014fr,Hach:2012ys,
+on lossless compression of base calls~\cite{asnani2012lossy,Canovas:2014fr,Hach:2012ys,
   janin2013adaptive,Kozanitis:2011kl,Ochoa:2013rt,Tembe:2010ys,
   Wan:2012kq,DBLP:conf/recomb/YuYB14,zhou2014compression}. Among the
 several challenges for compression of read data is dealing with
@@ -117,7 +115,7 @@ and trimming), genome assembly, and read mapping.
 
 \subsection{Methods}
 
-\subsubsection{Compression Strategy: Binning}
+\subsubsection{Compression strategy: binning}
 
 Quality values can be binned, and the minimum number of bins that
 allows for a any distinction among quality values is two, i.e., two
@@ -177,7 +175,7 @@ Our 2-bin encoding is a combination of LogBinning and Truncating in that we are 
 \renewcommand{\baselinestretch}{2}
 \small\normalsize
 
-\subsubsection{Compression Strategy: Modeling}
+\subsubsection{Compression strategy: modeling}
 
 If quality values are modeled, compression is conceivably possible by
 replacing the original quality values by a representation of the
@@ -208,7 +206,7 @@ Once the model parameters are calculated, they are stored by the decoder to late
 \textsc{QualComp} takes as input a user-specified rate (bits per read) and then poses an optimization problem of how to allot these bits for a given position while minimizing the \textsc{mse}.
 The quality values can be clustered before hand to produce more accurate models.
 
-\subsubsection{Compression Strategy: Profiling}
+\subsubsection{Compression strategy: profiling}
 
 As large sets of quality strings show similar trends of quality over
 their length, it makes sense to identify such common patterns in the
@@ -255,7 +253,7 @@ of encoding them, and these fixed costs are amortized over the entire
 set of reads to which they apply. Additionally there are marginal
 costs that are a function of the number of reads encoded.
 
-\subsubsection{Data sets}
+\subsubsection{Datasets}
 
 We used several Illumina sequence read datasets in this research,
 which are taken from data from the \textsc{gage} (Genome Assembly
@@ -284,7 +282,7 @@ from the NCBI RefSeq database (NC\_000014.8).
 
 \textit{Escherichia coli} str. K-12 MG1655 MiSeq data was downloaded
 from \url{http://www.illumina.com/systems/miseq/scientific_data.html},
-which are generated from a fragment library (insert size of 180bp nt;
+which are generated from a fragment library (insert size of 180 nt;
 1,145,8940 paired-end reads). The corresponding reference sequence
 was obtained from the NCBI RefSeq database (NC\_000913.2).
 
@@ -308,38 +306,6 @@ consisted of 18,828,274 reads of length 36.
 % \renewcommand{\baselinestretch}{2}
 % \small\normalsize
 % \end{landscape}
-
-\begin{landscape}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-\begin{quote}
-\begin{figure}[!tpb]%figure2
-\begin{center}
-\includegraphics[width=1.4\textheight]{compression_results.pdf}
-\end{center}
-\renewcommand{\baselinestretch}{1}
-\small\normalsize
-%\begin{quote}
-\caption[Mean squared error versus bits/base-call for different
-  compression methods applied to the \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} datasets]{Mean squared error versus bits/base-call for different
-  compression methods applied to the \textit{Rhodobacter sphaeroides}
-  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
-  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
-    musculus} datasets. 2B --- 2-bin encoding; P$n$ --- profiling
-  with $n$ profiles; R$n$ --- modeling with polynomial regression
-  models of degree $n$; Q$n$ --- \textsc{q}ual\textsc{c}omp with rate parameter of
-  $n$. Asterisks denote the corresponding lossless compression using
-  \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
-  data.}
-  \label{fig:mse_vs_bpbp}
-\end{figure}
-\end{quote}
-\renewcommand{\baselinestretch}{2}
-\small\normalsize
-\end{landscape}
 
 \subsubsection{Performance evaluation}
 
@@ -395,6 +361,40 @@ asterisks on the abscissa. The compression methods tend to cluster
 together across the different datasets. Across all datasets, the
 0-degree polynomial regression, profile encodings, and \textsc{q}ual\textsc{c}omp have
 the lowest bits/base-call.
+
+
+\begin{landscape}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+\begin{quote}
+\begin{figure}[!tpb]%figure2
+\begin{center}
+\includegraphics[width=1.4\textheight]{compression_results.pdf}
+\end{center}
+\renewcommand{\baselinestretch}{1}
+\small\normalsize
+%\begin{quote}
+\caption[Mean squared error versus bits/base-call for different
+  compression methods applied to the \textit{Rhodobacter sphaeroides}
+  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
+  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
+    musculus} datasets]{Mean squared error versus bits/base-call for different
+  compression methods applied to the \textit{Rhodobacter sphaeroides}
+  2.4.1, and \textit{Homo sapiens} chromosome 14 fragment libraries,
+  and \textit{Escherichia coli} str. K-12 MG1655, and \textit{Mus
+    musculus} datasets. 2B --- 2-bin encoding; P$n$ --- profiling
+  with $n$ profiles; R$n$ --- modeling with polynomial regression
+  models of degree $n$; Q$n$ --- \textsc{q}ual\textsc{c}omp with rate parameter of
+  $n$. Asterisks denote the corresponding lossless compression using
+  \textsc{bz}ip2, with the black asterisk corresponds to original uncompressed
+  data.}
+  \label{fig:mse_vs_bpbp}
+\end{figure}
+\end{quote}
+\renewcommand{\baselinestretch}{2}
+\small\normalsize
+\end{landscape}
+
 
 \textsc{q}ual\textsc{c}omp with the rate parameter set to 100 bits/read has the lowest
 \textsc{mse}, but requires 10-15x more storage than the profile
@@ -828,7 +828,7 @@ quality values, but the biological sequencing data themselves.
 
 \subsection{Conclusion}
 
-In this paper we have examined lossy compression on sequence quality
+In this chapter we have examined lossy compression on sequence quality
 values and their effect on subsequent analyses. Although most previous
 examinations on lossy compression primarily focused on information
 loss, we have shown that typically used bioinformatics software today
