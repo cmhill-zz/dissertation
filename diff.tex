@@ -1,7 +1,7 @@
 
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL origthesis.tex       Wed Jul 29 18:32:18 2015
-%DIF ADD completethesis.tex   Wed Jul 29 19:58:16 2015
+%DIF ADD completethesis.tex   Thu Jul 30 03:06:10 2015
 
 
 \newcommand{\mydriver}{pdftex} 
@@ -2553,7 +2553,39 @@ In this chapter, we detail how to modify the constraints of existing tools to al
 The result is VALET, the first \emph{de novo} pipeline for detecting mis-assemblies in metagenomic assemblies.
 
 \section{Methods}
-VALET flags regions of the assembly based on (1) sampling depth, (2) alignability of the sequences, and (3) insert size constraints.
+\DIFaddbegin 
+
+\subsection{\DIFadd{Types of mis-assemblies}}
+
+\DIFadd{The majority of mis-assemblies fall into two categories: (1) compression/expansion of repetitive sequence and (2) sequence rearrangements.
+The first category of mis-assembly results when an assembler is unable to determine the correct copy count of repeats, leading to additional or fewer copies.
+The second category results when an assembler erroneously links separate unique portions of the genome that lie adjacent to a repeat.
+The repeat acts as a bridge joining the two separate parts of the genome together.
+Each category of mis-assembly has its own signatures that can be used to identify potential mis-assemblies.
+}
+
+\DIFadd{The sequencing process of randomly-sheared fragments follows a Poisson distribution~\mbox{%DIFAUXCMD
+\cite{lander1988genomic}
+}%DIFAUXCMD
+.
+Regions within the assembly that show high variance in }\textbf{\DIFadd{depth of coverage}} \DIFadd{are a potential signature of compressed/expanded repeats, chimeric contigs, and other types of contamination.
+}
+
+\DIFadd{The reads given to the assembler should be }\textbf{\DIFadd{alignable}} \DIFadd{to the resulting assembly.
+In practice, however, a read may fail to align for a few reasons.
+In metagenomic samples, an unaligned read can be from a rare, low coverage organism, and was never assembled with any other reads.
+A read with a large amount of errors will be unable to align within a specified similarity to the assembly.
+A read can be sequenced from a unfiltered contaminant or primer.
+If a read does not fall into one of the above categories, then it may be a sign of a potential mis-assembly.
+}
+
+\DIFadd{Another signature that is used to find mis-assemblies relies on finding regions of the assembly that violate mate-pair }\textbf{\DIFadd{insert size constraints}}\DIFadd{.
+Certain sequencing technology allows researchers to sequence from the ends of a DNA fragment of a known insert size.
+Although the sequence technology can only give the raw sequence of the first couple hundred basepairs from the ends of the fragment, the distance between the ends of the sequences can be used to aid in resolving repeats, and orienting and scaffolding contigs.
+Regions of an assembly containing a disproportionate number of mate-pairs (reads from the same fragment) with incorrect insert sizes may be a potential mis-assembly.
+}
+
+\DIFaddend VALET flags regions of the assembly based on (1) sampling depth, (2) alignability of the sequences, and (3) insert size constraints.
 
 \subsection{Estimating contig abundances using $k$-mers}
 
@@ -2569,7 +2601,11 @@ This approach is similar in spirit to that of Sailfish~\cite{patro2014sailfish} 
 }\DIFdelend 
 
 \subsection{Depth of coverage analysis}
-The sequencing process of randomly-sheared fragments follows a Poisson distribution~\cite{lander1988genomic}.  Regions within assembled contigs that show high variance in coverage may be potential mis-assemblies.  Areas of high and low depths of coverage could be compressed/expanded repeats, chimeric contigs, and other types of contamination.
+\DIFdelbegin \DIFdel{The sequencing process of randomly-sheared fragments follows a Poisson distribution~\mbox{%DIFAUXCMD
+\cite{lander1988genomic}
+}%DIFAUXCMD
+.  Regions within assembled contigs that show high variance in coverage may be potential mis-assemblies.  Areas of high and low depths of coverage could be compressed/expanded repeats, chimeric contigs, and other types of contamination.
+}\DIFdelend 
 
 In order to find these regions of high/low coverage, we first learn the distribution of per-base coverages across a given contig.  Using this distribution, bases are marked if their coverage falls below or above a certain threshold.  We set the lower cutoff as the first quartile minus 1.5 \DIFdelbegin \DIFdel{* }\DIFdelend \DIFaddbegin \DIFadd{$\times$ }\DIFaddend the interquartile range (IQR), which is the difference between the first and third quartile. 1.5 \DIFdelbegin \DIFdel{* }\DIFdelend \DIFaddbegin \DIFadd{$\times$ }\DIFaddend IQR is the value used by Tukey’s box plot~\cite{mcgill1978variations}.  Regions whose coverage is greater than the third quartile plus 1.5 \DIFdelbegin \DIFdel{* }\DIFdelend \DIFaddbegin \DIFadd{$\times$ }\DIFaddend IQR are marked as high coverage.
 
@@ -2577,24 +2613,26 @@ Using the per-base coverages may result in a large number of regions erroneously
 VALET uses a window size of 300 bp by default.
 
 \subsection{Insert size consistency}
-Certain sequencing technology allows researchers to sequence from the ends of a DNA fragment of a known insert size.  Although the sequence technology can only give the raw sequence of the first couple hundred basepairs from the ends of the fragment, the distance between the ends of the sequences can be used to aid in resolving repeats, and orienting and scaffolding contigs.  Regions of an assembly containing a disproportionate number of mate-pairs (reads from the same fragment) with incorrect insert sizes may be a potential mis-assembly.
+\DIFdelbegin \DIFdel{Certain sequencing technology allows researchers to sequence from the ends of a DNA fragment of a known insert size.  Although the sequence technology can only give the raw sequence of the first couple hundred basepairs from the ends of the fragment, the distance between the ends of the sequences can be used to aid in resolving repeats, and orienting and scaffolding contigs.  Regions of an assembly containing a disproportionate number of mate-pairs (reads from the same fragment) with incorrect insert sizes may be a potential mis-assembly.
+}\DIFdelend 
+
 
 VALET relies on the REAPR~\cite{hunt2013reapr} pipeline to identify mate-pair insert size inconsistencies.  REAPR works by first sampling the fragment coverage across the genome to get average fragment length and depth of coverage.  Using this information, REAPR scans the assembly for observed regions that differ from the expected fragment length distribution and orientations.
 
 REAPR is designed to work with single genome assemblies, more specifically, assemblies with a global uniform coverage.  Since the contig abundances can vary drastically in metagenomic assemblies, VALET first bins contigs by similar abundances and then executes the REAPR pipeline on the binned contigs.
 
 \subsection{Identifying assembly breakpoints}
-\DIFdelbegin \DIFdel{When a read is unable to align to an assembly, there must be some explanation}\DIFdelend \DIFaddbegin \DIFadd{The reads given to the assembler must be alignable to the resulting assembly.
-In practice, however, a read may fail to align for a few reasons}\DIFaddend .
+\DIFdelbegin \DIFdel{When a read is unable to align to an assembly, there must be some explanation.
 In metagenomic samples, an unaligned read can be from a rare, low coverage organism, and was never assembled with any other reads.
 A read with a large amount of errors will be unable to align within a specified similarity to the assembly.
 A read can come from a unfiltered contaminant or primer.
 If a read does not fall into one of the above categories, then it may be a sign of a potential mis-assembly.
+}\DIFdelend 
 
 Possible breakpoints in the assembly are found by examining regions where a large number of partial reads are able to align.
 We evenly split each unaligned read into \emph{sister} reads.
 The \emph{sister} reads are then aligned independently back to the reference genome.
-We partition the provided assembly into bins (100 bp by default) and record what bins correspond to the sister reads.
+We partition the provided assembly into bins (100 bp by default) and record \DIFdelbegin \DIFdel{what }\DIFdelend \DIFaddbegin \DIFadd{which }\DIFaddend bins correspond to the sister reads.
 If we find a pair of bins that contain at least two different pairs of \textit{sister} reads, then we mark it as a breakpoint location.
 
 \subsection{Comparing multiple assemblies}
@@ -2611,7 +2649,8 @@ Contigs undergo an additional filtering step based on abundance (10x by default)
 Higher coverage and longer sequence provide a better baseline for detecting mis-assemblies.
 
 Once filtering has finished, regions of the assembly are flagged based on the inconsistencies described above.
-Regions that share multiple mis-assembly signatures may be more likely an \textit{actual} mis-assembly.
+\DIFdelbegin \DIFdel{Regions that share multiple }\DIFdelend \DIFaddbegin \DIFadd{In practice, most }\DIFaddend mis-assembly signatures \DIFdelbegin \DIFdel{may be more likely an }\textit{\DIFdel{actual}} %DIFAUXCMD
+\DIFdel{mis-assembly}\DIFdelend \DIFaddbegin \DIFadd{have high false positive rates which can be reduced by looking at regions where multiple signatures agree}\DIFaddend .
 Therefore, any window of the assembly (2000 in length by default) that contains multiple mis-assembly signatures are marked as \textbf{suspicious}.
 The flagged and suspicious regions are stored in a \textsc{GFF} file, which allows users to visualize the mis-assemblies using any genomic viewers, such as \text{IGV}~\cite{thorvaldsdottir2012integrative}.
 
@@ -2635,14 +2674,13 @@ The flagged and suspicious regions are stored in a \textsc{GFF} file, which allo
 \subsection{VALET achieves high sensitivity on a simulated metagenomic community}
 
 We examine the sensitivity of VALET on a toy simulated metagenomic community consisting of four bacteria at varying abundances: \emph{Bacteroides vulgatus} (80x), \emph{Bacillus cereus} (60x), \emph{Actinomyces odontolyticus} (40x), and \emph{Acinetobacter baumannii} (20x).
-Approximately four million reads are sequenced using \textsc{wgsim}~\cite{li2013wgsim}.
-The dataset is assembled using IDBA-UD~\cite{peng2012idba}, MetaVelvet~\cite{namiki2012metavelvet}, SPAdes~\cite{bankevich2012spades}, and SOAPdenovo2~\cite{luo2012soapdenovo2}.
-We run VALET on the assemblies and compare the errors found with those reference-based mis-assemblies detected by QUAST (Table~\ref{simulated_community} and Figure~\ref{fig:mock_frc}).
-If any part of a region flagged by VALET overlaps with a mis-assembled region reported by QUAST, we consider it successly identified.
+Approximately four million reads are \DIFdelbegin \DIFdel{sequenced }\DIFdelend \DIFaddbegin \DIFadd{simulated }\DIFaddend using \textsc{wgsim}~\cite{li2013wgsim} \DIFaddbegin \DIFadd{with default parameters}\DIFaddend .
+The dataset \DIFdelbegin \DIFdel{is }\DIFdelend \DIFaddbegin \DIFadd{was }\DIFaddend assembled using IDBA-UD~\cite{peng2012idba}, MetaVelvet~\cite{namiki2012metavelvet}, SPAdes~\cite{bankevich2012spades}, and SOAPdenovo2~\cite{luo2012soapdenovo2}.
+We \DIFdelbegin \DIFdel{run }\DIFdelend \DIFaddbegin \DIFadd{ran }\DIFaddend VALET on the assemblies and \DIFdelbegin \DIFdel{compare }\DIFdelend \DIFaddbegin \DIFadd{compared }\DIFaddend the errors found with \DIFdelbegin \DIFdel{those }\DIFdelend \DIFaddbegin \DIFadd{the }\DIFaddend reference-based mis-assemblies detected by QUAST (Table~\ref{simulated_community} and Figure~\ref{fig:mock_frc}).
+If any part of a region flagged by VALET overlaps with a mis-assembled region reported by QUAST, we consider it \DIFdelbegin \DIFdel{successly identified }\DIFdelend \DIFaddbegin \DIFadd{a true positive (mis-assembly correctly identified by our method)}\DIFaddend .
 
-Across all assemblers, VALET is able to detect greater than 80\% of mis-assemblies detected by QUAST with all mis-assemblies being found in the IDBA-UD and SOAPdenovo2 assemblies.
-IDBA-UD, MetaVelvet, and SPAdes assemblies contain roughly the same amount of sequence (16.3-16.5 Mbp), while SOAPdenovo2 contains roughly 4 Mbp less.
-IDBA-UD has the greatest corrected N50 (206.7 Kbp), followed by SPAdes (128.1 Kbp), MetaVelvet (29.5 Kbp), and SOAPdenovo2 (10.8 Kbp).
+Across all assemblers, VALET \DIFdelbegin \DIFdel{is able to detect }\DIFdelend \DIFaddbegin \DIFadd{detects }\DIFaddend greater than 80\% of mis-assemblies detected by QUAST\DIFdelbegin \DIFdel{with all mis-assemblies being found in the IDBA-UD and SOAPdenovo2 assemblies}\DIFdelend .IDBA-UD \DIFdelbegin \DIFdel{, MetaVelvet, and SPAdes assemblies contain roughly the same amount of sequence (16.3-16.5 Mbp), while SOAPdenovo2 contains roughly 4 Mbp less.
+IDBA-UD }\DIFdelend has the greatest \DIFdelbegin \DIFdel{corrected }\DIFdelend N50 \DIFaddbegin \DIFadd{after breaking the assembly at regions marked by QUAST }\DIFaddend (206.7 Kbp), followed by SPAdes (128.1 Kbp), MetaVelvet (29.5 Kbp), and SOAPdenovo2 (10.8 Kbp).
 These rankings match those provided by VALET (Figure~\ref{fig:mock_frc}).
 
 
@@ -2667,7 +2705,8 @@ These rankings match those provided by VALET (Figure~\ref{fig:mock_frc}).
 A major challenge of evaluating assemblies of environmental datasets is that a sizeable portion of the organsisms are unknown or lack a draft genome to compare against.
 In silico simulations often lack the complexity and sequencing biases present in real environmental samples.
 Fortunately, Shakya et al. provide a \emph{gold standard} synthetic metagenomic dataset containing a mixture of 64 organisms (16 members of Archaea and 48 organisms from 18 Bacteria phyla) with complete or high-quality draft genomes and 200-fold differences in abundances~\cite{shakya2013comparative}.
-We assemble these 53.4 million reads (101 bp in length) using two recent metagenomic assemblers: Omega~\cite{haider2014omega} and MEGAHIT\cite{li2015megahit}.
+\DIFdelbegin \DIFdel{We assemble these }\DIFdelend \DIFaddbegin \DIFadd{The dataset consists of }\DIFaddend 53.4 million reads (101 bp in length)\DIFaddbegin \DIFadd{.
+Due to the greater size and complexity of this dataset compared to the previous simulation, we assemble the dataset }\DIFaddend using two recent\DIFaddbegin \DIFadd{, fast }\DIFaddend metagenomic assemblers: Omega~\cite{haider2014omega} and MEGAHIT\cite{li2015megahit}.
 We run VALET on the assemblies and compare the errors found with those reference-based mis-assemblies detected by QUAST (Table~\ref{synthetic_valet}).
 
 
@@ -2675,10 +2714,22 @@ While the MEGAHIT and Omega assemblies are close in total size (192.3 Mbp vs. 19
 QUAST detects far more mis-assemblies in the Omega assembly compared to MEGAHIT (56,917 vs. 770, respectively).
 VALET detects 34.80\% and 96.10\% of these mis-assemblies found by QUAST in the MEGAHIT and Omega assemblies, respectively.
 While Omega has a higher N50 than MEGAHIT (44.1 Kbp vs. 38.9 Kbp), after breaking at mis-assemblies, the N50 drops well below MEGAHIT's (11.9 Kbp vs. 33.5 Kbp), illustrating why the N50 metric is not always a good indicator of assembly quality.
-Fortunately, VALET is able to accurately assess the quality of the two assemblies without using the reference genomes.
+\DIFdelbegin \DIFdel{Fortunately, }\DIFdelend VALET is able to accurately assess the quality of the two assemblies without using the reference genomes.
 
+\DIFaddbegin \DIFadd{We investigate the high false positive rate by examining a small number of regions flagged by VALET, but not marked by QUAST within the MEGAHIT assembly.
+One contig, roughly 25 Kbp in size, had a 5 Kbp region at the start of the contig marked as high coverage (Figure~\ref{fig:rrna_misassembly}).
+This region was roughly 4x the median coverage of the remaining contig.
+Using NCBI's BLAST~\mbox{%DIFAUXCMD
+\cite{blast}
+}%DIFAUXCMD
+and reference database, the region aligned to the organism }\emph{\DIFadd{Nostoc}} \DIFadd{sp. PCC 7120.
+Upon closer inspection, this region contained 16S, 23S, and 5S rRNA genes and was found at }\emph{\DIFadd{four}} \DIFadd{locations in  }\emph{\DIFadd{Nostoc}} \DIFadd{sp. PCC 7120.
+This region was only found once in the assembly, so all the sequences from the repeats aligned to this region, inflating the coverage.
+This noticeable and consistent increase in coverage caused VALET to mark it as mis-assembled.
+Unsurprisingly, QUAST did not mark this as a mis-assembly because the actual sequence within this region matched the reference.
+}
 
-\begin{landscape}
+\DIFaddend \begin{landscape}
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{table}[tb!]
@@ -2733,17 +2784,26 @@ Fortunately, VALET is able to accurately assess the quality of the two assemblie
 
 In practice, VALET has high sensitivity for mis-assembly detection, but also a high false positive rate.
 While we can tune parameters, such as window size, to trade-off between the measures, the high false positive rate still remains fairly prevalent.
-We investigated a small number of these regions flagged by VALET, but not marked by QUAST.
+\DIFdelbegin \DIFdel{We investigated a small number of these regions flagged by VALET, but not marked by QUAST.
 One contig, roughly 25 Kbp in size, had a 5 Kbp region at the start of the contig marked as high coverage (Figure~\ref{fig:rrna_misassembly}).
 This region was roughly 4x the median coverage of the remaining contig.
-Using NCBI's BLAST~\cite{blast} and reference database, the region aligned to the organism \emph{Nostoc} sp. PCC 7120.
-Upon closer inspection, this region contained 16S, 23S, and 5S rRNA genes and was found at \emph{four} locations in  \emph{Nostoc} sp. PCC 7120.
+Using NCBI's BLAST~\mbox{%DIFAUXCMD
+\cite{blast}
+}%DIFAUXCMD
+and reference database, the region aligned to the organism }\emph{\DIFdel{Nostoc}} %DIFAUXCMD
+\DIFdel{sp.PCC 7120.
+Upon closer inspection, this region contained 16S}\DIFdelend \DIFaddbegin \DIFadd{Some of the false positives can be explained as the assembler deduplicates repetitive regions of the genome, e.g.}\DIFaddend , \DIFdelbegin \DIFdel{23S, and 5S rRNA genes and was found at }\emph{\DIFdel{four}} %DIFAUXCMD
+\DIFdel{locations in  }\emph{\DIFdel{Nostoc}} %DIFAUXCMD
+\DIFdel{sp.PCC 7120.
 This region was only found once in the assembly, so all the sequences from the repeats aligned to this region, inflating the coverage.
 This noticeable and consistent increase in coverage caused VALET to mark it as mis-assembled.
 Unsurprisingly, QUAST did not mark this as a mis-assembly because the actual sequence within this region matched the reference.
+}%DIFDELCMD < 
 
-This highlights an important issue prevalent in metagenomic assemblers.
-A more \emph{correct} assembly would include an additional contig consisting solely of the ribosomal genes.
+%DIFDELCMD < %%%
+\DIFdel{This }\DIFdelend \DIFaddbegin \DIFadd{the ribosomal genes.
+This }\DIFaddend highlights an important issue prevalent in metagenomic assemblers.
+\DIFdelbegin \DIFdel{A }\DIFdelend \DIFaddbegin \DIFadd{In the Shakya et al. dataset, a }\DIFaddend more \emph{correct} \DIFaddbegin \emph{\DIFadd{Nostoc}} \DIFadd{sp. PCC 7120 }\DIFaddend assembly would include an additional contig consisting solely of the ribosomal genes.
 Then during the abundance estimation step of VALET, a quarter of the sequences would align to the original contig due to the flanking unique region and the remaining three quarters would align solely to the new contig containing the ribosomal genes.
 VALET would no longer mark this region in the original contig.
 
@@ -2789,7 +2849,7 @@ VALET finds mis-assemblies on a simulated and synthetic metagenomic mock communi
 \renewcommand{\baselinestretch}{1}
 \small\normalsize
 \begin{quote}
-\caption[Examining a 25 Kbp region flagged by VALET]{A 25 Kbp low coverage region flagged by VALET, but no mis-assembly reported by QUAST. The low coverage region was due to MetaCompass erroneously collapsing two strains of \emph{Propionibacterium acnes}.}
+\caption[Examining a 25 Kbp region flagged by VALET]{A 25 Kbp low coverage region flagged by VALET, but no mis-assembly reported by QUAST. The low coverage region was due to MetaCompass \DIFdelbeginFL \DIFdelFL{erroneously collapsing two strains }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{selecting only a single strain }\DIFaddendFL of \emph{Propionibacterium acnes} \DIFaddbeginFL \DIFaddFL{to use for assembly instead of both}\DIFaddendFL .}
 \label{fig:p_acnes}
 \end{quote}
 \end{figure}
@@ -2802,11 +2862,20 @@ VALET finds mis-assemblies on a simulated and synthetic metagenomic mock communi
 
 \chapter{Additional Contributions}
 
-During my time at the University of Maryland, I have had the privellage to work on a wide array of interesting problems in key areas of bioinformatics. In this chapter, I describe my contributions to the field of lossy compression and clustering.
+During my time at the University of Maryland, I have had the \DIFdelbegin \DIFdel{privellage }\DIFdelend \DIFaddbegin \DIFadd{privilege }\DIFaddend to work on a wide array of interesting problems in key areas of bioinformatics.
+\DIFaddbegin \DIFadd{The ever-increasing amount of sequencing data poses a challenge to commodity hardware both in terms of storage and analysis.
+}\DIFaddend In this chapter, I describe my contributions to the \DIFdelbegin \DIFdel{field }\DIFdelend \DIFaddbegin \DIFadd{fields }\DIFaddend of lossy compression and clustering.
+\DIFaddbegin \DIFadd{In Section \ref{lossy-section}, I show how that we can use lossy compression algorithms to greatly reduce the required storage for next generation sequencing data with little effect on downstream analyses.
+In Section \ref{kmulus-section}, I show how we can leverage the power of cloud computing to cluster sequencing data and speedup sequence alignment.
+I mentored two undergraduate students to complete this project.
+}\DIFaddend 
 
 \section{Lossy Compression of DNA Sequence Quality Values}
+\DIFdelbegin %DIFDELCMD < 
 
-\subsection{Abstract}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \label{lossy-section}
+\DIFaddend \subsection{Abstract}
 
 
 The \textsc{fastq} file format has become the \emph{de facto} standard
@@ -3550,7 +3619,8 @@ have additional built-in sensitivity to handle significant loss of
 information in the compressed quality values.
 \clearpage{}
 \clearpage{}\section{K-mulus: Strategies for BLAST in the Cloud}
-\subsection{Abstract}
+\DIFaddbegin \label{kmulus-section}
+\DIFaddend \subsection{Abstract}
 With the increased availability of next-generation sequencing technologies, researchers are gathering more data than they are able to process and analyze. One of the most widely performed analysis is identifying regions of similarity between DNA or protein sequences using the Basic Local Alignment Search Tool, or BLAST. Due to the large amount of sequencing data produced, parallel implementations of BLAST are needed to process the data in a timely manner.  While these implementations have been designed for those researchers with access to computing grids, recent web-based services, such as Amazon's Elastic Compute Cloud, now offer scalable, pay-as-you-go computing.  In this paper, we present K-mulus, an application that performs distributed BLAST queries via Hadoop MapReduce using a collection of established parallelization strategies. In addition, we provide a method to speedup BLAST by clustering the sequence database to reduce the search space for a given query.  Our results show that users must take into account the size of the BLAST database and memory of the underlying hardware to efficiently carry out the BLAST queries in parallel.  Finally, we show that while our database clustering and indexing approach offers a significant theoretical speedup, in practice the distribution of protein sequences prevents this potential from being realized.
 
 \subsection{Introduction}
@@ -3778,15 +3848,15 @@ The genome is the blueprint for building an organism and helps researchers bette
 Initially published in 2001, the human genome has undergone dozens of revisions over the years~\cite{monya2012}.
 Researchers fill in gaps, and correct mistakes in the sequence.
 It is not an easy task determining what parts of the genome are missing, what parts are mistakes, and what parts are due to experimental artifacts from the sequencing machine.
-The focus of this dissertation was to develop computational methods to compare and evaluate assemblies.
+\DIFaddbegin \DIFadd{This biological problem can be formulated as reconstructing a text (genome) from a collection of randomly sampled fragments with errors (sequence reads).
+}\DIFaddend The focus of this dissertation was to develop \DIFaddbegin \DIFadd{the theory and }\DIFaddend computational methods to compare and evaluate \DIFdelbegin \DIFdel{assemblies}\DIFdelend \DIFaddbegin \DIFadd{the reconstructed texts (assemblies)}\DIFaddend .
 
-By exploiting characteristics of the sequence data generation process, our LAP framework is able to reproduce evaluations conducted by assembly experts without the use of reference genomes.
-We extend our LAP framework and show that by taking into account abundances of assembled sequences we can accurately compare different metagenomic assemblies.
-Lastly, we introduce VALET, the first \emph{de novo} pipeline that flags regions in metagenomic assemblies that are statistically inconsistent with the data generation process.
+\DIFdelbegin \DIFdel{By exploiting }\DIFdelend \DIFaddbegin \DIFadd{I have developed computational tools that use }\DIFaddend characteristics of the sequence data generation process \DIFdelbegin \DIFdel{, our LAP framework is able }\DIFdelend to reproduce evaluations conducted by assembly experts without the use of reference genomes.
+\DIFdelbegin \DIFdel{We extend our LAP }\DIFdelend \DIFaddbegin \DIFadd{I extended our likelihood-based }\DIFaddend framework and show that by taking into account abundances of assembled sequences\DIFdelbegin \DIFdel{we }\DIFdelend \DIFaddbegin \DIFadd{, I }\DIFaddend can accurately compare different metagenomic assemblies.
+Lastly, \DIFdelbegin \DIFdel{we introduce }\DIFdelend \DIFaddbegin \DIFadd{I introduced }\DIFaddend VALET, the first \emph{de novo} pipeline that flags regions in metagenomic assemblies that are statistically inconsistent with the data generation process.
 VALET has detected mis-assemblies in publicly available datasets and highlights shortcomings in currently available metagenomic assemblers.
 
-By providing the computational tools for researchers to accurately evaluate their assemblies, we decrease the chance of incorrect biological conclusions and misguided future studies.
-
+By providing the computational tools for researchers to accurately evaluate their assemblies, \DIFdelbegin \DIFdel{we }\DIFdelend \DIFaddbegin \DIFadd{I }\DIFaddend decrease the chance of incorrect biological conclusions and misguided future studies.
 
 \clearpage{}
 \titleformat{\chapter}
