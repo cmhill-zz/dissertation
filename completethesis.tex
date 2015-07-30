@@ -114,7 +114,7 @@ Doctor of Philosophy \\
 \noindent Advisory Committee: \\
 Professor Mihai Pop, Chair/Advisor \\
 Professor Atif Memon \\
-Professor H\'{e}ctor Corrado Bravo \\
+Professor H\'{e}ctor Corrada Bravo \\
 Professor Michael Cummings \\
 Professor Stephen Mount, Dean$\text{'}$s Representative
 \clearpage{} 
@@ -248,7 +248,7 @@ I hope that you will continue to watch over my academic career and be proud.
 I am eternally grateful for your advice, support, and encouragement and hope to have the opportunity to pay it forward someday.
 
 I would also like to thank all of my other committee members. I will always enjoy the [often off-topic] discussions with Atif Memon who has introduced me to the world of software testing.
-I am indebted to H\'{e}ctor Corrado Bravo for increasing the focus of statistics within the Center for Bioinformatics and Computational Biology.
+I am indebted to H\'{e}ctor Corrada Bravo for increasing the focus of statistics within the Center for Bioinformatics and Computational Biology.
 I wish to thank Michael Cummings for his mentorship and allowing me to work abroad with him.
 I have built up collaborations and friendships that were made possible thanks to him.
 I am also very grateful to Stephen Mount for always being able to answer any biological question I come up with during our social hours.
@@ -257,7 +257,7 @@ I owe a great deal of thanks to countless past and present faculty and graduate 
 In particular, the majority of this dissertation was only made possible with the help of MohammadReza Ghodsi, Irina Astrovskaya, and Henry Lin.
 In addition, I owe a great deal of thanks to Sergey Koren who has been my mentor and oracle for all things related to assembly.
 Ted Gibbons has been a close friend and would always listen to me rant about the seemingly endless negative results and lack of progress.
-I would also like to thank everyone (past and present) from the labs of Mihai Pop, H\'{e}ctor Corrado Bravo, Sridhar Hannenhalli, and Steven Salzberg.
+I would also like to thank everyone (past and present) from the labs of Mihai Pop, H\'{e}ctor Corrada Bravo, Sridhar Hannenhalli, and Steven Salzberg.
 
 Finally, I must thank my friends, family, and loved ones who have supported me unconditionally throughout this adventure.
 
@@ -2491,16 +2491,16 @@ Reference-based methods rely on having a collection of, often manually curated, 
 QUAST~\cite{gurevich2013quast} is a tool that can identify mis-assemblies and structural variants when provided with a reference genome.
 QUAST leverages existing methods (Plantagora~\cite{barthelson2011plantagora},
 GeneMark.hmm~\cite{lukashin1998genemark}, GlimmerHMM~\cite{majoros2004tigrscan}) and quality metrics (GAGE~\cite{salzberg2011gage}).
-QUAST uses Plantagora’s definition of a mis-assembly,
+QUAST uses the Plantagora’s definition of a mis-assembly,
 i.e., a mis-assembly breakpoint is defined as a position in the assembled contigs where (1) the left flanking
 sequence aligns over 1kb away from right flanking sequence on the reference, or (2) the sequences overlap by
 over 1kb, or (3) the right flanking sequence aligns on opposite strands or different chromosomes.
 
 \emph{De novo} techniques for detecting mis-assemblies in single genomes rely on looking for inconsistencies between the sequence generation process and the resulting assembly.
 In other words, given a model of the sequencing process, could the sequences have been generated if the assembly was the truth (inserted into the sequencing machine)?
-Regions of the assembly that break these assumptions are signatures of potential mis-assemblies.
+Regions of the assembly that do not meet these assumptions are signatures of potential mis-assemblies.
 One assumption is that the sequence generation process is roughly uniform, i.e., sequences starting at any position have equal probability.
-Any regions of the assembly that have a large deviation in coverage may be a potential mis-assembly.
+Substantially divergent coverage may indicate mis-assembly.
 If the sequences are paired-end or mate-pair then additional constraints based on insert size can be used.
 
 Amosvalidate~\cite{amosvalidate2008} is a \emph{de novo} pipeline for detecting mis-assemblies that incorporates the above constraints.
@@ -2509,9 +2509,9 @@ REAPR determines the fragment coverage by first independently aligning the read-
 A fragment is defined as the distance from the end points of proper read-pairs (those that are determined to have correct orientation and separated by the correct distance).
 REAPR is able to find base-level errors by comparing the fragment coverage of a given base with the theoretical coverage.
 
-Since all the above tools to detect mis-assemblies were designed to work on single genomes, they do not function correctly on metagenomic assemblies.
-QUAST relies on the existence of reference genomes, which is not a given since the majority of typical metagenomic communities have no annotation available.
-Furthermore, if the \emph{correct} reference strain is not available, then QUAST maybe harmful and erroneously flag correct and biologically novel sequence as mis-assembled.
+Although all the above-mentioned tools were designed to work on single genomes, they do not function correctly on metagenomic assemblies.
+QUAST relies on the existence of reference genomes, which are simply not available for most metagenomic samples.
+Furthermore, if the \emph{correct} reference strain is not available, then QUAST may erroneously flag correct and biologically novel sequence as mis-assembled.
 The \emph{de novo} tools REAPR and amosvalidate rely on global uniform sequence coverage to flag regions.
 In previous chapters, we have shown that contigs within the metagenomic assemblers vary widely in abundances.
 Assuming uniform coverage will cause these tools to erroneously flag regions as mis-assembled.
@@ -2524,21 +2524,20 @@ VALET flags regions of the assembly based on (1) sampling depth, (2) alignabilit
 \subsection{Estimating contig abundances using $k$-mers}
 
 An important part of most metagenomic pipelines is determining the relative abundance of each contig.
-The presence of repeats between organisms of different phylogeny poses a serious problem for estimating abundances.
+The presence of repeats among different species poses a serious problem for estimating abundances.
 Short-read alignment tools such as Bowtie2 often randomly assign sequences that align equally well to multiple positions ignoring the relative abundances of the underlying contigs.
-This poses a \emph{chicken or the egg} type problem, since the sequence alignments are used to determine the contig abundances.
+This poses a \emph{chicken or the egg} type problem because the sequence alignments are used to determine the contig abundances.
 Here we solve this problem by using the uniquely alignable sequences to establish an initial contig abundance.
 Then when we encounter a sequence that can align multiple locations, we randomly assign it based on the relative abundance of the corresponding contigs.
 We update the contig abundances and repeat the above step for a given number of iterations (30 by default).
 This approach is similar in spirit to that of Sailfish~\cite{patro2014sailfish} which performs alignment-free abundance estimation of RNA-seq reads.
-It is alignment-free since it relies on the exact matches of small $k$ length substrings ($k$-mers).
 
 \subsection{Depth of coverage analysis}
 The sequencing process of randomly-sheared fragments follows a Poisson distribution~\cite{lander1988genomic}.  Regions within assembled contigs that show high variance in coverage may be potential mis-assemblies.  Areas of high and low depths of coverage could be compressed/expanded repeats, chimeric contigs, and other types of contamination.
 
-In order to find these regions of high/low coverage, we first learn the distribution of per-base coverages across a given contig.  Using this distribution, bases are marked if their coverage falls below or above a certain threshold.  We set the lower cutoff as the first quartile minus 1.5 * the interquartile range (IQR), which is the difference between the first and third quartile. 1.5 * IQR is the value used by Tukey’s box plot~\cite{mcgill1978variations}.  Regions whose coverage is greater than the third quartile plus 1.5 * IQR are marked as high coverage.
+In order to find these regions of high/low coverage, we first learn the distribution of per-base coverages across a given contig.  Using this distribution, bases are marked if their coverage falls below or above a certain threshold.  We set the lower cutoff as the first quartile minus 1.5 $\times$ the interquartile range (IQR), which is the difference between the first and third quartile. 1.5 $\times$ IQR is the value used by Tukey’s box plot~\cite{mcgill1978variations}.  Regions whose coverage is greater than the third quartile plus 1.5 $\times$ IQR are marked as high coverage.
 
-Using the per-base coverages may result in a large number of regions erroneously marked as mis-assemblies due to the inherent noisiness of the data, so we also provide a sliding window approach to smooth out the per-base coverages. The larger the window, the less regions will be marked as mis-assemblies.
+Using the per-base coverages may result in a large number of regions erroneously marked as mis-assemblies due to the inherent noisiness of the data, so we also provide a sliding window approach to smooth out the per-base coverages. The larger the window, the fewer the regions marked as mis-assemblies.
 VALET uses a window size of 300 bp by default.
 
 \subsection{Insert size consistency}
@@ -2549,7 +2548,8 @@ VALET relies on the REAPR~\cite{hunt2013reapr} pipeline to identify mate-pair in
 REAPR is designed to work with single genome assemblies, more specifically, assemblies with a global uniform coverage.  Since the contig abundances can vary drastically in metagenomic assemblies, VALET first bins contigs by similar abundances and then executes the REAPR pipeline on the binned contigs.
 
 \subsection{Identifying assembly breakpoints}
-When a read is unable to align to an assembly, there must be some explanation.
+The reads given to the assembler must be alignable to the resulting assembly.
+In practice, however, a read may fail to align for a few reasons.
 In metagenomic samples, an unaligned read can be from a rare, low coverage organism, and was never assembled with any other reads.
 A read with a large amount of errors will be unable to align within a specified similarity to the assembly.
 A read can come from a unfiltered contaminant or primer.
